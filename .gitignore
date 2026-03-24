@@ -1,0 +1,5 @@
+node_modules/
+.env
+*.local
+.claude/
+Front-End/package-lock-DESKTOP-9P48D23.json
