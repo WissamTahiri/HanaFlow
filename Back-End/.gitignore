@@ -1,2 +1,17 @@
+# Dépendances
 node_modules/
+
+# Variables d'environnement (NE JAMAIS committer)
 .env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

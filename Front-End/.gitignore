@@ -1,4 +1,19 @@
+# Dépendances
 node_modules/
+
+# Build
 dist/
+
+# Variables d'environnement (NE JAMAIS committer)
 .env
 .env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Vite cache
+.vite/
