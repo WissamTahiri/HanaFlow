@@ -25,6 +25,7 @@ const PP = lazy(() => import("./pages/PP.jsx"));
 const LoginPage = lazy(() => import("./pages/LoginPage.jsx"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage.jsx"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage.jsx"));
+const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 function App() {
   return (
@@ -65,18 +66,7 @@ function App() {
               />
 
               {/* 404 */}
-              <Route
-                path="*"
-                element={
-                  <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-white">
-                    <h1 className="text-4xl font-bold text-sapBlue">404</h1>
-                    <p className="text-lg text-gray-400">Page introuvable.</p>
-                    <a href="/" className="text-sapBlue hover:underline">
-                      Retour à l'accueil
-                    </a>
-                  </div>
-                }
-              />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </main>
