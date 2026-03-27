@@ -84,19 +84,26 @@ app.use(errorHandler);
 // ============================================================
 // Démarrage + Graceful Shutdown
 // ============================================================
-const server = app.listen(PORT, () => {
-  console.log(`[HanaFlow API] env=${NODE_ENV} port=${PORT} origins=${allowedOrigins.join(", ")}`);
-});
 
-const shutdown = (signal) => {
-  console.log(`[HanaFlow API] ${signal} reçu — arrêt gracieux en cours...`);
-  server.close(async () => {
-    await pool.end().catch(() => {});
-    console.log("[HanaFlow API] Connexions fermées. Au revoir.");
-    process.exit(0);
+// On exporte l'app pour les tests (supertest) sans démarrer le serveur
+module.exports = { app };
+
+// En production/dev, on démarre le serveur normalement
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    console.log(`[HanaFlow API] env=${NODE_ENV} port=${PORT} origins=${allowedOrigins.join(", ")}`);
   });
-  setTimeout(() => process.exit(1), 10_000);
-};
 
-process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("SIGINT", () => shutdown("SIGINT"));
+  const shutdown = (signal) => {
+    console.log(`[HanaFlow API] ${signal} reçu — arrêt gracieux en cours...`);
+    server.close(async () => {
+      await pool.end().catch(() => {});
+      console.log("[HanaFlow API] Connexions fermées. Au revoir.");
+      process.exit(0);
+    });
+    setTimeout(() => process.exit(1), 10_000);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+}

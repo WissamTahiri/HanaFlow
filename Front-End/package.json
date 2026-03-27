@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "echo \"No lint configured\"",
-    "generate:sitemap": "node scripts/generate-sitemap.cjs"
+    "generate:sitemap": "node scripts/generate-sitemap.cjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "motion": "^11.11.17",
@@ -19,10 +21,15 @@
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "jsdom": "^24.1.3",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.10",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "vitest": "^4.1.2"
   }
 }

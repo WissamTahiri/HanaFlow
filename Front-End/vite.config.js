@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
+// eslint-disable-next-line no-unused-vars
+/// <reference types="vitest" />
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -19,6 +21,13 @@ export default defineConfig({
 
   server: {
     port: 5173,
+  },
+
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/tests/setup.js",
+    css: false,
   },
 
   build: {
