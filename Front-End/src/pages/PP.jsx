@@ -161,45 +161,6 @@ const CareerBenefits = () => (
   </motion.section>
 );
 
-/* ─── Checklist ─── */
-const CHECKLIST_ITEMS = [
-  "Comprendre le rôle de PP dans une entreprise industrielle (planification & exécution).",
-  "Décrire le flux PP : MRP → Planned Order → Production Order → Confirmation → GI/GR → Settlement.",
-  "Connaître les master data clés : BOM, Routing, Work Center, Production Version.",
-  "Comprendre comment PP s'intègre avec CO-PC (coût standard, WIP, variances).",
-  "Identifier 2-3 Fiori apps clés pour un planificateur ou responsable d'atelier.",
-  "Préparer 2-3 cas de test : ordre standard, rework, sous-traitance.",
-];
-
-const PpMiniProjectChecklist = () => {
-  const [done, setDone] = useState(Array(CHECKLIST_ITEMS.length).fill(false));
-  const completedCount = done.filter(Boolean).length;
-  const progress = Math.round((completedCount / CHECKLIST_ITEMS.length) * 100);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.16 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-teal-200 dark:border-teal-800/40 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Mini-projet PP</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Prépare une mission production discrète en S/4HANA. Coche chaque compétence.</p>
-      <div className="mb-4">
-        <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1"><span>Progression</span><span>{completedCount} / {CHECKLIST_ITEMS.length} ({progress}%)</span></div>
-        <div className="h-2 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden">
-          <div className="h-full bg-teal-500 transition-all duration-300" style={{ width: `${progress}%` }} />
-        </div>
-      </div>
-      <ul className="space-y-2">
-        {CHECKLIST_ITEMS.map((item, idx) => (
-          <li key={idx} className="flex items-start gap-3">
-            <button type="button" onClick={() => setDone((prev) => { const c = [...prev]; c[idx] = !c[idx]; return c; })}
-              className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${done[idx] ? "bg-teal-500 border-teal-500 text-white" : "border-gray-300 dark:border-slate-600"}`}>
-              {done[idx] && <CheckIcon />}
-            </button>
-            <span className={`text-sm ${done[idx] ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-300"}`}>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </motion.section>
-  );
-};
 
 /* ─── Quiz ─── */
 const QUIZ_QUESTIONS = [
@@ -325,7 +286,7 @@ const PP = () => (
     <Integration />
     <S4HANAFeatures />
     <CareerBenefits />
-    <PpMiniProjectChecklist />
+
     <PpQuiz />
     <PpResources />
     <FaqAccordion />

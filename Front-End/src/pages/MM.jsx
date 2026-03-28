@@ -164,46 +164,6 @@ const CareerBenefits = () => (
   </motion.section>
 );
 
-/* ─── Checklist ─── */
-const CHECKLIST_ITEMS = [
-  "Expliquer les 5 étapes du P2P dans tes mots (PR, PO, GR, Invoice, Payment).",
-  "Décrire l'impact de chaque étape sur les stocks et la comptabilité FI.",
-  "Connaître les t-codes principaux : ME51N, ME21N, MIGO, MIRO, FBL1N.",
-  "Documenter un scénario P2P complet pour un achat de matière première.",
-  "Comprendre le rôle du compte GR/IR et savoir l'expliquer au contrôleur.",
-  "Identifier les principaux risques P2P (prix erronés, doublons de factures, retards GR).",
-  "Préparer 3 cas de test P2P (PO standard, service, facture sans PO).",
-];
-
-const MmMiniProjectChecklist = () => {
-  const [done, setDone] = useState(Array(CHECKLIST_ITEMS.length).fill(false));
-  const completedCount = done.filter(Boolean).length;
-  const progress = Math.round((completedCount / CHECKLIST_ITEMS.length) * 100);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.16 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-orange-200 dark:border-orange-800/40 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Mini-projet MM</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Prépare une mission P2P en S/4HANA. Coche chaque compétence.</p>
-      <div className="mb-4">
-        <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1"><span>Progression</span><span>{completedCount} / {CHECKLIST_ITEMS.length} ({progress}%)</span></div>
-        <div className="h-2 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden">
-          <div className="h-full bg-orange-400 transition-all duration-300" style={{ width: `${progress}%` }} />
-        </div>
-      </div>
-      <ul className="space-y-2">
-        {CHECKLIST_ITEMS.map((item, idx) => (
-          <li key={idx} className="flex items-start gap-3">
-            <button type="button" onClick={() => setDone((prev) => { const c = [...prev]; c[idx] = !c[idx]; return c; })}
-              className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${done[idx] ? "bg-orange-400 border-orange-400 text-white" : "border-gray-300 dark:border-slate-600"}`}>
-              {done[idx] && <CheckIcon />}
-            </button>
-            <span className={`text-sm ${done[idx] ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-300"}`}>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </motion.section>
-  );
-};
 
 /* ─── Quiz ─── */
 const QUIZ_QUESTIONS = [
@@ -330,7 +290,7 @@ const MM = () => (
     <Integration />
     <S4HANAFeatures />
     <CareerBenefits />
-    <MmMiniProjectChecklist />
+
     <MmQuiz />
     <MmResources />
     <FaqAccordion />

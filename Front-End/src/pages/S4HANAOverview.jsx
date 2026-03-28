@@ -111,16 +111,6 @@ const careerBenefits = [
   },
 ];
 
-const checklistItems = [
-  "Comprendre la différence entre SAP HANA (BDD) et S/4HANA (ERP)",
-  "Identifier les tables clés simplifiées : ACDOCA, MATDOC, ACDOCP",
-  "Comprendre le rôle de Fiori Launchpad dans l'expérience utilisateur",
-  "Distinguer les 3 stratégies de migration : Greenfield, Brownfield, Bluefield",
-  "Connaître les 5 phases SAP Activate : Discover, Prepare, Explore, Realize, Deploy",
-  "Comprendre RISE with SAP et ses composantes (S/4HANA Cloud, BTP, services)",
-  "Savoir expliquer l'Universal Journal (ACDOCA) à un client FI/CO",
-  "Lire un scope item S/4HANA dans le Best Practices Explorer de SAP",
-];
 
 const quizQuestions = [
   {
@@ -380,9 +370,6 @@ const FaqAccordion = () => {
 /* ─── Page principale ─────────────────────────────────── */
 
 const S4HANAOverview = () => {
-  const [checked, setChecked] = useState({});
-  const doneCount = Object.values(checked).filter(Boolean).length;
-
   return (
     <PageLayout
       label="S/4HANA"
@@ -626,38 +613,6 @@ const S4HANAOverview = () => {
         </div>
       </Section>
 
-      {/* Checklist */}
-      <Section title="Mini-projet – Ce que tu dois maîtriser">
-        <div className="space-y-2 mb-4">
-          {checklistItems.map((item, i) => (
-            <label
-              key={i}
-              className="flex items-start gap-3 p-3 rounded-xl cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-            >
-              <input
-                type="checkbox"
-                checked={!!checked[i]}
-                onChange={() => setChecked((p) => ({ ...p, [i]: !p[i] }))}
-                className="mt-0.5 accent-indigo-600"
-              />
-              <span className={`text-sm ${checked[i] ? "line-through text-slate-400" : "text-slate-700 dark:text-slate-300"}`}>
-                {item}
-              </span>
-            </label>
-          ))}
-        </div>
-        <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-          <motion.div
-            className="h-full rounded-full bg-indigo-500"
-            animate={{ width: `${(doneCount / checklistItems.length) * 100}%` }}
-            transition={{ duration: 0.4 }}
-          />
-        </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          {doneCount} / {checklistItems.length} complétés
-          {doneCount === checklistItems.length && " — Tu maîtrises S/4HANA !"}
-        </p>
-      </Section>
 
       {/* Quiz */}
       <S4Quiz />

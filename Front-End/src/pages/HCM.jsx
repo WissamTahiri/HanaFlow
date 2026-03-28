@@ -148,45 +148,6 @@ const CareerBenefits = () => (
   </motion.section>
 );
 
-/* ─── Checklist ─── */
-const CHECKLIST_ITEMS = [
-  "Expliquer la différence PA / OM à un RH ou un manager non-SAP.",
-  "Comprendre les concepts de base Time Management (horaires, absences, quotas).",
-  "Décrire le flux Time → Payroll (Time Evaluation, wage types).",
-  "Connaître les grandes briques SuccessFactors et la stratégie SAP HCM.",
-  "Identifier 2-3 cas d'usage Joule dans SuccessFactors (explain my pay, analytics RH).",
-  "Préparer 3 cas de test HCM : changement d'organisation, absence, erreur de paie.",
-];
-
-const HcmMiniProjectChecklist = () => {
-  const [done, setDone] = useState(Array(CHECKLIST_ITEMS.length).fill(false));
-  const completedCount = done.filter(Boolean).length;
-  const progress = Math.round((completedCount / CHECKLIST_ITEMS.length) * 100);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-red-200 dark:border-red-800/40 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Mini-projet HCM</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Structure ton apprentissage HCM / SuccessFactors pour une première mission.</p>
-      <div className="mb-4">
-        <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1"><span>Progression</span><span>{completedCount} / {CHECKLIST_ITEMS.length} ({progress}%)</span></div>
-        <div className="h-2 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden">
-          <div className="h-full bg-red-500 transition-all duration-300" style={{ width: `${progress}%` }} />
-        </div>
-      </div>
-      <ul className="space-y-2">
-        {CHECKLIST_ITEMS.map((item, idx) => (
-          <li key={idx} className="flex items-start gap-3">
-            <button type="button" onClick={() => setDone((prev) => { const c = [...prev]; c[idx] = !c[idx]; return c; })}
-              className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${done[idx] ? "bg-red-500 border-red-500 text-white" : "border-gray-300 dark:border-slate-600"}`}>
-              {done[idx] && <CheckIcon />}
-            </button>
-            <span className={`text-sm ${done[idx] ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-300"}`}>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </motion.section>
-  );
-};
 
 /* ─── Quiz ─── */
 const QUIZ_QUESTIONS = [
@@ -311,7 +272,7 @@ const HCM = () => (
     <TimePayrollSection />
     <SuccessFactorsSection />
     <CareerBenefits />
-    <HcmMiniProjectChecklist />
+
     <HcmQuiz />
     <HcmResources />
     <FaqAccordion />
