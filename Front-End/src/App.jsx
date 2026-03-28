@@ -1,5 +1,8 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useProgress } from "./hooks/useProgress.js";
+import { useAuth } from "./context/AuthContext.jsx";
 
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PageLoader from "./components/PageLoader.jsx";
@@ -21,11 +24,22 @@ const SD = lazy(() => import("./pages/SD.jsx"));
 const HCM = lazy(() => import("./pages/HCM.jsx"));
 const PP = lazy(() => import("./pages/PP.jsx"));
 
-// --- Lazy loading — Authentification ---
+// --- Lazy loading — Authentification & Profil ---
 const LoginPage = lazy(() => import("./pages/LoginPage.jsx"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage.jsx"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage.jsx"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
+
+// Wrapper qui marque un module SAP comme visité dès que la page est affichée
+const ModuleTracker = ({ module, children }) => {
+  const { isAuthenticated } = useAuth();
+  const { markVisited } = useProgress();
+  useEffect(() => {
+    if (isAuthenticated) markVisited(module);
+  }, [module, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+  return children;
+};
 
 function App() {
   return (
@@ -43,13 +57,13 @@ function App() {
               <Route path="/processus-metier" element={<ProcessusMetier />} />
               <Route path="/roadmap" element={<Roadmap />} />
 
-              {/* Modules SAP détaillés */}
-              <Route path="/modules-sap/fi" element={<FI />} />
-              <Route path="/modules-sap/co" element={<CO />} />
-              <Route path="/modules-sap/mm" element={<MM />} />
-              <Route path="/modules-sap/sd" element={<SD />} />
-              <Route path="/modules-sap/hcm" element={<HCM />} />
-              <Route path="/modules-sap/pp" element={<PP />} />
+              {/* Modules SAP — tracking automatique de progression */}
+              <Route path="/modules-sap/fi"  element={<ModuleTracker module="fi"><FI /></ModuleTracker>} />
+              <Route path="/modules-sap/co"  element={<ModuleTracker module="co"><CO /></ModuleTracker>} />
+              <Route path="/modules-sap/mm"  element={<ModuleTracker module="mm"><MM /></ModuleTracker>} />
+              <Route path="/modules-sap/sd"  element={<ModuleTracker module="sd"><SD /></ModuleTracker>} />
+              <Route path="/modules-sap/hcm" element={<ModuleTracker module="hcm"><HCM /></ModuleTracker>} />
+              <Route path="/modules-sap/pp"  element={<ModuleTracker module="pp"><PP /></ModuleTracker>} />
 
               {/* Authentification */}
               <Route path="/login" element={<LoginPage />} />
@@ -58,11 +72,11 @@ function App() {
               {/* Zone protégée */}
               <Route
                 path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                }
+                element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}
+              />
+              <Route
+                path="/profil"
+                element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
               />
 
               {/* 404 */}

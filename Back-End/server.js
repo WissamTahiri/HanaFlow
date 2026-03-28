@@ -7,6 +7,7 @@ const morgan = require("morgan");
 const pool = require("./db/pool");
 
 const authRoutes = require("./routes/auth");
+const progressRoutes = require("./routes/progress");
 const errorHandler = require("./middleware/errorHandler");
 
 // ============================================================
@@ -75,6 +76,9 @@ app.get("/", (req, res) => {
 
 // Routes d'authentification
 app.use("/auth", authRoutes);
+
+// Routes de progression
+app.use("/progress", progressRoutes);
 
 // ============================================================
 // Gestion des erreurs (doit être en dernier)
