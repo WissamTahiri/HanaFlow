@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "motion/react";
 import { useProgress } from "./hooks/useProgress.js";
 import { useAuth } from "./context/AuthContext.jsx";
 
@@ -7,6 +8,7 @@ import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PageLoader from "./components/PageLoader.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 // --- Lazy loading — Pages publiques ---
 const Home             = lazy(() => import("./pages/Home.jsx"));
@@ -42,14 +44,25 @@ const ModuleTracker = ({ module, children }) => {
   return children;
 };
 
-function App() {
-  return (
-    <Router>
-      <div className="min-h-screen flex flex-col bg-white dark:bg-sapDark">
-        <Navbar />
+// AppInner is inside Router so it can call useLocation for page transitions
+function AppInner() {
+  const location = useLocation();
 
-        {/* pt-16 pour compenser la navbar fixe (h-16) */}
-        <main className="flex-1 pt-16">
+  return (
+    <div className="min-h-screen flex flex-col bg-white dark:bg-sapDark">
+      <ScrollToTop />
+      <Navbar />
+
+      {/* pt-16 pour compenser la navbar fixe (h-16) */}
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location.pathname}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.18 }}
+          className="flex-1 pt-16"
+        >
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Pages principales */}
@@ -81,10 +94,18 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
-        </main>
+        </motion.main>
+      </AnimatePresence>
 
-        <Footer />
-      </div>
+      <Footer />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppInner />
     </Router>
   );
 }
