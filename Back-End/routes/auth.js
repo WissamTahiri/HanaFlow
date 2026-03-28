@@ -1,13 +1,12 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
+const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const { body } = require("express-validator");
+const { z } = require("zod");
 const rateLimit = require("express-rate-limit");
 
 const pool = require("../db/pool");
 const authMiddleware = require("../middleware/auth");
-const validate = require("../middleware/validate");
 
 const router = express.Router();
 
@@ -17,7 +16,7 @@ const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 const IS_PROD = process.env.NODE_ENV === "production";
 
 // ============================================================
-// Rate limiting
+// Rate limiting — authentification (brute force protection)
 // ============================================================
 const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000;
 const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX) || 15;
@@ -31,31 +30,53 @@ const authLimiter = rateLimit({
 });
 
 // ============================================================
-// Règles de validation
+// Schémas Zod — validation stricte des entrées
 // ============================================================
-const registerRules = [
-  body("name").trim().notEmpty().withMessage("Le nom est requis").isLength({ max: 100 }),
-  body("email").trim().isEmail().withMessage("Email invalide").normalizeEmail(),
-  body("password").isLength({ min: 8 }).withMessage("Mot de passe : 8 caractères minimum"),
-];
+const nameField = z.string().trim().min(1, "Le nom est requis").max(100, "Nom trop long");
 
-const loginRules = [
-  body("email").trim().isEmail().withMessage("Email invalide").normalizeEmail(),
-  body("password").notEmpty().withMessage("Mot de passe requis"),
-];
+const emailField = z
+  .string()
+  .trim()
+  .email("Email invalide")
+  .max(255, "Email trop long")
+  .transform((v) => v.toLowerCase());
 
-const profileRules = [
-  body("name")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Le nom ne peut pas être vide")
-    .isLength({ max: 100 }),
-  body("password")
-    .optional()
-    .isLength({ min: 8 })
-    .withMessage("Nouveau mot de passe : 8 caractères minimum"),
-];
+// Mot de passe : 8 chars min, au moins 1 lettre et 1 chiffre
+const passwordField = z
+  .string()
+  .min(8, "Mot de passe : 8 caractères minimum")
+  .max(128, "Mot de passe trop long")
+  .regex(/[a-zA-Z]/, "Le mot de passe doit contenir au moins une lettre")
+  .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre");
+
+const registerSchema = z.object({
+  name: nameField,
+  email: emailField,
+  password: passwordField,
+});
+
+const loginSchema = z.object({
+  email: emailField,
+  password: z.string().min(1, "Mot de passe requis"),
+});
+
+const profileSchema = z
+  .object({
+    name: nameField.optional(),
+    password: passwordField.optional(),
+  })
+  .refine((d) => d.name || d.password, { message: "Rien à mettre à jour" });
+
+// Middleware Zod générique
+const validateBody = (schema) => (req, res, next) => {
+  const result = schema.safeParse(req.body);
+  if (!result.success) {
+    const msg = result.error.issues[0]?.message || "Données invalides";
+    return res.status(400).json({ message: msg });
+  }
+  req.body = result.data; // remplace req.body par les données transformées/nettoyées
+  next();
+};
 
 // ============================================================
 // Helpers — Tokens
@@ -83,10 +104,11 @@ const saveRefreshToken = async (userId, rawToken) => {
   );
 };
 
+// Options cookie refresh token
 const cookieOptions = {
-  httpOnly: true,
-  secure: IS_PROD,
-  sameSite: IS_PROD ? "none" : "lax",
+  httpOnly: true,                          // Inaccessible depuis JS (protection XSS)
+  secure: IS_PROD,                         // HTTPS uniquement en production
+  sameSite: IS_PROD ? "none" : "lax",      // Cross-site pour Vercel ↔ Render
   maxAge: parseRefreshExpiry(JWT_REFRESH_EXPIRES_IN),
   path: "/",
 };
@@ -96,7 +118,7 @@ const cookieOptions = {
 // ============================================================
 
 // POST /auth/register
-router.post("/register", authLimiter, registerRules, validate, async (req, res, next) => {
+router.post("/register", authLimiter, validateBody(registerSchema), async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -105,7 +127,8 @@ router.post("/register", authLimiter, registerRules, validate, async (req, res, 
       return res.status(400).json({ message: "Email déjà utilisé" });
     }
 
-    const password_hash = await bcrypt.hash(password, 10);
+    // Argon2id : algorithme recommandé 2024 (gagnant du Password Hashing Competition)
+    const password_hash = await argon2.hash(password, { type: argon2.argon2id });
     const result = await pool.query(
       "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, role",
       [name, email, password_hash]
@@ -124,14 +147,16 @@ router.post("/register", authLimiter, registerRules, validate, async (req, res, 
 });
 
 // POST /auth/login
-router.post("/login", authLimiter, loginRules, validate, async (req, res, next) => {
+router.post("/login", authLimiter, validateBody(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
     const user = result.rows[0];
 
-    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+    // Même message pour email inexistant et mauvais mdp (évite l'énumération d'emails)
+    const validPassword = user && (await argon2.verify(user.password_hash, password));
+    if (!user || !validPassword) {
       return res.status(400).json({ message: "Identifiants invalides" });
     }
 
@@ -170,6 +195,7 @@ router.post("/refresh", async (req, res, next) => {
       return res.status(401).json({ message: "Refresh token invalide ou expiré" });
     }
 
+    // Rotation : suppression de l'ancien, création d'un nouveau
     await pool.query("DELETE FROM refresh_tokens WHERE token_hash = $1", [hash]);
 
     const user = { id: row.uid, name: row.name, email: row.email, role: row.role };
@@ -215,13 +241,9 @@ router.get("/me", authMiddleware, async (req, res, next) => {
 });
 
 // PATCH /auth/profile
-router.patch("/profile", authMiddleware, profileRules, validate, async (req, res, next) => {
+router.patch("/profile", authMiddleware, validateBody(profileSchema), async (req, res, next) => {
   try {
     const { name, password } = req.body;
-    if (!name && !password) {
-      return res.status(400).json({ message: "Rien à mettre à jour" });
-    }
-
     const updates = [];
     const values = [];
     let idx = 1;
@@ -229,7 +251,7 @@ router.patch("/profile", authMiddleware, profileRules, validate, async (req, res
     if (name) { updates.push(`name = $${idx++}`); values.push(name); }
     if (password) {
       updates.push(`password_hash = $${idx++}`);
-      values.push(await bcrypt.hash(password, 10));
+      values.push(await argon2.hash(password, { type: argon2.argon2id }));
     }
 
     values.push(req.user.id);

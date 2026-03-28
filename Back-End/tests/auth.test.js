@@ -1,5 +1,5 @@
 const request = require("supertest");
-const bcrypt = require("bcryptjs");
+const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 
 // --- Mock de la base de données ---
@@ -12,8 +12,12 @@ jest.mock("../db/pool", () => ({
 const pool = require("../db/pool");
 const { app } = require("../server");
 
-// Utilitaire : génère un vrai hash bcrypt pour les tests
-const makeHash = (pw) => bcrypt.hashSync(pw, 1); // cost=1 pour la vitesse en tests
+// Utilitaire : génère un vrai hash argon2id pour les tests
+// (mémorisé dans beforeAll pour éviter le coût à chaque test)
+let testPasswordHash;
+beforeAll(async () => {
+  testPasswordHash = await argon2.hash("motdepasse123", { type: argon2.argon2id });
+});
 
 // Utilitaire : génère un token JWT de test valide
 const makeToken = (payload) =>
@@ -100,7 +104,7 @@ describe("POST /auth/register", () => {
 // ============================================================
 describe("POST /auth/login", () => {
   it("connecte un utilisateur avec les bons identifiants", async () => {
-    const hash = makeHash("motdepasse123");
+    const hash = testPasswordHash;
     pool.query
       .mockResolvedValueOnce({
         rows: [{ id: 1, name: "Wissam", email: "w@test.com", role: "student", password_hash: hash }],
@@ -118,7 +122,7 @@ describe("POST /auth/login", () => {
   });
 
   it("rejette un mauvais mot de passe", async () => {
-    const hash = makeHash("motdepasse123");
+    const hash = testPasswordHash;
     pool.query.mockResolvedValueOnce({
       rows: [{ id: 1, email: "w@test.com", password_hash: hash }],
     });

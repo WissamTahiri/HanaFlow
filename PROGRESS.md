@@ -5,8 +5,8 @@
 ---
 
 ## État Global
-- **Étapes complétées** : 8/12
-- **Prochaine étape** : Étape 9 — SEO et page 404
+- **Étapes complétées** : 11/12
+- **Prochaine étape** : Étape 12 — Documentation et déploiement final
 
 ---
 
@@ -141,7 +141,7 @@
 ---
 
 ## Étape 9 : SEO et accessibilité frontend
-**[ ] Statut : Non commencée**
+**[✓] Statut : Complétée**
 
 **Description :** Installer `react-helmet-async` pour les meta tags dynamiques. Créer un composant `SEO.jsx` utilisé sur chaque page. Vérifier que le sitemap est correct. Ajouter une page 404 custom.
 
@@ -157,7 +157,7 @@
 ---
 
 ## Étape 10 : Ajouter les tests
-**[ ] Statut : Non commencée**
+**[✓] Statut : Complétée**
 
 **Description :** Configurer Vitest pour le frontend et Jest + Supertest pour le backend. Écrire des tests essentiels pour l'authentification et les composants critiques.
 
@@ -173,7 +173,7 @@
 ---
 
 ## Étape 11 : Fonctionnalités manquantes prioritaires
-**[ ] Statut : Non commencée**
+**[✓] Statut : Complétée**
 
 **Description :** Implémenter les fonctionnalités clés qui font d'une plateforme éducative une vraie application : progression de l'utilisateur, favoris, page dashboard enrichie.
 
