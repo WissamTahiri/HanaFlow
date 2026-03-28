@@ -185,11 +185,6 @@ const AIJoule = () => {
           </li>
         </ul>
 
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Plus tard, on pourra ajouter sur HanaFlow une section pratique
-          “Prompts Joule” par module (FI, MM, SD) pour t’entraîner à poser les
-          bonnes questions en contexte projet.
-        </p>
       </div>
     </section>
   );

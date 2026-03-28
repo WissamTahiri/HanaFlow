@@ -284,8 +284,7 @@ const Roadmap = () => {
             2. Type de profil cible
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mb-2">
-            Choisis l’orientation qui te correspond le plus aujourd’hui (tu
-            pourras en explorer d’autres plus tard).
+            Choisis l’orientation qui te correspond le plus aujourd’hui.
           </p>
 
           <div className="grid sm:grid-cols-2 gap-3">

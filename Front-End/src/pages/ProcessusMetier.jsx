@@ -5,8 +5,7 @@ const MermaidBlock = ({ title, code }) => {
     <div className="mt-6 border border-sapBlue/20 rounded-2xl p-4 sm:p-5 bg-sapGrayLight/60 dark:bg-slate-800">
       <h3 className="text-base font-semibold mb-2">{title}</h3>
       <p className="text-xs text-slate-600 dark:text-slate-300 mb-2">
-        Schéma Mermaid simplifié du flux. Tu pourras l&apos;intégrer avec un
-        renderer Mermaid plus tard.
+        Schéma Mermaid simplifié du flux.
       </p>
       <pre className="text-[11px] sm:text-xs bg-slate-900 text-slate-100 rounded-xl p-3 overflow-x-auto">
         {code}

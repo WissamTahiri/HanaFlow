@@ -13,7 +13,7 @@ const DEFAULT_IMAGE = `${SITE_URL}/icons/icon-512.png`;
  * <SEO title="Module FI" description="Apprenez la comptabilité SAP FI..." />
  */
 const SEO = ({ title, description, path = "", image }) => {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
+  const fullTitle = title && title !== SITE_NAME ? `${title} | ${SITE_NAME}` : SITE_NAME;
   const desc = description || DEFAULT_DESC;
   const canonical = `${SITE_URL}${path}`;
   const ogImage = image || DEFAULT_IMAGE;

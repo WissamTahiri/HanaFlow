@@ -12,7 +12,7 @@ Suivi de la refonte UI/UX. Mis à jour à chaque composant ou page redesigné.
 | 1 — Foundation | Design system, tokens, typo | ✅ Complété |
 | 2 — Composants core | Navbar, Footer, DarkMode, Loader | ✅ Complété |
 | 3 — Pages principales | Home, Modules, Login, Register, Dashboard, 404 | ✅ Complété |
-| 4 — Pages contenu | About, S4HANA, AIJoule, Processus, Roadmap | ⏳ À faire |
+| 4 — Pages contenu | About, S4HANA, AIJoule, Processus, Roadmap | ⏳ En cours |
 | 5 — Micro-interactions | Animations avancées, transitions de pages | ⏳ À faire |
 | 6 — Polish | Tests responsive, cross-browser, accessibilité | ⏳ À faire |
 
