@@ -1,15 +1,112 @@
-﻿@tailwind base;
+/* ============================================================
+   HanaFlow — Design System
+   ============================================================ */
+
+/* Inter font via Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light dark;
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  :root {
+    color-scheme: light dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased bg-white dark:bg-sapDark text-slate-900 dark:text-slate-100;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sapBlue rounded-sm;
+  }
+
+  /* Smooth color transitions on dark mode toggle */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+  }
+
+  /* Disable color transitions on interactive elements (use Tailwind instead) */
+  a, button, input, select, textarea, [role="button"] {
+    transition-property: all;
+    transition-duration: 150ms;
+  }
 }
 
-body {
-  @apply font-sans antialiased;
+/* ============================================================
+   Components
+   ============================================================ */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+           select-none whitespace-nowrap;
+  }
+
+  .btn-primary {
+    @apply btn px-5 py-2.5 text-sm bg-sapBlue text-white
+           hover:bg-sapBlueDark shadow-soft active:scale-[0.98];
+  }
+
+  .btn-outline {
+    @apply btn px-5 py-2.5 text-sm border-2 border-sapBlue text-sapBlue
+           hover:bg-sapBlue hover:text-white active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn px-4 py-2 text-sm text-slate-600 dark:text-slate-300
+           hover:bg-slate-100 dark:hover:bg-slate-800;
+  }
+
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-2xl border border-gray-100
+           dark:border-slate-700 shadow-card;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600
+           bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm
+           placeholder:text-slate-400 dark:placeholder:text-slate-500
+           focus:outline-none focus:ring-2 focus:ring-sapBlue/40 focus:border-sapBlue;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5;
+  }
+
+  .badge-blue {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs
+           font-medium bg-sapBlue/10 text-sapBlue dark:bg-sapBlue/20;
+  }
+
+  .section-title {
+    @apply text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white;
+  }
 }
 
-a {
-  @apply text-sapBlue hover:text-sapBlueDark transition-colors;
+/* ============================================================
+   Utilities
+   ============================================================ */
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #0F52BA, #0EA5E9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }

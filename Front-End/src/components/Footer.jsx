@@ -1,71 +1,165 @@
-﻿import React from "react";
 import { Link } from "react-router-dom";
 
-const Footer = () => {
-  return (
-    <footer className="mt-10 border-t border-sapBlue/10 bg-sapGrayLight/70 dark:bg-slate-950">
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-        {/* Bloc gauche : identité */}
-        <div>
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-            HanaFlow – Portfolio SAP S/4HANA
-          </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Par Wissam Tahiri – futur consultant SAP S/4HANA (FI/MM/SD/CO + IA &
-            Joule).
-          </p>
-        </div>
+const LinkedInIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+    <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+  </svg>
+);
 
-        {/* Bloc centre : liens rapides */}
-        <div className="flex flex-wrap gap-3 text-xs text-slate-600 dark:text-slate-300">
-          <Link to="/" className="hover:text-sapBlue">
-            Accueil
-          </Link>
-          <Link to="/modules" className="hover:text-sapBlue">
-            Modules SAP
-          </Link>
-          <Link to="/processus-metier" className="hover:text-sapBlue">
-            Processus métier
-          </Link>
-          <Link to="/roadmap" className="hover:text-sapBlue">
-            Roadmap
-          </Link>
-          <Link to="/a-propos" className="hover:text-sapBlue">
-            À propos
-          </Link>
-        </div>
+const GitHubIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  </svg>
+);
 
-        {/* Bloc droite : contact / réseaux (remplace par tes vrais liens plus tard) */}
-        <div className="text-xs text-slate-600 dark:text-slate-300">
-          <p className="mb-1">Me contacter :</p>
-          <div className="flex flex-wrap gap-3">
-            <a
-              href="mailto:wisstahiri91@gmail.com"
-              className="hover:text-sapBlue"
-            >
-              Email
-            </a>
+const MailIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+    <polyline points="22,6 12,13 2,6"/>
+  </svg>
+);
+
+const courses = [
+  { to: "/modules-sap/fi",  label: "FI — Finance" },
+  { to: "/modules-sap/co",  label: "CO — Controlling" },
+  { to: "/modules-sap/mm",  label: "MM — Achats" },
+  { to: "/modules-sap/sd",  label: "SD — Ventes" },
+  { to: "/modules-sap/hcm", label: "HCM — RH" },
+  { to: "/modules-sap/pp",  label: "PP — Production" },
+];
+
+const platform = [
+  { to: "/",                 label: "Accueil" },
+  { to: "/modules-sap",      label: "Vue des modules" },
+  { to: "/s4hana",           label: "S/4HANA" },
+  { to: "/ai-joule",         label: "IA & Joule" },
+  { to: "/processus-metier", label: "Processus métier" },
+  { to: "/roadmap",          label: "Roadmap consultant" },
+];
+
+const Footer = () => (
+  <footer className="bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-8">
+
+      {/* Grille principale */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+
+        {/* Branding */}
+        <div className="lg:col-span-1">
+          <Link to="/" className="flex items-center gap-2.5 mb-4">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-sapBlue to-sapBlueDark
+                            flex items-center justify-center text-[11px] font-bold text-white shadow-soft">
+              HF
+            </div>
+            <span className="text-base font-bold text-slate-900 dark:text-white">HanaFlow</span>
+          </Link>
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+            Master SAP Learning Platform — la référence pour apprendre SAP S/4HANA et se préparer à une carrière de consultant.
+          </p>
+          <div className="flex items-center gap-3">
             <a
               href="https://www.linkedin.com/in/wissam-tahiri-730a47326"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-sapBlue"
+              aria-label="LinkedIn de Wissam Tahiri"
+              className="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800
+                         text-slate-500 hover:bg-sapBlue hover:text-white dark:hover:bg-sapBlue
+                         transition-all duration-150"
             >
-              LinkedIn
+              <LinkedInIcon />
             </a>
             <a
               href="https://github.com/WissamTahiri"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-sapBlue"
+              aria-label="GitHub de Wissam Tahiri"
+              className="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800
+                         text-slate-500 hover:bg-slate-800 hover:text-white dark:hover:bg-slate-700
+                         transition-all duration-150"
             >
-              GitHub
+              <GitHubIcon />
+            </a>
+            <a
+              href="mailto:wisstahiri91@gmail.com"
+              aria-label="Envoyer un email"
+              className="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800
+                         text-slate-500 hover:bg-sapBlue hover:text-white dark:hover:bg-sapBlue
+                         transition-all duration-150"
+            >
+              <MailIcon />
             </a>
           </div>
         </div>
+
+        {/* Plateforme */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">
+            Plateforme
+          </h3>
+          <ul className="space-y-2.5">
+            {platform.map(({ to, label }) => (
+              <li key={to}>
+                <Link to={to} className="text-sm text-slate-500 dark:text-slate-400 hover:text-sapBlue dark:hover:text-sapAccent transition-colors">
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Modules SAP */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">
+            Modules SAP
+          </h3>
+          <ul className="space-y-2.5">
+            {courses.map(({ to, label }) => (
+              <li key={to}>
+                <Link to={to} className="text-sm text-slate-500 dark:text-slate-400 hover:text-sapBlue dark:hover:text-sapAccent transition-colors">
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* À propos */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">
+            À propos
+          </h3>
+          <ul className="space-y-2.5">
+            <li>
+              <Link to="/a-propos" className="text-sm text-slate-500 dark:text-slate-400 hover:text-sapBlue dark:hover:text-sapAccent transition-colors">
+                Le projet
+              </Link>
+            </li>
+            <li>
+              <Link to="/register" className="text-sm text-slate-500 dark:text-slate-400 hover:text-sapBlue dark:hover:text-sapAccent transition-colors">
+                S'inscrire gratuitement
+              </Link>
+            </li>
+            <li>
+              <Link to="/login" className="text-sm text-slate-500 dark:text-slate-400 hover:text-sapBlue dark:hover:text-sapAccent transition-colors">
+                Se connecter
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
-    </footer>
-  );
-};
+
+      {/* Bas du footer */}
+      <div className="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          © {new Date().getFullYear()} HanaFlow — Par Wissam Tahiri.
+        </p>
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          Plateforme éducative SAP · Non affilié à SAP SE
+        </p>
+      </div>
+    </div>
+  </footer>
+);
 
 export default Footer;

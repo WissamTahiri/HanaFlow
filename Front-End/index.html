@@ -1,41 +1,41 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <title>HanaFlow | Wissam Tahiri – SAP S/4HANA Finance & ERP Learning</title>
+    <title>HanaFlow</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- SEO de base -->
-    <meta
-      name="description"
-      content="HanaFlow, la plateforme SAP de Wissam Tahiri (ESGI, Paris) pour apprendre S/4HANA, FI/CO, MM, SD et préparer une carrière de consultant SAP."
-    />
-    <meta
-      name="keywords"
-      content="HanaFlow, SAP, S/4HANA, FI, CO, MM, SD, consultant SAP, ESGI, Paris"
-    />
+    <meta name="description" content="HanaFlow — Master SAP Learning Platform. Apprends les modules FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium." />
     <meta name="author" content="Wissam Tahiri" />
 
-    <!-- Open Graph basique -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="HanaFlow | Plateforme SAP de Wissam Tahiri"
-    />
-    <meta
-      property="og:description"
-      content="HanaFlow : ressources complètes SAP pour consultants juniors, modules fonctionnels, S/4HANA, carrière et certifications."
-    />
-    <meta property="og:url" content="https://hanaflow.vercel.app" />
+    <meta property="og:title" content="HanaFlow" />
+    <meta property="og:description" content="Master SAP Learning Platform — FI, CO, MM, SD, HCM, PP et S/4HANA." />
+    <meta property="og:url" content="https://hana-flow.vercel.app" />
     <meta property="og:image" content="/icons/icon-512.png" />
 
-    <!-- PWA (manifest à ajouter plus tard) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="theme-color" content="#0F52BA" />
+
+    <!-- Préchargement de la police Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Anti-flash dark mode : applique la classe "dark" avant le premier rendu -->
+    <script>
+      (function () {
+        try {
+          var pref = localStorage.getItem("hanaflow-theme");
+          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (pref === "dark" || (!pref && prefersDark)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
-
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

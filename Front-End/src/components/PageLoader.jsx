@@ -1,8 +1,21 @@
 const PageLoader = () => (
-  <div className="min-h-[60vh] flex items-center justify-center">
-    <div className="flex flex-col items-center gap-3">
-      <div className="w-10 h-10 border-4 border-sapBlue border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm text-gray-400">Chargement...</p>
+  <div
+    className="min-h-[calc(100vh-4rem)] flex items-center justify-center"
+    role="status"
+    aria-label="Chargement en cours"
+  >
+    <div className="flex flex-col items-center gap-4">
+      <div className="relative h-12 w-12">
+        <div className="absolute inset-0 rounded-full border-4 border-sapBlue/20" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-sapBlue animate-spin" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-sapBlue to-sapBlueDark
+                        flex items-center justify-center text-[9px] font-bold text-white">
+          HF
+        </div>
+        <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">HanaFlow</span>
+      </div>
     </div>
   </div>
 );
