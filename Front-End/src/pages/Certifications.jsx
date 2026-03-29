@@ -40,9 +40,9 @@ const certifications = [
     questions: 80,
     duration: 180,
     chapters: 7,
-    available: false,
-    color: "from-orange-600 to-orange-800",
-    accent: "bg-orange-600",
+    available: true,
+    color: "from-emerald-600 to-emerald-800",
+    accent: "bg-emerald-600",
     path: "/certifications/mm",
   },
   {
