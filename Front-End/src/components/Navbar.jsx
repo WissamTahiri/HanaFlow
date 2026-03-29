@@ -216,6 +216,14 @@ const Navbar = () => {
                     >
                       Mon profil
                     </Link>
+                    <Link
+                      to="/achievements"
+                      onClick={() => { setOpenUser(false); handleNavClick(); }}
+                      className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm
+                                 text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800"
+                    >
+                      🏅 Achievements
+                    </Link>
                     <hr className="my-1 border-gray-100 dark:border-slate-700" />
                     <button
                       onClick={handleLogout}

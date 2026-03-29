@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { mmMockExamQuestions, mmCertification } from "../data/certifications/mm.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
+import { useGamification } from "../context/GamificationContext.jsx";
 import SEO from "../components/SEO.jsx";
 
 const EXAM_DURATION = 90 * 60;
@@ -187,6 +188,7 @@ function ResultsScreen({ answers, questions, timeUsed }) {
 // ── Composant principal ──────────────────────────────────────────────────────
 export default function ExamSimulatorMM() {
   const { canAccess } = useSubscription();
+  const { onExamComplete } = useGamification();
   const navigate = useNavigate();
 
   const [phase, setPhase] = useState("start");
@@ -237,7 +239,12 @@ export default function ExamSimulatorMM() {
   const handleAnswer = (idx) => {
     setAnswers((prev) => { const next = [...prev]; next[currentQ] = idx; return next; });
   };
-  const handleSubmit = () => { clearInterval(timerRef.current); setPhase("results"); };
+  const handleSubmit = () => {
+    clearInterval(timerRef.current);
+    const score = answers.filter((a, i) => a === mmMockExamQuestions[i].correctIndex).length;
+    onExamComplete("mm", Math.round((score / mmMockExamQuestions.length) * 100) >= 65);
+    setPhase("results");
+  };
   const toggleFlag = () => {
     setFlagged((prev) => { const next = new Set(prev); next.has(currentQ) ? next.delete(currentQ) : next.add(currentQ); return next; });
   };

@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { motion } from "motion/react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useProgress, SAP_MODULES } from "../hooks/useProgress";
 import { useSubscription } from "../context/SubscriptionContext";
+import { useGamification, BADGES, getLevelInfo } from "../context/GamificationContext";
 import SEO from "../components/SEO";
 
 /* ─── Icônes ──────────────────────────────────────────────── */
@@ -60,7 +61,16 @@ const DashboardPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { isVisited, visitedCount, totalModules, percentage, loading, progress } = useProgress();
-  const { isPro, plan, upgradeToPro } = useSubscription();
+  const { isPro } = useSubscription();
+  const { xp, earnedBadges, onLogin } = useGamification();
+
+  useEffect(() => { onLogin(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const levelInfo = getLevelInfo(xp);
+  const recentBadges = useMemo(
+    () => earnedBadges.slice(-3).reverse().map((id) => BADGES.find((b) => b.id === id)).filter(Boolean),
+    [earnedBadges]
+  );
 
   /* Leçons FI complétées (localStorage) */
   const fiLessonsCompleted = useMemo(() => {
@@ -230,13 +240,70 @@ const DashboardPage = () => {
                 <>
                   <p className="mt-1.5 text-xs text-slate-400">Chapitre 1 FI débloqué</p>
                   <button
-                    onClick={upgradeToPro}
+                    onClick={() => navigate("/pricing")}
                     className="mt-3 text-xs font-semibold text-sapBlue dark:text-sapAccent hover:underline inline-flex items-center gap-1"
                   >
                     Passer à Pro <ArrowRight />
                   </button>
                 </>
               )}
+            </div>
+          </motion.div>
+
+          {/* ── Gamification : XP & Badges ──────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.12 }}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          >
+            {/* XP & Niveau */}
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Niveau &amp; XP</span>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{xp.toLocaleString()} XP</span>
+              </div>
+              <p className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
+                Niv. {levelInfo.current.level} — {levelInfo.current.name}
+              </p>
+              <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${levelInfo.progress}%` }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
+                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                />
+              </div>
+              <p className="text-xs text-slate-400 mt-1.5">
+                {levelInfo.next
+                  ? `${levelInfo.xpToNext} XP pour atteindre ${levelInfo.next.name}`
+                  : "Niveau maximum atteint !"}
+              </p>
+            </div>
+
+            {/* Badges récents */}
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Badges récents</span>
+                <Link to="/achievements" className="text-xs text-sapBlue dark:text-sapAccent hover:underline font-medium">
+                  Voir tout
+                </Link>
+              </div>
+              {recentBadges.length > 0 ? (
+                <div className="flex gap-3">
+                  {recentBadges.map((badge) => (
+                    <div key={badge.id} className="flex flex-col items-center gap-1">
+                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-xl">
+                        {badge.icon}
+                      </div>
+                      <p className="text-[10px] text-center text-slate-500 dark:text-slate-400 leading-tight max-w-[56px]">{badge.name}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400 dark:text-slate-500">
+                  Aucun badge pour l'instant — commence à explorer !
+                </p>
+              )}
+              <p className="text-xs text-slate-400 mt-3">{earnedBadges.length} / {BADGES.length} débloqués</p>
             </div>
           </motion.div>
 
