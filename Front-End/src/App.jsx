@@ -28,9 +28,11 @@ const HCM = lazy(() => import("./pages/HCM.jsx"));
 const PP  = lazy(() => import("./pages/PP.jsx"));
 
 // --- Lazy loading — Certifications ---
-const Certifications    = lazy(() => import("./pages/Certifications.jsx"));
-const CertificationFI   = lazy(() => import("./pages/CertificationFI.jsx"));
-const ExamSimulator     = lazy(() => import("./pages/ExamSimulator.jsx"));
+const Certifications      = lazy(() => import("./pages/Certifications.jsx"));
+const CertificationFI     = lazy(() => import("./pages/CertificationFI.jsx"));
+const ExamSimulator       = lazy(() => import("./pages/ExamSimulator.jsx"));
+const CertificationCO     = lazy(() => import("./pages/CertificationCO.jsx"));
+const ExamSimulatorCO     = lazy(() => import("./pages/ExamSimulatorCO.jsx"));
 
 // --- Lazy loading — Auth & Profil ---
 const LoginPage     = lazy(() => import("./pages/LoginPage.jsx"));
@@ -83,6 +85,8 @@ function AppInner() {
               <Route path="/certifications"             element={<Certifications />} />
               <Route path="/certifications/fi"          element={<ProtectedRoute><CertificationFI /></ProtectedRoute>} />
               <Route path="/certifications/fi/examen"   element={<ProtectedRoute><ExamSimulator /></ProtectedRoute>} />
+              <Route path="/certifications/co"          element={<ProtectedRoute><CertificationCO /></ProtectedRoute>} />
+              <Route path="/certifications/co/examen"   element={<ProtectedRoute><ExamSimulatorCO /></ProtectedRoute>} />
 
               {/* Modules SAP — tracking automatique */}
               <Route path="/modules-sap/fi"  element={<ModuleTracker module="fi"><FI /></ModuleTracker>} />
