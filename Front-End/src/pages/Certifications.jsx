@@ -54,7 +54,7 @@ const certifications = [
     questions: 80,
     duration: 180,
     chapters: 7,
-    available: false,
+    available: true,
     color: "from-purple-600 to-purple-800",
     accent: "bg-purple-600",
     path: "/certifications/sd",
