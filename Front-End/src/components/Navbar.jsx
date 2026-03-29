@@ -162,6 +162,10 @@ const Navbar = () => {
             <NavLink to="/roadmap" className={({ isActive }) => `${navLinkBase} ${isActive ? navLinkActive : navLinkInactive}`}>
               Roadmap
             </NavLink>
+            <NavLink to="/certifications" className={({ isActive }) => `${navLinkBase} ${isActive ? navLinkActive : navLinkInactive} flex items-center gap-1.5`}>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Certifications
+            </NavLink>
           </nav>
 
           {/* Zone droite */}
@@ -273,6 +277,7 @@ const Navbar = () => {
             { to: "/processus-metier", label: "Processus métier" },
             { to: "/roadmap",          label: "Roadmap consultant" },
             { to: "/a-propos",         label: "À propos" },
+            { to: "/certifications",   label: "Certifications" },
           ].map(({ to, label, end }) => (
             <NavLink
               key={to}
