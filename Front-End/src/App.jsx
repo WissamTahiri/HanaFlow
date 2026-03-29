@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { AnimatePresence, motion } from "motion/react";
 import { useProgress } from "./hooks/useProgress.js";
 import { useAuth } from "./context/AuthContext.jsx";
+import { useGamification } from "./context/GamificationContext.jsx";
 
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PageLoader from "./components/PageLoader.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
+import BadgeToast from "./components/BadgeToast.jsx";
 
 // --- Lazy loading — Pages publiques ---
 const Home             = lazy(() => import("./pages/Home.jsx"));
@@ -44,14 +46,19 @@ const LoginPage     = lazy(() => import("./pages/LoginPage.jsx"));
 const RegisterPage  = lazy(() => import("./pages/RegisterPage.jsx"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage.jsx"));
 const ProfilePage   = lazy(() => import("./pages/ProfilePage.jsx"));
-const NotFound      = lazy(() => import("./pages/NotFound.jsx"));
+const NotFound        = lazy(() => import("./pages/NotFound.jsx"));
+const AchievementsPage = lazy(() => import("./pages/AchievementsPage.jsx"));
 
 // Wrapper qui marque un module SAP comme visité dès que la page est affichée
 const ModuleTracker = ({ module, children }) => {
   const { isAuthenticated } = useAuth();
-  const { markVisited } = useProgress();
+  const { markVisited, visitedCount } = useProgress();
+  const { onModuleVisit } = useGamification();
   useEffect(() => {
-    if (isAuthenticated) markVisited(module);
+    if (isAuthenticated) {
+      markVisited(module);
+      onModuleVisit(visitedCount + 1);
+    }
   }, [module, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
   return children;
 };
@@ -113,8 +120,9 @@ function AppInner() {
               <Route path="/register" element={<RegisterPage />} />
 
               {/* Zone protégée */}
-              <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-              <Route path="/profil"    element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/dashboard"    element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              <Route path="/profil"       element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
 
               {/* 404 */}
               <Route path="*" element={<NotFound />} />
@@ -124,6 +132,7 @@ function AppInner() {
       </AnimatePresence>
 
       <Footer />
+      <BadgeToast />
     </div>
   );
 }

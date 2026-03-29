@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useGamification } from "../context/GamificationContext.jsx";
 import SEO from "../components/SEO.jsx";
 
 const CheckIcon = () => (
@@ -113,6 +114,7 @@ const FAQ = [
 export default function PricingPage() {
   const { isPro, upgradeToPro } = useSubscription();
   const { isAuthenticated } = useAuth();
+  const { onProActivated } = useGamification();
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
   const [annual, setAnnual] = useState(false);
@@ -120,6 +122,7 @@ export default function PricingPage() {
   const handleProCta = () => {
     if (!isAuthenticated) { navigate("/register"); return; }
     upgradeToPro();
+    onProActivated();
     navigate("/dashboard");
   };
 

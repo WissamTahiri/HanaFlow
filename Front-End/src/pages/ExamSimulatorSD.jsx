@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { sdMockExamQuestions, sdCertification } from "../data/certifications/sd.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
+import { useGamification } from "../context/GamificationContext.jsx";
 import SEO from "../components/SEO.jsx";
 
 const EXAM_DURATION = 90 * 60;
@@ -179,6 +180,7 @@ function ResultsScreen({ answers, questions, timeUsed }) {
 
 export default function ExamSimulatorSD() {
   const { canAccess } = useSubscription();
+  const { onExamComplete } = useGamification();
   const navigate = useNavigate();
 
   const [phase, setPhase] = useState("start");
@@ -227,7 +229,12 @@ export default function ExamSimulatorSD() {
 
   const handleStart = () => { setPhase("exam"); startTimer(); };
   const handleAnswer = (idx) => { setAnswers((prev) => { const next = [...prev]; next[currentQ] = idx; return next; }); };
-  const handleSubmit = () => { clearInterval(timerRef.current); setPhase("results"); };
+  const handleSubmit = () => {
+    clearInterval(timerRef.current);
+    const score = answers.filter((a, i) => a === sdMockExamQuestions[i].correctIndex).length;
+    onExamComplete("sd", Math.round((score / sdMockExamQuestions.length) * 100) >= 65);
+    setPhase("results");
+  };
   const toggleFlag = () => {
     setFlagged((prev) => { const next = new Set(prev); next.has(currentQ) ? next.delete(currentQ) : next.add(currentQ); return next; });
   };

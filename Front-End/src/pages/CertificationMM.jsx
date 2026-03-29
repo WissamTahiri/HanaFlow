@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { mmCertification } from "../data/certifications/mm.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useGamification } from "../context/GamificationContext.jsx";
 import SEO from "../components/SEO.jsx";
 
 // ── Icônes ──────────────────────────────────────────────────────────────────
@@ -214,6 +215,7 @@ export default function CertificationMM() {
   const { isPro, canAccess } = useSubscription();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { onLessonComplete, onQuizPass } = useGamification();
 
   const [activeChapter, setActiveChapter] = useState("ch1");
   const [activeLesson, setActiveLesson] = useState("l1-1");
@@ -234,7 +236,12 @@ export default function CertificationMM() {
   }, [completedLessons]);
 
   const markLessonComplete = (lessonId) => {
-    setCompletedLessons((prev) => new Set([...prev, lessonId]));
+    setCompletedLessons((prev) => {
+      if (prev.has(lessonId)) return prev;
+      const next = new Set([...prev, lessonId]);
+      onLessonComplete("mm", next.size);
+      return next;
+    });
   };
 
   const totalLessons = cert.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0);
@@ -499,7 +506,7 @@ export default function CertificationMM() {
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-5">
                               Quiz — {chapter.title}
                             </h3>
-                            <QuizBlock quiz={chapter.quiz} chapterId={chapter.id} />
+                            <QuizBlock quiz={chapter.quiz} chapterId={chapter.id} onComplete={(s, t) => onQuizPass(Math.round((s / t) * 100))} />
                           </motion.div>
                         ) : null}
                       </AnimatePresence>

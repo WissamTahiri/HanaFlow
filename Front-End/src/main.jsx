@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import "./index.css";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { SubscriptionProvider } from "./context/SubscriptionContext.jsx";
+import { GamificationProvider } from "./context/GamificationContext.jsx";
 
 // ============================================================
 // Sentry — monitoring des erreurs frontend (production seulement)
@@ -38,7 +39,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <HelmetProvider>
       <AuthProvider>
         <SubscriptionProvider>
-          <App />
+          <GamificationProvider>
+            <App />
+          </GamificationProvider>
         </SubscriptionProvider>
       </AuthProvider>
     </HelmetProvider>

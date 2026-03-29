@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { fiMockExamQuestions, fiCertification } from "../data/certifications/fi.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
+import { useGamification } from "../context/GamificationContext.jsx";
 import SEO from "../components/SEO.jsx";
 
 const EXAM_DURATION = 90 * 60; // 90 minutes en secondes
@@ -210,6 +211,7 @@ function ResultsScreen({ answers, questions, timeUsed }) {
 // ── Composant principal ──────────────────────────────────────────────────────
 export default function ExamSimulator() {
   const { canAccess } = useSubscription();
+  const { onExamComplete } = useGamification();
   const navigate = useNavigate();
 
   const [phase, setPhase] = useState("start"); // start | exam | results
@@ -251,6 +253,11 @@ export default function ExamSimulator() {
       setTimeLeft((t) => {
         if (t <= 1) {
           clearInterval(timerRef.current);
+          setAnswers((ans) => {
+            const score = ans.filter((a, i) => a === fiMockExamQuestions[i].correctIndex).length;
+            onExamComplete("fi", Math.round((score / fiMockExamQuestions.length) * 100) >= 65);
+            return ans;
+          });
           setPhase("results");
           return 0;
         }
@@ -279,6 +286,9 @@ export default function ExamSimulator() {
 
   const handleSubmit = () => {
     clearInterval(timerRef.current);
+    const score = answers.filter((a, i) => a === fiMockExamQuestions[i].correctIndex).length;
+    const pct = Math.round((score / fiMockExamQuestions.length) * 100);
+    onExamComplete("fi", pct >= 65);
     setPhase("results");
   };
 

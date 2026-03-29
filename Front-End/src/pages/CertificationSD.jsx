@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { sdCertification } from "../data/certifications/sd.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useGamification } from "../context/GamificationContext.jsx";
 import SEO from "../components/SEO.jsx";
 
 const LockIcon = () => (
@@ -203,6 +204,7 @@ export default function CertificationSD() {
   const { isPro, canAccess } = useSubscription();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { onLessonComplete, onQuizPass } = useGamification();
 
   const [activeChapter, setActiveChapter] = useState("ch1");
   const [activeLesson, setActiveLesson] = useState("l1-1");
@@ -221,7 +223,14 @@ export default function CertificationSD() {
     localStorage.setItem("sd_completed_lessons", JSON.stringify([...completedLessons]));
   }, [completedLessons]);
 
-  const markLessonComplete = (lessonId) => setCompletedLessons((prev) => new Set([...prev, lessonId]));
+  const markLessonComplete = (lessonId) => {
+    setCompletedLessons((prev) => {
+      if (prev.has(lessonId)) return prev;
+      const next = new Set([...prev, lessonId]);
+      onLessonComplete("sd", next.size);
+      return next;
+    });
+  };
 
   const totalLessons = cert.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0);
   const completedCount = [...completedLessons].length;
@@ -464,7 +473,7 @@ export default function CertificationSD() {
                             transition={{ duration: 0.2 }}
                           >
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-5">Quiz — {chapter.title}</h3>
-                            <QuizBlock quiz={chapter.quiz} chapterId={chapter.id} />
+                            <QuizBlock quiz={chapter.quiz} chapterId={chapter.id} onComplete={(s, t) => onQuizPass(Math.round((s / t) * 100))} />
                           </motion.div>
                         ) : null}
                       </AnimatePresence>
