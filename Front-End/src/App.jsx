@@ -80,7 +80,7 @@ function AppInner() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.18 }}
-          className="flex-1 pt-16"
+          className="flex-1 pt-[4.5rem]"
         >
           <Suspense fallback={<PageLoader />}>
             <Routes>
