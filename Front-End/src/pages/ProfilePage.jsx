@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../hooks/useProgress";
 import { useSubscription } from "../context/SubscriptionContext";
@@ -54,7 +54,8 @@ const LEARNING_GOALS = [
 const ProfilePage = () => {
   const { user, updateProfile } = useAuth();
   const { visitedCount, totalModules } = useProgress();
-  const { isPro, plan, upgradeToPro, downgradeToFree } = useSubscription();
+  const { isPro, plan, downgradeToFree } = useSubscription();
+  const navigate = useNavigate();
 
   /* Formulaire */
   const [name, setName]                   = useState(user?.name || "");
@@ -349,7 +350,7 @@ const ProfilePage = () => {
                 </button>
               ) : (
                 <button
-                  onClick={upgradeToPro}
+                  onClick={() => navigate("/pricing")}
                   className="flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r
                              from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-xl
                              hover:from-amber-600 hover:to-orange-600 transition-colors shadow-sm"

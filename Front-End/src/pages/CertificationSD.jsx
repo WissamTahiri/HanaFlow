@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { sdCertification } from "../data/certifications/sd.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
@@ -200,7 +200,8 @@ function LessonContent({ lesson }) {
 }
 
 export default function CertificationSD() {
-  const { isPro, upgradeToPro, canAccess } = useSubscription();
+  const { isPro, canAccess } = useSubscription();
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
   const [activeChapter, setActiveChapter] = useState("ch1");
@@ -233,7 +234,7 @@ export default function CertificationSD() {
     setShowQuiz(false);
   };
 
-  const handleUpgrade = () => { upgradeToPro(); setShowUpgradeModal(false); };
+  const handleUpgrade = () => navigate("/pricing");
 
   return (
     <>
