@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { fiCertification } from "../data/certifications/fi.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
@@ -233,7 +233,8 @@ function LessonContent({ lesson }) {
 
 // ── Composant principal ──────────────────────────────────────────────────────
 export default function CertificationFI() {
-  const { isPro, upgradeToPro, canAccess } = useSubscription();
+  const { isPro, canAccess } = useSubscription();
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
   const [activeChapter, setActiveChapter] = useState("ch1");
@@ -273,10 +274,7 @@ export default function CertificationFI() {
     setShowQuiz(false);
   };
 
-  const handleUpgrade = () => {
-    upgradeToPro();
-    setShowUpgradeModal(false);
-  };
+  const handleUpgrade = () => navigate("/pricing");
 
   return (
     <>
