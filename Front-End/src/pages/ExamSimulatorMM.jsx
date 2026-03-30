@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { mmMockExamQuestions, mmCertification } from "../data/certifications/mm.js";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
 import { useGamification } from "../context/GamificationContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import CertificateDownloadButton from "../components/CertificateDownloadButton.jsx";
 import SEO from "../components/SEO.jsx";
 
 const EXAM_DURATION = 90 * 60;
@@ -66,6 +68,7 @@ function StartScreen({ onStart }) {
 
 // ── Écran de résultats ───────────────────────────────────────────────────────
 function ResultsScreen({ answers, questions, timeUsed }) {
+  const { user } = useAuth();
   const score = answers.filter((a, i) => a === questions[i].correctIndex).length;
   const pct = Math.round((score / questions.length) * 100);
   const passed = pct >= 65;
@@ -169,6 +172,22 @@ function ResultsScreen({ answers, questions, timeUsed }) {
           Retour aux chapitres
         </Link>
       </div>
+
+      {passed && (
+        <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold text-emerald-800 dark:text-emerald-200 text-sm">🎉 Félicitations ! Télécharge ton certificat de réussite.</p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">Certificat PDF personnalisé — SAP MM (C_TS4MM_2023)</p>
+          </div>
+          <CertificateDownloadButton
+            userName={user?.name}
+            moduleCode="C_TS4MM_2023"
+            moduleName="Materials Management"
+            score={score}
+            totalQuestions={questions.length}
+          />
+        </div>
+      )}
 
       {!passed && (
         <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-sm text-emerald-800 dark:text-emerald-200">
