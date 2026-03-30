@@ -45,14 +45,11 @@ export default defineConfig({
           if (id.includes("node_modules/motion") || id.includes("node_modules/framer-motion")) {
             return "vendor-motion";
           }
-          // Autres dépendances npm → vendor générique
-          if (id.includes("node_modules")) {
-            return "vendor";
+          // @react-pdf/renderer isolé — dépendances circulaires internes connues
+          if (id.includes("node_modules/@react-pdf")) {
+            return "vendor-pdf";
           }
-          // Pages SAP lourdes → un chunk chargé uniquement si l'utilisateur navigue vers ces pages
-          if (/\/pages\/(FI|CO|MM|SD|HCM|PP)\.jsx/.test(id)) {
-            return "sap-modules";
-          }
+          // Laisser Rollup gérer le reste automatiquement (évite les circular deps)
         },
       },
     },
