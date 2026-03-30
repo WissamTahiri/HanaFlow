@@ -32,26 +32,6 @@ export default defineConfig({
 
   build: {
     sourcemap: false,
-    // Avertit si un chunk dépasse 500 kB
-    chunkSizeWarningLimit: 500,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          // Librairies React core → un seul chunk vendor stable
-          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
-            return "vendor-react";
-          }
-          // Librairie d'animation → chunk séparé (lourd)
-          if (id.includes("node_modules/motion") || id.includes("node_modules/framer-motion")) {
-            return "vendor-motion";
-          }
-          // @react-pdf/renderer isolé — dépendances circulaires internes connues
-          if (id.includes("node_modules/@react-pdf")) {
-            return "vendor-pdf";
-          }
-          // Laisser Rollup gérer le reste automatiquement (évite les circular deps)
-        },
-      },
-    },
+    chunkSizeWarningLimit: 2000,
   },
 });
