@@ -39,6 +39,10 @@ const CertificationMM     = lazy(() => import("./pages/CertificationMM.jsx"));
 const ExamSimulatorMM     = lazy(() => import("./pages/ExamSimulatorMM.jsx"));
 const CertificationSD     = lazy(() => import("./pages/CertificationSD.jsx"));
 const ExamSimulatorSD     = lazy(() => import("./pages/ExamSimulatorSD.jsx"));
+const CertificationHCM    = lazy(() => import("./pages/CertificationHCM.jsx"));
+const ExamSimulatorHCM    = lazy(() => import("./pages/ExamSimulatorHCM.jsx"));
+const CertificationPP     = lazy(() => import("./pages/CertificationPP.jsx"));
+const ExamSimulatorPP     = lazy(() => import("./pages/ExamSimulatorPP.jsx"));
 const PricingPage         = lazy(() => import("./pages/PricingPage.jsx"));
 
 // --- Lazy loading — Auth & Profil ---
@@ -103,6 +107,10 @@ function AppInner() {
               <Route path="/certifications/mm/examen"   element={<ProtectedRoute><ExamSimulatorMM /></ProtectedRoute>} />
               <Route path="/certifications/sd"          element={<ProtectedRoute><CertificationSD /></ProtectedRoute>} />
               <Route path="/certifications/sd/examen"   element={<ProtectedRoute><ExamSimulatorSD /></ProtectedRoute>} />
+              <Route path="/certifications/hcm"         element={<ProtectedRoute><CertificationHCM /></ProtectedRoute>} />
+              <Route path="/certifications/hcm/examen"  element={<ProtectedRoute><ExamSimulatorHCM /></ProtectedRoute>} />
+              <Route path="/certifications/pp"          element={<ProtectedRoute><CertificationPP /></ProtectedRoute>} />
+              <Route path="/certifications/pp/examen"   element={<ProtectedRoute><ExamSimulatorPP /></ProtectedRoute>} />
 
               {/* Pricing */}
               <Route path="/pricing" element={<PricingPage />} />
