@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* SAP Brand Colors */
+  --color-sap-blue:       #0F52BA;
+  --color-sap-blue-dark:  #0B3C87;
+  --color-sap-gray-light: #F3F4F6;
+  --color-sap-dark:       #0F172A;
+  --color-sap-card:       #1E293B;
+  --color-sap-muted:      #64748B;
+  --color-sap-accent:     #0EA5E9;
+  --color-sap-accent-dark:#0284C7;
+  --color-sap-success:    #10B981;
+  --color-sap-warning:    #F59E0B;
+  --color-sap-error:      #EF4444;
+
+  /* SAP Palette */
+  --color-sap-50:  #EBF2FF;
+  --color-sap-100: #D6E6FF;
+  --color-sap-200: #ADC8FF;
+  --color-sap-300: #84AAFF;
+  --color-sap-400: #5B8BFF;
+  --color-sap-500: #0F52BA;
+  --color-sap-600: #0B3C87;
+  --color-sap-700: #082C61;
+  --color-sap-800: #051D40;
+  --color-sap-900: #020F21;
+
+  /* Shadows */
+  --shadow-soft:   0 4px 24px rgba(15, 82, 186, 0.12);
+  --shadow-medium: 0 8px 32px rgba(15, 82, 186, 0.18);
+  --shadow-card:   0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+
+/* Anti-flash dark mode */
+:root {
+  color-scheme: light dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-sans antialiased bg-white dark:bg-sap-dark text-slate-900 dark:text-slate-100;
+  text-rendering: optimizeLegibility;
+}
+
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-sap-blue rounded-sm;
+}
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+
+a, button, input, select, textarea, [role="button"] {
+  transition-property: all;
+  transition-duration: 150ms;
+}
+
+/* ── Components ── */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+           select-none whitespace-nowrap;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+           select-none whitespace-nowrap
+           px-5 py-2.5 text-sm bg-sap-blue text-white
+           hover:bg-sap-blue-dark shadow-sm active:scale-[0.98];
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+           select-none whitespace-nowrap
+           px-5 py-2.5 text-sm border-2 border-sap-blue text-sap-blue
+           hover:bg-sap-blue hover:text-white active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+           select-none whitespace-nowrap
+           px-4 py-2 text-sm text-slate-600 dark:text-slate-300
+           hover:bg-slate-100 dark:hover:bg-slate-800;
+  }
+
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600
+           bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm
+           placeholder:text-slate-400 dark:placeholder:text-slate-500
+           focus:outline-none focus:ring-2 focus:ring-sap-blue/40 focus:border-sap-blue;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5;
+  }
+}
+
+/* ── Utilities ── */
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #0F52BA, #0EA5E9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
