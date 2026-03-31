@@ -8,7 +8,7 @@ import BadgeToast from "@/components/BadgeToast";
 
 export const metadata: Metadata = {
   title: {
-    default: "HanaFlow — Master SAP Learning Platform",
+    default: "HanaFlow",
     template: "%s | HanaFlow",
   },
   description:
@@ -16,10 +16,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "https://hanaflow.vercel.app"
   ),
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/icons/icon-192.png",
+  },
   openGraph: {
     type: "website",
     siteName: "HanaFlow",
-    title: "HanaFlow — Master SAP Learning Platform",
+    title: "HanaFlow",
     description:
       "Apprends les modules SAP FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium.",
   },
