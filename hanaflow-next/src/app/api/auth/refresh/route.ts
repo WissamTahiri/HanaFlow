@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   const stored = await prisma.refreshToken.findFirst({
     where: { tokenHash, expiresAt: { gt: new Date() } },
-    include: { user: { select: { id: true, name: true, email: true, role: true } } },
+    include: { user: { select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true } } },
   });
 
   if (!stored) {

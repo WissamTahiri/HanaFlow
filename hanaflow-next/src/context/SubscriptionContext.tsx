@@ -1,47 +1,30 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext } from "react";
 import { useAuth } from "./AuthContext";
 
 interface SubscriptionContextValue {
   plan: "free" | "pro";
   isPro: boolean;
-  upgradeToPro: () => void;
-  downgradeToFree: () => void;
   canAccess: (isPremium: boolean) => boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextValue | null>(null);
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  const [plan, setPlan] = useState<"free" | "pro">("free");
+  const { user, isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    const saved = localStorage.getItem("hanaflow_plan");
-    if (saved === "pro") setPlan("pro");
-  }, []);
-
-  const upgradeToPro = () => {
-    setPlan("pro");
-    localStorage.setItem("hanaflow_plan", "pro");
-  };
-
-  const downgradeToFree = () => {
-    setPlan("free");
-    localStorage.setItem("hanaflow_plan", "free");
-  };
+  const isPro = isAuthenticated && (user?.isPro ?? false);
+  const plan: "free" | "pro" = isPro ? "pro" : "free";
 
   const canAccess = (isPremium: boolean) => {
     if (!isPremium) return true;
     if (!isAuthenticated) return false;
-    return plan === "pro";
+    return isPro;
   };
 
-  const isPro = isAuthenticated && plan === "pro";
-
   return (
-    <SubscriptionContext.Provider value={{ plan, isPro, upgradeToPro, downgradeToFree, canAccess }}>
+    <SubscriptionContext.Provider value={{ plan, isPro, canAccess }}>
       {children}
     </SubscriptionContext.Provider>
   );

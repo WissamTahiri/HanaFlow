@@ -3,6 +3,8 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  isPro: boolean;
+  isSuspended: boolean;
   createdAt: string;
 }
 
