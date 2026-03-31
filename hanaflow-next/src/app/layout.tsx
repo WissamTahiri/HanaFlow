@@ -17,12 +17,10 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL ?? "https://hanaflow.vercel.app"
   ),
   icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: "/icons/icon-192.png",
   },
+  manifest: "/manifest.json",
   openGraph: {
     type: "website",
     siteName: "HanaFlow",
