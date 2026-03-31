@@ -56,6 +56,15 @@ export function requireAuth(
   return { user };
 }
 
+export function requireAdmin(
+  req: NextRequest
+): { user: JwtPayload } | NextResponse {
+  const user = getAuthUser(req);
+  if (!user) return err("Non authentifié", 401);
+  if (user.role !== "admin") return err("Accès refusé", 403);
+  return { user };
+}
+
 // ── Rate limiting (mémoire — suffisant pour MVP) ──────────────────────────────
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 

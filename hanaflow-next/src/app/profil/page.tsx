@@ -52,9 +52,9 @@ const LEARNING_GOALS = [
 ];
 
 function ProfileContent() {
-  const { user, updateProfile } = useAuth();
+  const { user, token, updateProfile } = useAuth();
   const { visitedCount, totalModules } = useProgress();
-  const { isPro, downgradeToFree } = useSubscription();
+  const { isPro } = useSubscription();
   const router = useRouter();
 
   const [name, setName]                       = useState(user?.name || "");
@@ -64,6 +64,38 @@ function ProfileContent() {
   const [success, setSuccess]                 = useState("");
   const [error, setError]                     = useState("");
   const [loading, setLoading]                 = useState(false);
+
+  const [promoCode, setPromoCode]     = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoMsg, setPromoMsg]       = useState<{ text: string; ok: boolean } | null>(null);
+
+  const redeemPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoCode.trim() || !token) return;
+    setPromoLoading(true);
+    setPromoMsg(null);
+    try {
+      const r = await fetch("/api/promo/redeem", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ code: promoCode.trim() }),
+      });
+      const d = await r.json();
+      if (r.ok) {
+        setPromoMsg({ text: d.message, ok: true });
+        setPromoCode("");
+        // Reload the page after a short delay so the Pro status updates
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        setPromoMsg({ text: d.message ?? "Code invalide", ok: false });
+      }
+    } catch {
+      setPromoMsg({ text: "Erreur réseau", ok: false });
+    } finally {
+      setPromoLoading(false);
+    }
+  };
 
   const [goal, setGoal] = useState(
     () => (typeof window !== "undefined" ? localStorage.getItem("hanaflow_learning_goal") || "" : "")
@@ -322,14 +354,7 @@ function ProfileContent() {
                 }
               </p>
             </div>
-            {isPro ? (
-              <button
-                onClick={downgradeToFree}
-                className="text-sm text-slate-400 hover:text-red-500 transition-colors hover:underline flex-shrink-0"
-              >
-                Rétrograder
-              </button>
-            ) : (
+            {!isPro && (
               <button
                 onClick={() => router.push("/pricing")}
                 className="flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 bg-linear-to-r
@@ -342,19 +367,45 @@ function ProfileContent() {
           </div>
 
           {!isPro && (
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {[
-                "7 chapitres FI complets (C_TS4FI_2023)",
-                "Simulateur d'examen 40 questions",
-                "Quiz par chapitre avec corrections",
-                "Certifications CO, MM, SD (à venir)",
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span className="text-sap-blue mt-0.5 flex-shrink-0"><CheckIcon /></span>
-                  {item}
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  "7 chapitres FI complets (C_TS4FI_2023)",
+                  "Simulateur d'examen 40 questions",
+                  "Quiz par chapitre avec corrections",
+                  "Certifications CO, MM, SD (à venir)",
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="text-sap-blue mt-0.5 flex-shrink-0"><CheckIcon /></span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Tu as un code promo ?</p>
+                <form onSubmit={redeemPromo} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    placeholder="HANAFLOW2025"
+                    className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/50 font-mono"
+                  />
+                  <button
+                    type="submit"
+                    disabled={promoLoading || !promoCode.trim()}
+                    className="px-4 py-2 bg-sap-blue text-white text-sm font-semibold rounded-lg hover:bg-sap-blue/90 transition-colors disabled:opacity-50"
+                  >
+                    {promoLoading ? "..." : "Activer"}
+                  </button>
+                </form>
+                {promoMsg && (
+                  <p className={`mt-2 text-xs ${promoMsg.ok ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                    {promoMsg.text}
+                  </p>
+                )}
+              </div>
+            </>
           )}
         </div>
 

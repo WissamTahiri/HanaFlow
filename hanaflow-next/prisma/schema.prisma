@@ -14,12 +14,27 @@ model User {
   email        String   @unique @db.VarChar(255)
   passwordHash String   @map("password_hash") @db.VarChar(255)
   role         String   @default("student") @db.VarChar(20)
+  isPro        Boolean  @default(false) @map("is_pro")
+  isSuspended  Boolean  @default(false) @map("is_suspended")
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   refreshTokens RefreshToken[]
   progress      UserProgress[]
 
   @@map("users")
+}
+
+model PromoCode {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique @db.VarChar(50)
+  description String?   @db.VarChar(255)
+  isActive    Boolean   @default(true) @map("is_active")
+  usageLimit  Int?      @map("usage_limit")
+  usageCount  Int       @default(0) @map("usage_count")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt   DateTime? @map("expires_at") @db.Timestamptz
+
+  @@map("promo_codes")
 }
 
 model RefreshToken {

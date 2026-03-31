@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { useAuth } from "@/context/AuthContext";
-import { useGamification } from "@/context/GamificationContext";
 
 const CheckIcon = () => (
   <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -114,18 +113,15 @@ const FAQ = [
 ];
 
 export default function PricingPage() {
-  const { isPro, upgradeToPro } = useSubscription();
+  const { isPro } = useSubscription();
   const { isAuthenticated } = useAuth();
-  const { onProActivated } = useGamification();
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [annual, setAnnual] = useState(false);
 
   const handleProCta = () => {
     if (!isAuthenticated) { router.push("/register"); return; }
-    upgradeToPro();
-    onProActivated();
-    router.push("/dashboard");
+    router.push("/profil?upgrade=1");
   };
 
   return (

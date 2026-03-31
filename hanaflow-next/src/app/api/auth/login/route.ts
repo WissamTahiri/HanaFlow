@@ -45,8 +45,10 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  if (user.isSuspended) return err("Compte suspendu. Contactez le support.", 403);
+
   const res = NextResponse.json({
-    user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    user: { id: user.id, name: user.name, email: user.email, role: user.role, isPro: user.isPro, isSuspended: user.isSuspended },
     token: accessToken,
   });
   res.cookies.set("refreshToken", rawRefresh, COOKIE_OPTIONS);

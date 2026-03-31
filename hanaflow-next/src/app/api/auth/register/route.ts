@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   const passwordHash = await argon2.hash(data.password, { type: argon2.argon2id });
   const user = await prisma.user.create({
     data: { name: data.name, email: data.email, passwordHash },
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true, createdAt: true },
   });
 
   const accessToken = signAccessToken({ userId: user.id, email: user.email, role: user.role });
