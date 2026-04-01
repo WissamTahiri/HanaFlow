@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HanaFlow
 
-## Getting Started
+Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, HCM, PP et S/4HANA de zéro à consultant certifié.
 
-First, run the development server:
+## Stack technique
+
+- **Framework** : Next.js 16 App Router (TypeScript)
+- **Styles** : Tailwind CSS v4
+- **Base de données** : Neon PostgreSQL + Prisma ORM
+- **Auth** : JWT (argon2id) + refresh tokens httpOnly
+- **Analytics** : PostHog
+- **Error tracking** : Sentry
+- **PWA** : next-pwa (installable sur mobile)
+- **Déploiement** : Vercel
+
+## Fonctionnalités
+
+- 6 modules SAP : FI, CO, MM, SD, HCM, PP
+- 6 simulateurs d'examens SAP avec corrections
+- Système de certification avec PDF téléchargeable
+- Gamification : XP, badges, niveaux (1–10)
+- Dashboard de progression personnalisé
+- Panel admin : gestion users, codes promo, stats
+- Codes promo pour activer le plan Pro
+- Dark mode
+- PWA installable
+
+## Installation
+
+```bash
+git clone https://github.com/WissamTahiri/HanaFlow.git
+cd HanaFlow/hanaflow-next
+npm install
+```
+
+Copier les variables d'environnement :
+
+```bash
+cp .env.example .env
+# Remplir les valeurs dans .env
+```
+
+Initialiser la base de données :
+
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+Lancer en développement :
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variables d'environnement
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Voir `.env.example` pour la liste complète.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | URL poolée Neon PostgreSQL |
+| `DIRECT_URL` | URL directe Neon PostgreSQL (migrations) |
+| `JWT_SECRET` | Secret pour les access tokens (min 32 chars) |
+| `JWT_REFRESH_SECRET` | Secret pour les refresh tokens (min 32 chars) |
+| `NEXT_PUBLIC_APP_URL` | URL publique du site |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Clé PostHog analytics |
+| `SENTRY_AUTH_TOKEN` | Token Sentry error tracking |
 
-## Learn More
+## Déploiement
 
-To learn more about Next.js, take a look at the following resources:
+Le projet est déployé sur Vercel avec auto-deploy sur la branche `master`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+git push origin master  # déclenche un déploiement automatique
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Créer un compte admin
 
-## Deploy on Vercel
+Après avoir créé un compte sur le site :
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+echo "UPDATE users SET role = 'admin' WHERE email = 'ton@email.com';" | \
+  npx prisma db execute --schema=prisma/schema.prisma --stdin
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Structure du projet
+
+```
+src/
+├── app/
+│   ├── api/            # API Routes (auth, admin, promo)
+│   ├── admin/          # Panel admin (/admin)
+│   ├── modules-sap/    # Pages modules SAP (FI, CO, MM, SD, HCM, PP)
+│   ├── certifications/ # Simulateurs d'examens
+│   └── ...
+├── components/         # Composants réutilisables
+├── context/            # React Contexts (Auth, Subscription, Gamification)
+├── hooks/              # Hooks personnalisés
+├── lib/                # Prisma, auth, API helpers
+└── types/              # Types TypeScript
+```
