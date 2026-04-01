@@ -3,7 +3,7 @@ import Home from "./_home";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "HanaFlow — Apprends SAP de zéro à consultant certifié",
+    absolute: "HanaFlow",
   },
   description:
     "Cours SAP FI, CO, MM, SD, HCM, PP et S/4HANA. Simulateurs d'examens, certifications et roadmap consultant. Commence gratuitement.",
