@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import argon2 from "argon2";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, validateBody, ok, err } from "@/lib/apiHelpers";
+import { requireAuth, validateBody, ok, err, rateLimit } from "@/lib/apiHelpers";
 
 const profileSchema = z
   .object({
@@ -18,6 +18,11 @@ const profileSchema = z
   .refine((d) => d.name || d.password, { message: "Rien à mettre à jour" });
 
 export async function PATCH(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  if (!rateLimit(`profile:${ip}`, 10, 15 * 60 * 1000)) {
+    return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
+  }
+
   const auth = requireAuth(req);
   if ("status" in auth) return auth;
 
@@ -35,7 +40,7 @@ export async function PATCH(req: NextRequest) {
   const user = await prisma.user.update({
     where: { id: auth.user.userId },
     data: updates,
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true, createdAt: true },
   });
 
   return ok({ user });

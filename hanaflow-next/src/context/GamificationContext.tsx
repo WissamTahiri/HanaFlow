@@ -104,6 +104,7 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
   const [xp, setXP] = useState(() => load("hf_xp", 0));
   const [earnedBadges, setEarnedBadges] = useState<string[]>(() => load("hf_badges", []));
   const [quizPassCount, setQuizPassCount] = useState(() => load("hf_quiz_pass", 0));
+  const [streak, setStreak] = useState(() => load("hf_streak", 0));
   const [notification, setNotification] = useState<{ badge: Badge; ts: number } | null>(null);
 
   const hasBadge = useCallback((id: string) => earnedBadges.includes(id), [earnedBadges]);
@@ -129,14 +130,16 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     awardBadge("welcome");
     const today = new Date().toDateString();
     const lastLogin = load<string | null>("hf_last_login", null);
-    const streak = load("hf_streak", 0);
     if (lastLogin !== today) {
       const yesterday = new Date(Date.now() - 86400000).toDateString();
-      const newStreak = lastLogin === yesterday ? streak + 1 : 1;
-      save("hf_streak", newStreak);
+      setStreak((prev) => {
+        const newStreak = lastLogin === yesterday ? prev + 1 : 1;
+        save("hf_streak", newStreak);
+        if (newStreak >= 7) awardBadge("streak_7");
+        else if (newStreak >= 3) awardBadge("streak_3");
+        return newStreak;
+      });
       save("hf_last_login", today);
-      if (newStreak >= 7) awardBadge("streak_7");
-      else if (newStreak >= 3) awardBadge("streak_3");
     }
   }, [awardBadge]);
 
@@ -172,16 +175,13 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
 
   const dismissNotification = useCallback(() => setNotification(null), []);
 
-  // Suppress unused variable warning
-  void quizPassCount;
-
   return (
     <GamificationContext.Provider value={{
       xp, earnedBadges, hasBadge, awardBadge, addXP,
       onLogin, onModuleVisit, onLessonComplete, onQuizPass, onExamComplete, onProActivated,
       notification, dismissNotification,
       levelInfo: getLevelInfo(xp),
-      streak: load("hf_streak", 0),
+      streak,
     }}>
       {children}
     </GamificationContext.Provider>

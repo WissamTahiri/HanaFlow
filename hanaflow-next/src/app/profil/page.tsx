@@ -52,7 +52,7 @@ const LEARNING_GOALS = [
 ];
 
 function ProfileContent() {
-  const { user, token, updateProfile } = useAuth();
+  const { user, token, updateProfile, logout } = useAuth();
   const { visitedCount, totalModules } = useProgress();
   const { isPro } = useSubscription();
   const router = useRouter();
@@ -85,8 +85,11 @@ function ProfileContent() {
       if (r.ok) {
         setPromoMsg({ text: d.message, ok: true });
         setPromoCode("");
-        // Reload the page after a short delay so the Pro status updates
-        setTimeout(() => window.location.reload(), 1500);
+        // Déconnexion + reconnexion silencieuse pour rafraîchir isPro depuis la DB
+        setTimeout(async () => {
+          await logout();
+          router.push("/login?redirect=/profil");
+        }, 1500);
       } else {
         setPromoMsg({ text: d.message ?? "Code invalide", ok: false });
       }

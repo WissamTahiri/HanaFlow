@@ -34,6 +34,8 @@ export async function POST(req: NextRequest) {
     return err("Identifiants invalides", 400);
   }
 
+  if (user.isSuspended) return err("Compte suspendu. Contactez le support.", 403);
+
   const accessToken = signAccessToken({ userId: user.id, email: user.email, role: user.role });
   const rawRefresh = crypto.randomBytes(64).toString("hex");
 
@@ -44,8 +46,6 @@ export async function POST(req: NextRequest) {
       expiresAt: getRefreshTokenExpiry(),
     },
   });
-
-  if (user.isSuspended) return err("Compte suspendu. Contactez le support.", 403);
 
   const res = NextResponse.json({
     user: { id: user.id, name: user.name, email: user.email, role: user.role, isPro: user.isPro, isSuspended: user.isSuspended },
