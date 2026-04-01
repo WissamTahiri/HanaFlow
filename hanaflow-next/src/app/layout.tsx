@@ -5,6 +5,9 @@ import { ThemeScript } from "@/components/ThemeScript";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BadgeToast from "@/components/BadgeToast";
+import { JsonLd } from "@/components/JsonLd";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://hanaflow.vercel.app";
 
 export const metadata: Metadata = {
   title: {
@@ -39,6 +42,27 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <head>
         <ThemeScript />
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "HanaFlow",
+          "url": BASE,
+          "description": "Plateforme éducative SAP : cours FI, CO, MM, SD, HCM, PP, S/4HANA, simulateurs d'examens et roadmap consultant.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": { "@type": "EntryPoint", "urlTemplate": `${BASE}/modules-sap` },
+            "query-input": "required name=search_term_string"
+          }
+        }} />
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "EducationalOrganization",
+          "name": "HanaFlow",
+          "url": BASE,
+          "logo": `${BASE}/icons/icon-512.png`,
+          "description": "Plateforme éducative dédiée à l'apprentissage de SAP pour les étudiants et futurs consultants.",
+          "sameAs": []
+        }} />
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-sap-dark text-slate-900 dark:text-slate-100 antialiased">
         <Providers>
