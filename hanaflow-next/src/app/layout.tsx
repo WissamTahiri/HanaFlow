@@ -31,6 +31,14 @@ export const metadata: Metadata = {
     title: "HanaFlow",
     description:
       "Apprends les modules SAP FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium.",
+    images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: "HanaFlow" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "HanaFlow",
+    description:
+      "Apprends les modules SAP FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium.",
+    images: ["/icons/icon-512.png"],
   },
 };
 
