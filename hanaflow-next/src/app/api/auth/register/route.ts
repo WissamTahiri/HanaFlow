@@ -3,7 +3,7 @@ import argon2 from "argon2";
 import crypto from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { signAccessToken, signRefreshToken, hashToken, getRefreshTokenExpiry } from "@/lib/auth";
+import { signAccessToken, hashToken, getRefreshTokenExpiry } from "@/lib/auth";
 import { validateBody, err, rateLimit, COOKIE_OPTIONS } from "@/lib/apiHelpers";
 
 const registerSchema = z.object({
@@ -44,8 +44,6 @@ export async function POST(req: NextRequest) {
 
   const accessToken = signAccessToken({ userId: user.id, email: user.email, role: user.role });
   const rawRefresh = crypto.randomBytes(64).toString("hex");
-  const refreshToken = signRefreshToken({ userId: user.id, email: user.email, role: user.role });
-  void refreshToken; // on stocke le token brut hashé, pas le JWT
 
   await prisma.refreshToken.create({
     data: {

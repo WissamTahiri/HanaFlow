@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BadgeToast from "@/components/BadgeToast";
 import { JsonLd } from "@/components/JsonLd";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://hanaflow.vercel.app";
 
@@ -68,7 +69,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           <main className="flex-1 pt-[4.5rem]">
-            {children}
+            <ErrorBoundary>{children}</ErrorBoundary>
           </main>
           <Footer />
           <BadgeToast />
