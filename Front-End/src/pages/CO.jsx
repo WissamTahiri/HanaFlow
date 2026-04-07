@@ -213,7 +213,7 @@ const S4HANAFeatures = () => (
 const CareerBenefits = () => (
   <motion.section
     initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }}
-    className="bg-gradient-to-br from-emerald-900 to-emerald-700 rounded-2xl p-6 text-white"
+    className="grain relative bg-slate-950 rounded-2xl p-6 text-white overflow-hidden border border-white/8"
   >
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser CO ?</h2>
     <p className="text-sm text-white/70 mb-5">CO est demandé dans tous les projets S/4HANA Finance. Les profils FI/CO bénéficient d'une prime salariale significative.</p>

@@ -266,7 +266,7 @@ const CareerBenefits = () => (
     initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.4, delay: 0.16 }}
-    className="bg-gradient-to-br from-sapBlueDark to-sapBlue rounded-2xl p-6 text-white"
+    className="grain relative bg-slate-950 rounded-2xl p-6 text-white overflow-hidden border border-white/8"
   >
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser FI ?</h2>
     <p className="text-sm text-white/70 mb-5">FI est le module le plus demandé en consulting SAP — il est présent dans chaque projet S/4HANA.</p>

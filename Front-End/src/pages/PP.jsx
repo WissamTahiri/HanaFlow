@@ -142,7 +142,7 @@ const S4HANAFeatures = () => (
 /* ─── Débouchés ─── */
 const CareerBenefits = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }}
-    className="bg-gradient-to-br from-teal-900 to-teal-600 rounded-2xl p-6 text-white">
+    className="grain relative bg-slate-950 rounded-2xl p-6 text-white overflow-hidden border border-white/8">
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser PP ?</h2>
     <p className="text-sm text-white/70 mb-5">PP est incontournable dans les entreprises industrielles (automobile, aéro, chimie, agroalimentaire). La demande est forte et les profils sont rares.</p>
     <div className="grid sm:grid-cols-2 gap-4">

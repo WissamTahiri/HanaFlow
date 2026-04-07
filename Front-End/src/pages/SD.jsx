@@ -146,7 +146,7 @@ const S4HANAFeatures = () => (
 /* ─── Débouchés ─── */
 const CareerBenefits = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }}
-    className="bg-gradient-to-br from-purple-900 to-violet-700 rounded-2xl p-6 text-white">
+    className="grain relative bg-slate-950 rounded-2xl p-6 text-white overflow-hidden border border-white/8">
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser SD ?</h2>
     <p className="text-sm text-white/70 mb-5">SD est le module clé pour toutes les entreprises B2B ou B2C. La maîtrise de l'O2C est un prérequis pour de nombreux projets S/4HANA.</p>
     <div className="grid sm:grid-cols-2 gap-4">
