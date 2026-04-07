@@ -65,9 +65,9 @@ const Section = ({ title, children }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.4 }}
-    className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-soft border border-sapBlue/10"
+    className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800"
   >
-    <h2 className="text-xl sm:text-2xl font-bold mb-5">{title}</h2>
+    <h2 className="font-display text-xl sm:text-2xl font-semibold tracking-tight-xl text-slate-900 dark:text-white mb-5">{title}</h2>
     {children}
   </motion.section>
 );
@@ -106,7 +106,7 @@ const AboutPage = () => (
     label="À propos"
     title="HanaFlow & Wissam Tahiri"
     description="HanaFlow est mon laboratoire de consultant SAP — un espace où je structure mes apprentissages sur S/4HANA, FI/CO, MM, SD et l'IA Joule, comme si je préparais une vraie mission."
-    gradient="from-slate-900 via-sapBlueDark to-sapBlue"
+    accent="#0F52BA"
     badge="Portfolio SAP · Projet personnel · Open source"
     seoTitle="À propos – HanaFlow & Wissam Tahiri"
     seoDescription="Découvrez HanaFlow, le projet SAP de Wissam Tahiri : plateforme pédagogique sur S/4HANA, FI/CO, MM, SD. Profil consultant SAP junior, stack technique et mission du projet."
@@ -334,12 +334,15 @@ const AboutPage = () => (
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
-      className="bg-gradient-to-br from-sapBlueDark via-sapBlue to-sapAccent rounded-3xl p-8 text-white text-center"
+      className="grain relative bg-slate-950 rounded-2xl p-8 text-white text-center overflow-hidden border border-white/8"
     >
-      <p className="text-sm uppercase tracking-widest font-semibold text-white/60 mb-3">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-2xl">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] rounded-full bg-sapBlue/20 blur-[80px]" />
+      </div>
+      <p className="relative text-xs uppercase tracking-widest font-semibold text-sapBlue mb-3">
         Contact
       </p>
-      <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">
+      <h2 className="relative font-display text-2xl sm:text-3xl font-bold tracking-display mb-3">
         Échangeons autour de SAP
       </h2>
       <p className="text-white/80 text-sm sm:text-base max-w-xl mx-auto mb-6 leading-relaxed">

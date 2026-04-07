@@ -720,14 +720,14 @@ export default function Roadmap() {
       label="Roadmap"
       title="Roadmap consultant SAP personnalisée"
       description="Réponds à quelques questions sur ton profil et obtiens une roadmap sur-mesure — adaptée à ton niveau, tes objectifs et ta disponibilité."
-      gradient="from-slate-900 via-sapBlueDark to-sapBlue"
+      accent="#0F52BA"
       badge="Personnalisée · Tous niveaux · Tous profils"
       seoTitle="Roadmap Consultant SAP Personnalisée"
       seoDescription="Génère ta roadmap SAP personnalisée : niveau, objectif, disponibilité. Finance, Supply Chain, IT ou Sales — un parcours sur-mesure vers la certification."
       seoPath="/roadmap"
     >
       {step < 4 ? (
-        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden">
           {/* Indicateur d'étapes */}
           {step < 3 && (
             <div className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-slate-700">

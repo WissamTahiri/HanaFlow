@@ -283,9 +283,9 @@ const Section = ({ title, children }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.4 }}
-    className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-soft border border-violet-500/10"
+    className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800"
   >
-    <h2 className="text-xl sm:text-2xl font-bold mb-5">{title}</h2>
+    <h2 className="font-display text-xl sm:text-2xl font-semibold tracking-tight-xl text-slate-900 dark:text-white mb-5">{title}</h2>
     {children}
   </motion.section>
 );
@@ -402,7 +402,7 @@ const AIJoule = () => (
     label="IA & Joule"
     title="IA & Joule – L'IA générative de SAP"
     description="Joule est l'assistant IA de SAP intégré dans toutes les apps cloud. Il répond en langage naturel, automatise les tâches métier et transforme la façon de travailler sur S/4HANA."
-    gradient="from-violet-900 via-purple-700 to-pink-500"
+    accent="#8B5CF6"
     badge="Tous niveaux · IA générative · Agents SAP"
     seoTitle="IA & Joule SAP – Cas d'usage et concepts"
     seoDescription="Découvrez Joule, l'assistant IA générative de SAP : agents IA, Joule Studio, use cases par module (Finance, Supply Chain, RH) et perspectives de carrière."
