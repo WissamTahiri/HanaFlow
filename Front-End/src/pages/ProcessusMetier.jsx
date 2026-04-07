@@ -95,9 +95,9 @@ const Section = ({ title, children }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.4 }}
-    className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-soft border border-cyan-500/10"
+    className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800"
   >
-    <h2 className="text-xl sm:text-2xl font-bold mb-5">{title}</h2>
+    <h2 className="font-display text-xl sm:text-2xl font-semibold tracking-tight-xl text-slate-900 dark:text-white mb-5">{title}</h2>
     {children}
   </motion.section>
 );
@@ -166,7 +166,7 @@ const ProcessusMetier = () => (
     label="Processus Métier"
     title="Processus Métier – P2P, O2C, R2R"
     description="Les trois grands cycles end-to-end qui structurent les flux d'une entreprise : achats, ventes et reporting financier. Le point de départ pour comprendre comment les modules SAP se connectent."
-    gradient="from-cyan-900 via-teal-700 to-emerald-500"
+    accent="#06B6D4"
     badge="Débutant · Point d'entrée · Cross-modules"
     seoTitle="Processus Métier SAP – P2P, O2C, R2R"
     seoDescription="Comprendre les processus end-to-end SAP : P2P (Procure-to-Pay), O2C (Order-to-Cash) et R2R (Record-to-Report) avec les étapes, t-codes et modules impliqués."

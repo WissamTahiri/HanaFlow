@@ -249,9 +249,9 @@ const Section = ({ title, children }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.4 }}
-    className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-soft border border-indigo-500/10"
+    className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800"
   >
-    <h2 className="text-xl sm:text-2xl font-bold mb-5">{title}</h2>
+    <h2 className="font-display text-xl sm:text-2xl font-semibold tracking-tight-xl text-slate-900 dark:text-white mb-5">{title}</h2>
     {children}
   </motion.section>
 );
@@ -375,7 +375,7 @@ const S4HANAOverview = () => {
       label="S/4HANA"
       title="SAP S/4HANA"
       description="L'ERP de nouvelle génération de SAP : in-memory, Fiori, Universal Journal et analytique temps réel. Comprendre S/4HANA, c'est comprendre l'avenir de tous les projets SAP."
-      gradient="from-indigo-900 via-indigo-700 to-violet-500"
+      accent="#6366F1"
       badge="ERP nouvelle génération · SAP HANA · Fiori"
       seoTitle="SAP S/4HANA – Vue d'ensemble et concepts clés"
       seoDescription="Découvrez SAP S/4HANA : Universal Journal, SAP HANA in-memory, Fiori UX, stratégies de migration Greenfield/Brownfield et méthodologie SAP Activate."
