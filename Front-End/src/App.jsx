@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PageLoader from "./components/PageLoader.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import BadgeToast from "./components/BadgeToast.jsx";
+import CustomCursor from "./components/CustomCursor.jsx";
 
 // --- Lazy loading — Pages publiques ---
 const Home             = lazy(() => import("./pages/Home.jsx"));
@@ -74,6 +75,7 @@ function AppInner() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-sapDark">
+      <CustomCursor />
       <ScrollToTop />
       <Navbar />
 

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SEO from "../components/SEO";
+import { useMagneticButton } from "../hooks/useMagneticButton";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -110,6 +111,9 @@ export default function Home() {
   const subtitleRef = useRef(null);
   const ctaRef      = useRef(null);
   const badgeRef    = useRef(null);
+
+  const magPrimary   = useMagneticButton(0.35);
+  const magSecondary = useMagneticButton(0.25);
 
   /* Animation GSAP hero au montage */
   useEffect(() => {
@@ -240,9 +244,12 @@ export default function Home() {
           <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4">
             <Link
               to="/modules-sap"
+              ref={magPrimary.ref}
+              onMouseMove={magPrimary.onMouseMove}
+              onMouseLeave={magPrimary.onMouseLeave}
               className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
                          bg-white text-slate-900 text-sm font-bold
-                         hover:bg-slate-100 transition-all duration-150 active:scale-[0.98]
+                         hover:bg-slate-100 transition-colors active:scale-[0.98]
                          shadow-[0_0_30px_rgba(255,255,255,0.15)]"
             >
               Explorer les modules SAP
@@ -250,9 +257,12 @@ export default function Home() {
             </Link>
             <Link
               to="/register"
+              ref={magSecondary.ref}
+              onMouseMove={magSecondary.onMouseMove}
+              onMouseLeave={magSecondary.onMouseLeave}
               className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
                          border border-white/20 text-white text-sm font-semibold
-                         hover:bg-white/8 hover:border-white/40 transition-all duration-150"
+                         hover:bg-white/8 hover:border-white/40 transition-colors"
             >
               Créer un compte — Gratuit
             </Link>
