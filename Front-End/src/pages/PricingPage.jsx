@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "motion/react";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useGamification } from "../context/GamificationContext.jsx";
@@ -27,7 +26,7 @@ const PLANS = [
     color: "border-gray-200 dark:border-slate-700",
     badge: null,
     cta: "Commencer gratuitement",
-    ctaStyle: "bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700",
+    ctaStyle: "bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700",
     features: [
       { label: "6 modules SAP complets (FI, CO, MM, SD, HCM, PP)", included: true },
       { label: "Chapitre 1 de chaque certification (aperçu)", included: true },
@@ -143,39 +142,43 @@ export default function PricingPage() {
         description="Choisissez le plan HanaFlow adapté à votre objectif SAP. Gratuit pour démarrer, Pro pour préparer une certification, Équipe pour former vos collaborateurs."
         path="/pricing"
       />
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sapDark">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-slate-950">
 
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-sapBlue text-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold mb-5">
-                🚀 Phase de lancement — Pro gratuit pour tous
-              </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
-                Le bon plan pour votre objectif SAP
-              </h1>
-              <p className="text-base sm:text-lg text-white/80 max-w-xl mx-auto mb-8">
-                Commencez gratuitement, passez au Pro quand vous êtes prêt à préparer votre certification.
-              </p>
+        {/* ── Hero dark ─────────────────────────────────── */}
+        <div className="grain relative bg-slate-950 pt-24 pb-16 px-4 sm:px-6 overflow-hidden text-center">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-sapBlue/15 blur-[120px]" />
+            <div className="absolute inset-0 opacity-[0.025]"
+              style={{ backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+          </div>
 
-              {/* Toggle annuel/mensuel */}
-              <div className="inline-flex items-center gap-3 bg-white/10 rounded-full p-1">
-                <button
-                  onClick={() => setAnnual(false)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${!annual ? "bg-white text-slate-900" : "text-white/70 hover:text-white"}`}
-                >
-                  Mensuel
-                </button>
-                <button
-                  onClick={() => setAnnual(true)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors flex items-center gap-1.5 ${annual ? "bg-white text-slate-900" : "text-white/70 hover:text-white"}`}
-                >
-                  Annuel
-                  <span className="text-xs bg-emerald-400 text-slate-900 px-1.5 py-0.5 rounded-full font-bold">-27%</span>
-                </button>
-              </div>
-            </motion.div>
+          <div className="relative max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-xs font-semibold text-emerald-400 mb-6">
+              🚀 Phase de lancement — Pro gratuit pour tous
+            </div>
+            <h1 className="font-display text-5xl sm:text-6xl font-bold text-white tracking-display mb-5">
+              Le bon plan pour<br className="hidden sm:block" /> votre objectif SAP
+            </h1>
+            <p className="text-slate-400 max-w-xl mx-auto text-base leading-relaxed mb-10">
+              Commencez gratuitement, passez au Pro quand vous êtes prêt à préparer votre certification.
+            </p>
+
+            {/* Toggle annuel/mensuel */}
+            <div className="inline-flex items-center gap-1 bg-white/8 rounded-full p-1 border border-white/10">
+              <button onClick={() => setAnnual(false)}
+                className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                  !annual ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-white"
+                }`}>
+                Mensuel
+              </button>
+              <button onClick={() => setAnnual(true)}
+                className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                  annual ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-white"
+                }`}>
+                Annuel
+                <span className="text-xs bg-emerald-500 text-white px-1.5 py-0.5 rounded-full font-bold">-27%</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -183,12 +186,9 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-8 pb-16">
           <div className="grid md:grid-cols-3 gap-5">
             {PLANS.map((plan, i) => (
-              <motion.div
+              <div
                 key={plan.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className={`bg-white dark:bg-slate-800 rounded-2xl border-2 ${plan.color} overflow-hidden flex flex-col`}
+                className={`bg-white dark:bg-slate-900 rounded-2xl border-2 ${plan.color} overflow-hidden flex flex-col`}
               >
                 {/* Badge */}
                 <div className="h-8 flex items-center justify-center">
@@ -269,7 +269,7 @@ export default function PricingPage() {
                     ))}
                   </ul>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -281,15 +281,12 @@ export default function PricingPage() {
           )}
 
           {/* Banner lancement */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }}
-            className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4"
-          >
+          <div className="mt-8 bg-sapBlue/8 border border-sapBlue/20 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <p className="font-semibold text-blue-900 dark:text-blue-200 text-sm">
+              <p className="font-semibold text-slate-900 dark:text-white text-sm">
                 🎉 Phase de lancement — Accès Pro totalement gratuit
               </p>
-              <p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Profitez de toutes les fonctionnalités Pro sans carte bancaire. Vous serez prévenu avant toute activation de la facturation.
               </p>
             </div>
@@ -302,20 +299,17 @@ export default function PricingPage() {
                 {upgrading ? "Activation…" : "Activer Pro gratuitement →"}
               </button>
             )}
-          </motion.div>
+          </div>
 
           {/* Comparatif détaillé */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.5 }}
-            className="mt-10 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden"
-          >
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700">
-              <h2 className="font-bold text-slate-900 dark:text-white">Comparatif détaillé</h2>
+          <div className="mt-10 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-800">
+              <h2 className="font-display font-semibold text-slate-900 dark:text-white tracking-tight-xl">Comparatif détaillé</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-slate-700/50">
+                  <tr className="bg-gray-50 dark:bg-slate-800/50">
                     <th className="text-left px-6 py-3 font-semibold text-slate-600 dark:text-slate-300 w-1/2">Fonctionnalité</th>
                     <th className="text-center px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Gratuit</th>
                     <th className="text-center px-4 py-3 font-semibold text-sapBlue dark:text-blue-400">Pro</th>
@@ -346,14 +340,11 @@ export default function PricingPage() {
                 </tbody>
               </table>
             </div>
-          </motion.div>
+          </div>
 
           {/* FAQ */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.6 }}
-            className="mt-10 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6"
-          >
-            <h2 className="font-bold text-slate-900 dark:text-white mb-5">Questions fréquentes</h2>
+          <div className="mt-10 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
+            <h2 className="font-display font-semibold text-slate-900 dark:text-white mb-5 tracking-tight-xl">Questions fréquentes</h2>
             <div className="space-y-2">
               {FAQ.map((item, i) => (
                 <div key={i} className="border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
@@ -376,13 +367,10 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* CTA final */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.7 }}
-            className="mt-10 text-center"
-          >
+          <div className="mt-10 text-center">
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
               Des questions ? Contactez-nous à{" "}
               <a href="mailto:contact@hanaflow.fr" className="text-sapBlue hover:underline">contact@hanaflow.fr</a>
@@ -390,7 +378,7 @@ export default function PricingPage() {
             <Link to="/certifications" className="inline-flex items-center gap-2 text-sm text-sapBlue dark:text-blue-400 hover:underline font-medium">
               ← Voir les certifications disponibles
             </Link>
-          </motion.div>
+          </div>
         </div>
       </div>
     </>

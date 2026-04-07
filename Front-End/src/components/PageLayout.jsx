@@ -1,29 +1,22 @@
-import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import SEO from "./SEO";
 
 /**
  * PageLayout — Hero + wrapper réutilisable pour les pages non-modules (S/4HANA, IA&Joule, etc.)
  *
- * Usage :
- * <PageLayout
- *   label="S/4HANA"
- *   title="SAP S/4HANA"
- *   description="..."
- *   gradient="from-indigo-900 via-indigo-700 to-violet-500"
- *   badge="ERP nouvelle génération · SAP HANA · Fiori"
- *   seoTitle="SAP S/4HANA – Vue d'ensemble"
- *   seoDescription="..."
- *   seoPath="/s4hana"
- * >
- *   {/* contenu *\/}
- * </PageLayout>
+ * Props :
+ *   label        — texte du badge + breadcrumb
+ *   title        — titre h1
+ *   description  — sous-titre
+ *   accent       — couleur CSS hex pour le glow (défaut : #0F52BA)
+ *   badge        — texte optionnel à droite du badge
+ *   seoTitle / seoDescription / seoPath
  */
 const PageLayout = ({
   label,
   title,
   description,
-  gradient,
+  accent = "#0F52BA",
   badge,
   seoTitle,
   seoDescription,
@@ -34,49 +27,56 @@ const PageLayout = ({
     <SEO title={seoTitle} description={seoDescription} path={seoPath} />
 
     <div className="min-h-[calc(100vh-4rem)]">
-      {/* Hero */}
-      <div className={`bg-gradient-to-br ${gradient} text-white`}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-          {/* Fil d'Ariane */}
-          <nav
-            className="flex items-center gap-2 text-xs text-white/60 mb-6"
-            aria-label="Fil d'Ariane"
-          >
-            <Link to="/" className="hover:text-white/90 transition-colors">
-              Accueil
-            </Link>
+      {/* ── Hero dark ───────────────────────────────────── */}
+      <div className="grain relative bg-slate-950 pt-20 pb-14 px-4 sm:px-6 overflow-hidden">
+        {/* Glow orb */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div
+            className="absolute top-0 left-1/3 w-[500px] h-[350px] rounded-full blur-[110px] opacity-20"
+            style={{ background: accent }}
+          />
+          {/* Grid */}
+          <div
+            className="absolute inset-0 opacity-[0.025]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-xs text-slate-500 mb-5" aria-label="Fil d'Ariane">
+            <Link to="/" className="hover:text-slate-300 transition-colors">Accueil</Link>
             <span>/</span>
-            <span className="text-white/90">{label}</span>
+            <span className="text-slate-400">{label}</span>
           </nav>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-4">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 border border-white/30 backdrop-blur-sm">
-                {label}
-              </span>
-              {badge && (
-                <span className="text-xs text-white/70">{badge}</span>
-              )}
-            </div>
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 mb-4">
+            <span
+              className="px-3 py-1 rounded-full text-xs font-semibold border"
+              style={{ background: `${accent}20`, color: accent, borderColor: `${accent}40` }}
+            >
+              {label}
+            </span>
+            {badge && <span className="text-xs text-slate-500">{badge}</span>}
+          </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
-              {title}
-            </h1>
-            <p className="text-base sm:text-lg text-white/80 max-w-2xl leading-relaxed">
-              {description}
-            </p>
-          </motion.div>
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-display mb-5 leading-tight">
+            {title}
+          </h1>
+          <p className="text-slate-400 max-w-2xl text-base leading-relaxed">
+            {description}
+          </p>
         </div>
       </div>
 
-      {/* Contenu */}
-      <div className="bg-gray-50 dark:bg-sapDark">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+      {/* ── Contenu ─────────────────────────────────────── */}
+      <div className="bg-gray-50 dark:bg-slate-950">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-10">
           {children}
         </div>
       </div>
