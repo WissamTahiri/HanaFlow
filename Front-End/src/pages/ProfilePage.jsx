@@ -7,7 +7,7 @@ import SEO from "../components/SEO";
 
 /* ─── Icônes ──────────────────────────────────────────────── */
 const CheckIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polyline points="20 6 9 17 4 12"/>
   </svg>
 );
@@ -40,33 +40,30 @@ const EyeIcon = ({ open }) => open ? (
 
 /* ─── Objectifs SAP ───────────────────────────────────────── */
 const LEARNING_GOALS = [
-  { value: "fi",         label: "Consultant SAP FI",    color: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" },
-  { value: "co",         label: "Consultant SAP CO",    color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400" },
-  { value: "mm",         label: "Consultant SAP MM",    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400" },
-  { value: "sd",         label: "Consultant SAP SD",    color: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400" },
-  { value: "hcm",        label: "Consultant SAP HCM",   color: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" },
-  { value: "pp",         label: "Consultant SAP PP",    color: "bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400" },
-  { value: "s4hana",     label: "Architecte S/4HANA",   color: "bg-sky-100 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400" },
-  { value: "developer",  label: "Développeur ABAP/BTP", color: "bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400" },
+  { value: "fi",        label: "Consultant SAP FI",    accent: "#3B82F6" },
+  { value: "co",        label: "Consultant SAP CO",    accent: "#8B5CF6" },
+  { value: "mm",        label: "Consultant SAP MM",    accent: "#10B981" },
+  { value: "sd",        label: "Consultant SAP SD",    accent: "#F59E0B" },
+  { value: "hcm",       label: "Consultant SAP HCM",   accent: "#EC4899" },
+  { value: "pp",        label: "Consultant SAP PP",    accent: "#EF4444" },
+  { value: "s4hana",    label: "Architecte S/4HANA",   accent: "#06B6D4" },
+  { value: "developer", label: "Développeur ABAP/BTP", accent: "#14B8A6" },
 ];
 
-/* ─── Composant ───────────────────────────────────────────── */
-const ProfilePage = () => {
+export default function ProfilePage() {
   const { user, updateProfile } = useAuth();
   const { visitedCount, totalModules } = useProgress();
   const { isPro, plan, downgradeToFree } = useSubscription();
   const navigate = useNavigate();
 
-  /* Formulaire */
-  const [name, setName]                   = useState(user?.name || "");
-  const [password, setPassword]           = useState("");
+  const [name,            setName]            = useState(user?.name || "");
+  const [password,        setPassword]        = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPwd, setShowPwd]             = useState(false);
-  const [success, setSuccess]             = useState("");
-  const [error, setError]                 = useState("");
-  const [loading, setLoading]             = useState(false);
+  const [showPwd,         setShowPwd]         = useState(false);
+  const [success,         setSuccess]         = useState("");
+  const [error,           setError]           = useState("");
+  const [loading,         setLoading]         = useState(false);
 
-  /* Objectif d'apprentissage (localStorage) */
   const [goal, setGoal] = useState(
     () => localStorage.getItem("hanaflow_learning_goal") || ""
   );
@@ -77,7 +74,6 @@ const ProfilePage = () => {
     localStorage.setItem("hanaflow_learning_goal", next);
   };
 
-  /* Certif FI (localStorage) */
   const fiLessonsCompleted = useMemo(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("hanaflow_fi_lessons") || "[]");
@@ -89,32 +85,21 @@ const ProfilePage = () => {
     ? user.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
     : "?";
 
-  /* Soumission formulaire */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (password && password !== confirmPassword)
-      return setError("Les mots de passe ne correspondent pas.");
-    if (password && password.length < 8)
-      return setError("Le mot de passe doit contenir au moins 8 caractères.");
-    if (!name.trim())
-      return setError("Le nom ne peut pas être vide.");
-
+    setError(""); setSuccess("");
+    if (password && password !== confirmPassword) return setError("Les mots de passe ne correspondent pas.");
+    if (password && password.length < 8) return setError("Le mot de passe doit contenir au moins 8 caractères.");
+    if (!name.trim()) return setError("Le nom ne peut pas être vide.");
     const updates = {};
     if (name !== user?.name) updates.name = name.trim();
-    if (password)            updates.password = password;
-
-    if (Object.keys(updates).length === 0)
-      return setError("Aucune modification détectée.");
-
+    if (password) updates.password = password;
+    if (Object.keys(updates).length === 0) return setError("Aucune modification détectée.");
     setLoading(true);
     try {
       await updateProfile(updates);
       setSuccess("Profil mis à jour avec succès !");
-      setPassword("");
-      setConfirmPassword("");
+      setPassword(""); setConfirmPassword("");
     } catch (err) {
       setError(err.message || "Erreur lors de la mise à jour.");
     } finally {
@@ -128,87 +113,82 @@ const ProfilePage = () => {
     <>
       <SEO title="Mon profil" description="Modifiez vos informations personnelles sur HanaFlow." path="/profil" />
 
-      <div className="min-h-screen bg-gray-50 dark:bg-sapDark py-8 px-4 sm:px-6">
-        <div className="max-w-2xl mx-auto space-y-6">
+      {/* ── Hero dark ─────────────────────────────────── */}
+      <div className="grain relative bg-slate-950 pt-20 pb-24 px-4 sm:px-6 overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div className="absolute top-0 right-1/4 w-[400px] h-[300px] rounded-full bg-sapBlue/15 blur-[100px]" />
+        </div>
 
-          {/* ── Retour ──────────────────────────────────────── */}
-          <Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-sapBlue dark:text-sapAccent hover:underline">
+        <div className="relative max-w-2xl mx-auto">
+          <Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-300 transition-colors mb-8">
             ← Retour au dashboard
           </Link>
 
-          {/* ── Header profil ────────────────────────────────── */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card overflow-hidden">
-            <div className="h-20 bg-gradient-to-r from-sapBlueDark to-sapBlue" />
-            <div className="px-6 pb-6">
-              <div className="flex items-end justify-between -mt-8 mb-4">
-                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-sapBlue to-sapBlueDark
-                                flex items-center justify-center text-white font-bold text-xl
-                                shadow-soft border-4 border-white dark:border-slate-800 flex-shrink-0">
-                  {initials}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full
-                                    ${isPro
-                                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                      : "bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400"
-                                    }`}>
-                    {isPro ? <><StarIcon /> Plan Pro</> : "Plan Gratuit"}
-                  </span>
-                </div>
-              </div>
-
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">{user?.name}</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{user?.email}</p>
+          {/* Carte profil flottante */}
+          <div className="flex items-center gap-5">
+            <div className="h-16 w-16 rounded-2xl flex items-center justify-center text-white font-display font-bold text-xl flex-shrink-0 border border-white/15"
+              style={{ background: "linear-gradient(135deg, #0F52BA, #1a6fd8)" }}>
+              {initials}
+            </div>
+            <div>
+              <h1 className="font-display text-2xl font-bold text-white tracking-display">{user?.name}</h1>
+              <p className="text-sm text-slate-500 mt-0.5">{user?.email}</p>
               {activeGoal && (
-                <span className={`inline-block mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full ${activeGoal.color}`}>
+                <span className="inline-block mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full border"
+                  style={{ background: `${activeGoal.accent}18`, color: activeGoal.accent, borderColor: `${activeGoal.accent}40` }}>
                   {activeGoal.label}
                 </span>
               )}
-
-              {/* Stats rapides */}
-              <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-gray-100 dark:border-slate-700">
-                <div className="text-center">
-                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{visitedCount}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Modules visités</p>
-                </div>
-                <div className="text-center border-x border-gray-100 dark:border-slate-700">
-                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{fiLessonsCompleted}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Leçons FI</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                    {Math.round((visitedCount / totalModules) * 100)}%
-                  </p>
-                  <p className="text-xs text-slate-400 mt-0.5">Progression</p>
-                </div>
-              </div>
+            </div>
+            <div className="ml-auto">
+              <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${
+                isPro ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-white/8 text-slate-400 border border-white/10"
+              }`}>
+                {isPro ? <><StarIcon /> Pro</> : "Gratuit"}
+              </span>
             </div>
           </div>
 
-          {/* ── Objectif d'apprentissage ─────────────────────── */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+          {/* Stats rapides */}
+          <div className="grid grid-cols-3 gap-3 mt-8">
+            {[
+              { v: visitedCount,                                            l: "Modules visités" },
+              { v: fiLessonsCompleted,                                      l: "Leçons FI" },
+              { v: `${Math.round((visitedCount / totalModules) * 100)}%`,  l: "Progression" },
+            ].map(({ v, l }) => (
+              <div key={l} className="flex flex-col items-center justify-center px-4 py-3 rounded-xl bg-white/5 border border-white/8">
+                <span className="font-display text-2xl font-bold text-white">{v}</span>
+                <span className="text-xs text-slate-500 mt-0.5">{l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Contenu ───────────────────────────────────── */}
+      <div className="bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 py-8">
+        <div className="max-w-2xl mx-auto -mt-10 space-y-5">
+
+          {/* Objectif d'apprentissage */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
+            <h2 className="font-display text-base font-semibold text-slate-900 dark:text-white mb-1 tracking-tight-xl">
               Objectif d'apprentissage
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Quel profil SAP vises-tu ? HanaFlow adaptera tes recommandations en conséquence.
+              Quel profil SAP vises-tu ?
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {LEARNING_GOALS.map((g) => (
-                <button
-                  key={g.value}
-                  onClick={() => selectGoal(g.value)}
+                <button key={g.value} onClick={() => selectGoal(g.value)}
                   className={`relative flex flex-col items-center text-center px-3 py-3 rounded-xl border text-xs font-medium
-                               transition-all hover:-translate-y-0.5
-                               ${goal === g.value
-                                 ? `${g.color} border-current shadow-sm`
-                                 : "bg-gray-50 dark:bg-slate-700/50 border-gray-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-300"
-                               }`}
-                >
+                               transition-all hover:-translate-y-0.5 ${
+                    goal === g.value
+                      ? "border-current shadow-sm"
+                      : "bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300"
+                  }`}
+                  style={goal === g.value ? { background: `${g.accent}18`, color: g.accent, borderColor: `${g.accent}40` } : {}}>
                   {goal === g.value && (
-                    <span className="absolute top-1.5 right-1.5 text-current opacity-70">
-                      <CheckIcon />
-                    </span>
+                    <span className="absolute top-1.5 right-1.5 opacity-70"><CheckIcon /></span>
                   )}
                   {g.label}
                 </button>
@@ -216,122 +196,79 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* ── Informations personnelles ─────────────────────── */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
+          {/* Informations personnelles */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
             <div className="flex items-center gap-2 mb-5">
               <span className="text-slate-400"><EditIcon /></span>
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+              <h2 className="font-display text-base font-semibold text-slate-900 dark:text-white tracking-tight-xl">
                 Informations personnelles
               </h2>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Nom */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-                  Nom complet
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600
-                             bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm
-                             focus:outline-none focus:ring-2 focus:ring-sapBlue/50"
-                />
+                <label className="label">Nom complet</label>
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="input" />
               </div>
-
-              {/* Email (read-only) */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={user?.email || ""}
-                  disabled
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600
-                             bg-gray-50 dark:bg-slate-800 text-gray-400 text-sm cursor-not-allowed"
-                />
+                <label className="label">Email</label>
+                <input type="email" value={user?.email || ""} disabled
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700
+                             bg-gray-50 dark:bg-slate-800 text-gray-400 text-sm cursor-not-allowed" />
                 <p className="text-xs text-gray-400 mt-1">L'adresse email ne peut pas être modifiée.</p>
               </div>
-
-              {/* Nouveau mot de passe */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-                  Nouveau mot de passe{" "}
-                  <span className="text-gray-400 font-normal">(optionnel)</span>
+                <label className="label">
+                  Nouveau mot de passe <span className="text-slate-400 font-normal">(optionnel)</span>
                 </label>
                 <div className="relative">
-                  <input
-                    type={showPwd ? "text" : "password"}
-                    value={password}
+                  <input type={showPwd ? "text" : "password"} value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Laisser vide pour ne pas changer"
-                    className="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-200 dark:border-slate-600
-                               bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm
-                               focus:outline-none focus:ring-2 focus:ring-sapBlue/50"
-                  />
+                    className="input pr-11" />
                   {password && (
-                    <button
-                      type="button"
-                      onClick={() => setShowPwd((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                    >
+                    <button type="button" onClick={() => setShowPwd((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                       <EyeIcon open={showPwd} />
                     </button>
                   )}
                 </div>
-                {password && (
-                  <p className="text-xs text-slate-400 mt-1">8 caractères minimum.</p>
-                )}
+                {password && <p className="text-xs text-slate-400 mt-1">8 caractères minimum.</p>}
               </div>
-
-              {/* Confirmation */}
               {password && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-                    Confirmer le mot de passe
-                  </label>
-                  <input
-                    type={showPwd ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600
-                               bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm
-                               focus:outline-none focus:ring-2 focus:ring-sapBlue/50"
-                  />
+                  <label className="label">Confirmer le mot de passe</label>
+                  <input type={showPwd ? "text" : "password"} value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)} className="input" />
                 </div>
               )}
 
               {error   && <p className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{error}</p>}
               {success && <p className="text-sm text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 rounded-lg">{success}</p>}
 
-              <button
-                type="submit"
-                disabled={loading}
+              <button type="submit" disabled={loading}
                 className="w-full py-2.5 bg-sapBlue text-white rounded-xl font-medium text-sm
-                           hover:bg-sapBlueDark transition-colors disabled:opacity-50"
-              >
+                           hover:bg-sapBlueDark transition-colors disabled:opacity-50
+                           shadow-[0_4px_14px_rgba(15,82,186,0.25)]">
                 {loading ? "Enregistrement…" : "Enregistrer les modifications"}
               </button>
             </form>
           </div>
 
-          {/* ── Plan & abonnement ────────────────────────────── */}
-          <div className={`rounded-2xl border shadow-card p-6
-                           ${isPro
-                             ? "bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 dark:from-amber-900/10 dark:to-orange-900/10 dark:border-amber-700/40"
-                             : "bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700"
-                           }`}>
+          {/* Plan & abonnement */}
+          <div className={`rounded-2xl border p-6 ${
+            isPro
+              ? "bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 dark:from-amber-900/10 dark:to-orange-900/10 dark:border-amber-700/40"
+              : "bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800"
+          }`}>
             <div className="flex items-center gap-2 mb-4">
               <span className={isPro ? "text-amber-500" : "text-slate-400"}><ZapIcon /></span>
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">Mon abonnement</h2>
+              <h2 className="font-display text-base font-semibold text-slate-900 dark:text-white tracking-tight-xl">Mon abonnement</h2>
             </div>
 
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div>
-                <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                <p className="font-display text-2xl font-bold text-slate-900 dark:text-white">
                   {isPro ? "Plan Pro" : "Plan Gratuit"}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
@@ -342,26 +279,22 @@ const ProfilePage = () => {
                 </p>
               </div>
               {isPro ? (
-                <button
-                  onClick={downgradeToFree}
-                  className="text-sm text-slate-400 hover:text-red-500 transition-colors hover:underline flex-shrink-0"
-                >
+                <button onClick={downgradeToFree}
+                  className="text-sm text-slate-400 hover:text-red-500 transition-colors hover:underline flex-shrink-0">
                   Rétrograder
                 </button>
               ) : (
-                <button
-                  onClick={() => navigate("/pricing")}
-                  className="flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r
-                             from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-xl
-                             hover:from-amber-600 hover:to-orange-600 transition-colors shadow-sm"
-                >
+                <button onClick={() => navigate("/pricing")}
+                  className="flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5
+                             bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-xl
+                             hover:from-amber-600 hover:to-orange-600 transition-colors shadow-sm">
                   <StarIcon /> Passer à Pro
                 </button>
               )}
             </div>
 
             {!isPro && (
-              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   "7 chapitres FI complets (C_TS4FI_2023)",
                   "Simulateur d'examen 40 questions",
@@ -381,6 +314,4 @@ const ProfilePage = () => {
       </div>
     </>
   );
-};
-
-export default ProfilePage;
+}
