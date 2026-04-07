@@ -2,9 +2,6 @@
    HanaFlow — Design System
    ============================================================ */
 
-/* Inter font via Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,7 +12,11 @@
 @layer base {
   :root {
     color-scheme: light dark;
-    scroll-behavior: smooth;
+  }
+
+  html {
+    /* Lenis smooth scroll — remplace scroll-behavior: smooth */
+    /* (géré en JS, pas ici) */
   }
 
   body {
@@ -24,18 +25,30 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Clash Display sur tous les titres sémantiques */
+  h1, h2 {
+    font-family: "Clash Display", system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  h3, h4, h5, h6 {
+    font-family: "Clash Display", system-ui, sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-sapBlue rounded-sm;
   }
 
-  /* Smooth color transitions on dark mode toggle */
+  /* Transitions douces dark mode */
   *, *::before, *::after {
     transition-property: background-color, border-color, color, fill, stroke;
     transition-duration: 200ms;
     transition-timing-function: ease;
   }
 
-  /* Disable color transitions on interactive elements (use Tailwind instead) */
   a, button, input, select, textarea, [role="button"] {
     transition-property: all;
     transition-duration: 150ms;
@@ -93,7 +106,16 @@
   }
 
   .section-title {
-    @apply text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white;
+    @apply text-2xl sm:text-3xl font-display font-semibold text-slate-900 dark:text-white;
+    letter-spacing: -0.02em;
+  }
+
+  /* Titre display grande taille — hero sections */
+  .display-title {
+    font-family: "Clash Display", system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
   }
 }
 
@@ -103,10 +125,45 @@
 @layer utilities {
   .text-balance { text-wrap: balance; }
 
+  .font-display {
+    font-family: "Clash Display", system-ui, sans-serif;
+  }
+
   .gradient-text {
     background: linear-gradient(135deg, #0F52BA, #0EA5E9);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Grain texture — donne de la profondeur aux backgrounds */
+  .grain {
+    position: relative;
+  }
+
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* Ligne animée en dégradé */
+  .gradient-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #0F52BA, #0EA5E9, transparent);
+  }
+
+  /* Fond glow subtil pour éléments hero */
+  .glow-blue {
+    box-shadow: 0 0 60px rgba(15, 82, 186, 0.15), 0 0 120px rgba(14, 165, 233, 0.08);
+  }
+
+  /* Tracking serré pour les titres display */
+  .tracking-display { letter-spacing: -0.03em; }
+  .tracking-tight-xl { letter-spacing: -0.02em; }
 }
