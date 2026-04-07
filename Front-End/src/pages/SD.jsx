@@ -280,7 +280,7 @@ const SD = () => (
     code="SD"
     title="Sales & Distribution"
     description="Maîtrisez le cycle Order-to-Cash SAP : commande client, livraison, facturation, intégration FI-SD et reconnaissance de revenus sur S/4HANA."
-    gradient="from-purple-900 via-violet-700 to-purple-500"
+    accent="#F59E0B"
     badge="Ventes · O2C · Facturation"
     seoTitle="Module SAP SD – Sales & Distribution"
     seoDescription="Apprenez le module SAP SD (Sales & Distribution) : cycle O2C, Sales Order, Post Goods Issue, Billing, intégration FI-SD et RAR sur S/4HANA."

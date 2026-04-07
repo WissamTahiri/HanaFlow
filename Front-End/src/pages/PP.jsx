@@ -274,7 +274,7 @@ const PP = () => (
     code="PP"
     title="Production Planning"
     description="Maîtrisez la planification et l'exécution de production SAP : BOM, gammes, MRP, ordres de fabrication, intégration CO-PC et S/4HANA."
-    gradient="from-teal-900 via-teal-700 to-cyan-500"
+    accent="#EF4444"
     badge="Production · MRP · CO-PC"
     seoTitle="Module SAP PP – Production Planning"
     seoDescription="Apprenez le module SAP PP (Production Planning) : BOM, routing, MRP, ordres de fabrication, intégration CO-PC, MRP Live et S/4HANA."

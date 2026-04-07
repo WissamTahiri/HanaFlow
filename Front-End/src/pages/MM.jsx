@@ -278,7 +278,7 @@ const MM = () => (
     code="MM"
     title="Materials Management"
     description="Maîtrisez le cycle Procure-to-Pay SAP : achats, réception des marchandises, vérification de factures et intégration FI-MM sur S/4HANA."
-    gradient="from-orange-900 via-orange-600 to-amber-400"
+    accent="#10B981"
     badge="Achats · Stocks · P2P"
     seoTitle="Module SAP MM – Materials Management"
     seoDescription="Apprenez le module SAP MM (Materials Management) : cycle P2P, Purchase Requisition, PO, Goods Receipt, MIRO, GR/IR et intégration FI-MM sur S/4HANA."

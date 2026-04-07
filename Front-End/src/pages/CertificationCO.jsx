@@ -326,19 +326,19 @@ export default function CertificationCO() {
 
       <div className="min-h-[calc(100vh-4rem)]">
         {/* Hero */}
-        <div className="bg-gradient-to-br from-indigo-900 via-indigo-700 to-indigo-500 text-white">
+        <div className="grain relative bg-slate-950 text-white overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-            <nav className="flex items-center gap-2 text-xs text-white/60 mb-4">
-              <Link to="/" className="hover:text-white">Accueil</Link>
+            <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+              <Link to="/" className="hover:text-slate-300">Accueil</Link>
               <span>/</span>
-              <Link to="/certifications" className="hover:text-white">Certifications</Link>
+              <Link to="/certifications" className="hover:text-slate-300">Certifications</Link>
               <span>/</span>
               <span className="text-white/90">SAP CO</span>
             </nav>
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
                 <p className="text-xs font-mono text-white/60 mb-1">{cert.code}</p>
-                <h1 className="text-2xl sm:text-3xl font-extrabold mb-2">{cert.shortName}</h1>
+                <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-display mb-2">{cert.shortName}</h1>
                 <div className="flex flex-wrap gap-3 text-sm">
                   <span className="bg-white/20 px-3 py-1 rounded-full">{cert.examQuestions} questions</span>
                   <span className="bg-white/20 px-3 py-1 rounded-full">{cert.examDuration} min</span>
@@ -380,13 +380,13 @@ export default function CertificationCO() {
         </div>
 
         {/* Corps principal */}
-        <div className="bg-gray-50 dark:bg-sapDark">
+        <div className="bg-gray-50 dark:bg-slate-950">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
             <div className="flex gap-6 items-start">
 
               {/* Sidebar */}
               <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-20">
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden">
                   <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
                     <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chapitres</p>
                   </div>
@@ -442,7 +442,7 @@ export default function CertificationCO() {
               {/* Contenu principal */}
               <main className="flex-1 min-w-0">
                 {chapter && (
-                  <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700">
                       <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                         Chapitre {chapter.number} · {chapter.weight}% de l'examen
@@ -515,7 +515,7 @@ export default function CertificationCO() {
                 )}
 
                 {/* Navigation mobile */}
-                <div className="lg:hidden mt-4 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <div className="lg:hidden mt-4 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden">
                   <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tous les chapitres</p>
                   </div>

@@ -20,7 +20,7 @@ function formatTime(seconds) {
 function StartScreen({ onStart }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-8 text-center">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-8 text-center">
         <div className="h-16 w-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -89,7 +89,7 @@ function ResultsScreen({ answers, questions, timeUsed }) {
     const isCorrect = userAnswer === q.correctIndex;
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs font-semibold text-slate-400 uppercase">Révision · Question {reviewIndex + 1}/{questions.length}</p>
             <button onClick={() => setReviewMode(false)} className="text-sm text-indigo-600 hover:underline">Retour aux résultats</button>
@@ -139,7 +139,7 @@ function ResultsScreen({ answers, questions, timeUsed }) {
         </p>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-5">
         <h3 className="font-bold text-slate-900 dark:text-white mb-4">Résultats par chapitre</h3>
         <div className="space-y-3">
           {Object.entries(byChapter).map(([chapter, data]) => {
@@ -222,8 +222,8 @@ export default function ExamSimulatorCO() {
     return (
       <>
         <SEO title="Simulateur d'examen SAP CO" description="Accès Pro requis" path="/certifications/co/examen" />
-        <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sapDark flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-8 text-center max-w-md">
+        <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-slate-950 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-8 text-center max-w-md">
             <div className="h-14 w-14 bg-indigo-600/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -275,7 +275,7 @@ export default function ExamSimulatorCO() {
   return (
     <>
       <SEO title="Simulateur d'examen SAP CO — C_TS4CO_2023" description="Simulateur d'examen 40 questions format réel SAP CO Controlling." path="/certifications/co/examen" />
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sapDark">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-slate-950">
 
         {phase === "exam" && (
           <div className="sticky top-16 z-30 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 py-2">
@@ -312,7 +312,7 @@ export default function ExamSimulatorCO() {
               <motion.div
                 key={currentQ}
                 initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }}
-                className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6"
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6"
               >
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-600/10 dark:bg-indigo-600/20 px-2.5 py-1 rounded-lg">
@@ -364,7 +364,7 @@ export default function ExamSimulatorCO() {
               </motion.div>
 
               <div className="lg:w-48">
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-4 sticky top-32">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 sticky top-32">
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Navigation</p>
                   <div className="grid grid-cols-5 gap-1">
                     {coMockExamQuestions.map((_, i) => (

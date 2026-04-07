@@ -579,7 +579,7 @@ const FI = () => (
       code="FI"
       title="Financial Accounting"
       description="Maîtrisez la comptabilité externe SAP : grand livre, fournisseurs, clients, immobilisations et clôture financière sur S/4HANA."
-      gradient="from-sapBlueDark via-sapBlue to-blue-500"
+      accent="#3B82F6"
       badge="Comptabilité · Clôture · Reporting"
       seoTitle="Module SAP FI – Financial Accounting"
       seoDescription="Apprenez le module SAP FI (Financial Accounting) : GL, AP, AR, AA, flux P2P et O2C, clôture, Universal Journal S/4HANA et T-codes essentiels."

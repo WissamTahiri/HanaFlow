@@ -381,7 +381,7 @@ const CO = () => (
     code="CO"
     title="Controlling"
     description="Maîtrisez l'analyse interne des coûts et de la rentabilité SAP : cost centers, profit centers, CO-PA et product costing sur S/4HANA."
-    gradient="from-emerald-900 via-emerald-700 to-teal-500"
+    accent="#8B5CF6"
     badge="Controlling · Rentabilité · CO-PA"
     seoTitle="Module SAP CO – Controlling"
     seoDescription="Apprenez le module SAP CO (Controlling) : cost centers, profit centers, internal orders, CO-PA, product costing et Universal Journal S/4HANA."
