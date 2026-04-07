@@ -261,7 +261,7 @@ const HCM = () => (
     code="HCM"
     title="Human Capital Management"
     description="Maîtrisez la gestion des ressources humaines SAP : administration du personnel, temps, paie, SuccessFactors et la stratégie cloud RH de SAP."
-    gradient="from-red-900 via-rose-700 to-red-500"
+    accent="#EC4899"
     badge="RH · Paie · SuccessFactors"
     seoTitle="Module SAP HCM – Human Capital Management"
     seoDescription="Apprenez le module SAP HCM : Personnel Administration, Organizational Management, Time Management, Payroll et SuccessFactors Employee Central."
