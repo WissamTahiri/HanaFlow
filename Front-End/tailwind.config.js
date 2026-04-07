@@ -41,8 +41,9 @@ module.exports = {
       },
 
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        mono: ["Fira Code", "Roboto Mono", "monospace"],
+        display: ["Clash Display", "system-ui", "sans-serif"],
+        sans:    ["Satoshi", "system-ui", "sans-serif"],
+        mono:    ["Fira Code", "Roboto Mono", "monospace"],
       },
 
       fontSize: {

@@ -1,4 +1,7 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import { useAuth } from "./AuthContext";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // ── Définition des badges ────────────────────────────────────────────────────
 export const BADGES = [
@@ -23,6 +26,8 @@ export const BADGES = [
   { id: "exam_co",      icon: "🎓", name: "Simulateur CO",         desc: "Terminer le simulateur d'examen CO",            xp: 300, category: "Examens" },
   { id: "exam_mm",      icon: "🎓", name: "Simulateur MM",         desc: "Terminer le simulateur d'examen MM",            xp: 300, category: "Examens" },
   { id: "exam_sd",      icon: "🎓", name: "Simulateur SD",         desc: "Terminer le simulateur d'examen SD",            xp: 300, category: "Examens" },
+  { id: "exam_hcm",     icon: "🎓", name: "Simulateur HCM",        desc: "Terminer le simulateur d'examen HCM",           xp: 300, category: "Examens" },
+  { id: "exam_pp",      icon: "🎓", name: "Simulateur PP",         desc: "Terminer le simulateur d'examen PP",            xp: 300, category: "Examens" },
   { id: "exam_pass",    icon: "⭐", name: "Reçu !",                desc: "Passer un simulateur d'examen avec ≥65%",       xp: 500, category: "Examens" },
 
   // Régularité
@@ -59,98 +64,99 @@ export function getLevelInfo(xp) {
   return { current, next, progress, xpInLevel: xp - current.minXP, xpToNext: next ? next.minXP - xp : 0 };
 }
 
-// ── Helpers localStorage ──────────────────────────────────────────────────────
-const load = (key, fallback) => { try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; } catch { return fallback; } };
-const save = (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} };
-
 // ── Context ───────────────────────────────────────────────────────────────────
 const GamificationContext = createContext(null);
 
 export function GamificationProvider({ children }) {
-  const [xp, setXP] = useState(() => load("hf_xp", 0));
-  const [earnedBadges, setEarnedBadges] = useState(() => load("hf_badges", []));
-  const [quizPassCount, setQuizPassCount] = useState(() => load("hf_quiz_pass", 0));
-  // notification queue for toast
+  const { token, isAuthenticated } = useAuth();
+
+  const [xp, setXP] = useState(0);
+  const [earnedBadges, setEarnedBadges] = useState([]);
+  const [streak, setStreak] = useState(0);
+  const [quizPassCount, setQuizPassCount] = useState(0);
   const [notification, setNotification] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+
+  // Evite de re-fetch si déjà chargé pour cette session
+  const loadedRef = useRef(false);
+
+  // Charge l'état depuis le serveur
+  const fetchState = useCallback(async () => {
+    if (!isAuthenticated || !token) return;
+    try {
+      const res = await fetch(`${API_URL}/gamification`, {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setXP(data.xp ?? 0);
+      setEarnedBadges(data.badges ?? []);
+      setStreak(data.streak ?? 0);
+      setQuizPassCount(data.quiz_pass_count ?? 0);
+      setLoaded(true);
+    } catch { /* silencieux si offline */ }
+  }, [isAuthenticated, token]);
+
+  useEffect(() => {
+    if (isAuthenticated && !loadedRef.current) {
+      loadedRef.current = true;
+      fetchState();
+    }
+    if (!isAuthenticated) {
+      loadedRef.current = false;
+      setLoaded(false);
+      setXP(0);
+      setEarnedBadges([]);
+      setStreak(0);
+      setQuizPassCount(0);
+    }
+  }, [isAuthenticated, fetchState]);
+
+  // Envoie un événement au serveur et applique les retours
+  const sendEvent = useCallback(async (type, payload = {}) => {
+    if (!isAuthenticated || !token) return;
+    try {
+      const res = await fetch(`${API_URL}/gamification/event`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        credentials: "include",
+        body: JSON.stringify({ type, payload }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      setXP(data.xp);
+      setEarnedBadges(data.badges);
+      setStreak(data.streak);
+      setQuizPassCount(data.quiz_pass_count);
+
+      // Affiche une notification pour chaque nouveau badge
+      if (data.newBadges?.length > 0) {
+        const badge = BADGES.find((b) => b.id === data.newBadges[0]);
+        if (badge) setNotification({ badge, ts: Date.now() });
+      }
+    } catch { /* silencieux si offline */ }
+  }, [isAuthenticated, token]);
 
   const hasBadge = useCallback((id) => earnedBadges.includes(id), [earnedBadges]);
 
-  const awardBadge = useCallback((id) => {
-    setEarnedBadges((prev) => {
-      if (prev.includes(id)) return prev;
-      const badge = BADGES.find((b) => b.id === id);
-      if (!badge) return prev;
-      const next = [...prev, id];
-      save("hf_badges", next);
-      // give XP + show notification
-      setXP((x) => { const nx = x + badge.xp; save("hf_xp", nx); return nx; });
-      setNotification({ badge, ts: Date.now() });
-      return next;
-    });
-  }, []);
-
-  const addXP = useCallback((amount) => {
-    setXP((prev) => { const next = prev + amount; save("hf_xp", next); return next; });
-  }, []);
-
-  // ── Événements déclencheurs ───────────────────────────────────────────────
-  const onLogin = useCallback(() => {
-    awardBadge("welcome");
-    // streak logic
-    const today = new Date().toDateString();
-    const lastLogin = load("hf_last_login", null);
-    const streak = load("hf_streak", 0);
-    if (lastLogin !== today) {
-      const yesterday = new Date(Date.now() - 86400000).toDateString();
-      const newStreak = lastLogin === yesterday ? streak + 1 : 1;
-      save("hf_streak", newStreak);
-      save("hf_last_login", today);
-      if (newStreak >= 7) awardBadge("streak_7");
-      else if (newStreak >= 3) awardBadge("streak_3");
-    }
-  }, [awardBadge]);
-
-  const onModuleVisit = useCallback((visitedCount) => {
-    if (visitedCount >= 1) awardBadge("first_module");
-    if (visitedCount >= 3) awardBadge("explorer");
-    if (visitedCount >= 6) awardBadge("sap_expert");
-  }, [awardBadge]);
-
-  const onLessonComplete = useCallback((module, lessonCount) => {
-    addXP(25);
-    if (lessonCount >= 5) awardBadge(`lesson_${module}`);
-  }, [awardBadge, addXP]);
-
-  const onQuizPass = useCallback((score100) => {
-    addXP(score100 === 100 ? 150 : 75);
-    if (score100 === 100) awardBadge("quiz_perfect");
-    setQuizPassCount((prev) => {
-      const next = prev + 1;
-      save("hf_quiz_pass", next);
-      if (next >= 3) awardBadge("quiz_pass");
-      return next;
-    });
-  }, [awardBadge, addXP]);
-
-  const onExamComplete = useCallback((module, passed) => {
-    addXP(passed ? 400 : 150);
-    awardBadge(`exam_${module}`);
-    if (passed) awardBadge("exam_pass");
-  }, [awardBadge, addXP]);
-
-  const onProActivated = useCallback(() => {
-    awardBadge("pro_member");
-  }, [awardBadge]);
+  const onLogin = useCallback(() => sendEvent("login"), [sendEvent]);
+  const onModuleVisit = useCallback((visitedCount) => sendEvent("module_visit", { visitedCount }), [sendEvent]);
+  const onLessonComplete = useCallback((module, lessonCount) => sendEvent("lesson_complete", { module, lessonCount }), [sendEvent]);
+  const onQuizPass = useCallback((score100) => sendEvent("quiz_pass", { score100 }), [sendEvent]);
+  const onExamComplete = useCallback((module, passed) => sendEvent("exam_complete", { module, passed }), [sendEvent]);
+  const onProActivated = useCallback(() => sendEvent("pro_activated"), [sendEvent]);
 
   const dismissNotification = useCallback(() => setNotification(null), []);
 
   return (
     <GamificationContext.Provider value={{
-      xp, earnedBadges, hasBadge, awardBadge, addXP,
+      xp, earnedBadges, streak, quizPassCount, loaded,
+      hasBadge,
       onLogin, onModuleVisit, onLessonComplete, onQuizPass, onExamComplete, onProActivated,
       notification, dismissNotification,
       levelInfo: getLevelInfo(xp),
-      streak: load("hf_streak", 0),
     }}>
       {children}
     </GamificationContext.Provider>

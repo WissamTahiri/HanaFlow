@@ -82,7 +82,7 @@ const validateBody = (schema) => (req, res, next) => {
 // Helpers — Tokens
 // ============================================================
 const generateAccessToken = (user) =>
-  jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  jwt.sign({ id: user.id, email: user.email, plan: user.plan }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
 const generateRefreshToken = () => crypto.randomBytes(64).toString("hex");
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
@@ -130,7 +130,7 @@ router.post("/register", authLimiter, validateBody(registerSchema), async (req, 
     // Argon2id : algorithme recommandé 2024 (gagnant du Password Hashing Competition)
     const password_hash = await argon2.hash(password, { type: argon2.argon2id });
     const result = await pool.query(
-      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, role",
+      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, role, plan",
       [name, email, password_hash]
     );
     const user = result.rows[0];
@@ -166,7 +166,7 @@ router.post("/login", authLimiter, validateBody(loginSchema), async (req, res, n
 
     res.cookie("refreshToken", refreshToken, cookieOptions);
     res.json({
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, plan: user.plan },
       token: accessToken,
     });
   } catch (err) {
@@ -182,7 +182,7 @@ router.post("/refresh", async (req, res, next) => {
   try {
     const hash = hashToken(rawToken);
     const result = await pool.query(
-      `SELECT rt.*, u.id as uid, u.name, u.email, u.role
+      `SELECT rt.*, u.id as uid, u.name, u.email, u.role, u.plan
        FROM refresh_tokens rt
        JOIN users u ON u.id = rt.user_id
        WHERE rt.token_hash = $1 AND rt.expires_at > NOW()`,
@@ -198,7 +198,7 @@ router.post("/refresh", async (req, res, next) => {
     // Rotation : suppression de l'ancien, création d'un nouveau
     await pool.query("DELETE FROM refresh_tokens WHERE token_hash = $1", [hash]);
 
-    const user = { id: row.uid, name: row.name, email: row.email, role: row.role };
+    const user = { id: row.uid, name: row.name, email: row.email, role: row.role, plan: row.plan };
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken();
     await saveRefreshToken(user.id, newRefreshToken);
@@ -229,7 +229,38 @@ router.post("/logout", async (req, res, next) => {
 router.get("/me", authMiddleware, async (req, res, next) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, email, role FROM users WHERE id = $1",
+      "SELECT id, name, email, role, plan FROM users WHERE id = $1",
+      [req.user.id]
+    );
+    const user = result.rows[0];
+    if (!user) return res.status(404).json({ message: "Utilisateur introuvable" });
+    res.json({ user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /auth/upgrade — Passe l'utilisateur en plan Pro
+// En production, ce endpoint sera appelé après validation du paiement Stripe (webhook)
+router.post("/upgrade", authMiddleware, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      "UPDATE users SET plan = 'pro' WHERE id = $1 RETURNING id, name, email, role, plan",
+      [req.user.id]
+    );
+    const user = result.rows[0];
+    if (!user) return res.status(404).json({ message: "Utilisateur introuvable" });
+    res.json({ user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /auth/downgrade — Repasse en plan gratuit
+router.post("/downgrade", authMiddleware, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      "UPDATE users SET plan = 'free' WHERE id = $1 RETURNING id, name, email, role, plan",
       [req.user.id]
     );
     const user = result.rows[0];
@@ -256,7 +287,7 @@ router.patch("/profile", authMiddleware, validateBody(profileSchema), async (req
 
     values.push(req.user.id);
     const result = await pool.query(
-      `UPDATE users SET ${updates.join(", ")} WHERE id = $${idx} RETURNING id, name, email, role`,
+      `UPDATE users SET ${updates.join(", ")} WHERE id = $${idx} RETURNING id, name, email, role, plan`,
       values
     );
 

@@ -1,293 +1,483 @@
-import { motion } from "motion/react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SEO from "../components/SEO";
 
-// --- Icônes SVG ---
-const ChartIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-  </svg>
-);
-const BookIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-  </svg>
-);
-const TargetIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-  </svg>
-);
-const ZapIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-  </svg>
-);
+gsap.registerPlugin(ScrollTrigger);
+
+/* ─── Icônes ──────────────────────────────────────────────── */
 const ArrowRight = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
   </svg>
 );
 const CheckIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polyline points="20 6 9 17 4 12"/>
   </svg>
 );
 
-// --- Données ---
-const stats = [
-  { value: "6",    label: "Modules SAP" },
-  { value: "50+",  label: "Concepts clés" },
-  { value: "100%", label: "Gratuit" },
-  { value: "1",    label: "Plateforme unifiée" },
-];
-
-const features = [
-  {
-    icon: <BookIcon />,
-    title: "Contenu structuré",
-    description: "Chaque module SAP (FI, CO, MM, SD, HCM, PP) est présenté de façon claire, avec les concepts fondamentaux et les intégrations clés.",
-    color: "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
-  },
-  {
-    icon: <ChartIcon />,
-    title: "Suivi de progression",
-    description: "Track ton avancement module par module. Visualise ce que tu as déjà maîtrisé et ce qu'il te reste à explorer.",
-    color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
-  },
-  {
-    icon: <TargetIcon />,
-    title: "Roadmap consultant",
-    description: "Génère une roadmap personnalisée selon ton profil cible : Finance, Supply Chain, RH ou IA & Joule.",
-    color: "bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
-  },
-  {
-    icon: <ZapIcon />,
-    title: "S/4HANA & IA Joule",
-    description: "Au-delà des modules classiques, plonge dans S/4HANA, l'Universal Journal, Fiori UX et l'IA intégrée SAP.",
-    color: "bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
-  },
-];
-
+/* ─── Données ──────────────────────────────────────────────── */
 const modules = [
-  { code: "FI",  name: "Financial Accounting", path: "/modules-sap/fi",  color: "from-blue-500 to-blue-700",     desc: "Comptabilité générale, clients, fournisseurs" },
-  { code: "CO",  name: "Controlling",          path: "/modules-sap/co",  color: "from-indigo-500 to-indigo-700", desc: "Centres de coûts, CO-PA, marge analytique" },
-  { code: "MM",  name: "Materials Mgmt",       path: "/modules-sap/mm",  color: "from-emerald-500 to-emerald-700",desc: "Achats, stocks, MRP, Procure-to-Pay" },
-  { code: "SD",  name: "Sales & Distribution", path: "/modules-sap/sd",  color: "from-orange-500 to-orange-700", desc: "Devis, livraisons, Order-to-Cash" },
-  { code: "HCM", name: "Human Capital Mgmt",   path: "/modules-sap/hcm", color: "from-purple-500 to-purple-700", desc: "RH, paie, temps, organisation" },
-  { code: "PP",  name: "Production Planning",  path: "/modules-sap/pp",  color: "from-rose-500 to-rose-700",     desc: "Ordres de fabrication, MRP, atelier" },
+  { code: "FI",  name: "Financial Accounting", path: "/modules-sap/fi",  accent: "#3B82F6", desc: "Comptabilité générale, clients, fournisseurs, états financiers", size: "large" },
+  { code: "CO",  name: "Controlling",          path: "/modules-sap/co",  accent: "#8B5CF6", desc: "Centres de coûts, CO-PA, marge analytique", size: "small" },
+  { code: "MM",  name: "Materials Mgmt",       path: "/modules-sap/mm",  accent: "#10B981", desc: "Achats, stocks, MRP, Procure-to-Pay", size: "small" },
+  { code: "SD",  name: "Sales & Distribution", path: "/modules-sap/sd",  accent: "#F59E0B", desc: "Devis, commandes, livraisons, Order-to-Cash", size: "medium" },
+  { code: "HCM", name: "Human Capital Mgmt",   path: "/modules-sap/hcm", accent: "#EC4899", desc: "RH, paie, temps, organisation", size: "medium" },
+  { code: "PP",  name: "Production Planning",  path: "/modules-sap/pp",  accent: "#EF4444", desc: "Ordres de fabrication, MRP II, atelier", size: "small" },
+];
+
+const marqueeItems = [
+  "FI — Finance", "CO — Controlling", "MM — Materials", "SD — Sales",
+  "HCM — HR", "PP — Production", "S/4HANA", "AI Joule", "Fiori UX",
+  "Universal Journal", "MRP", "Procure-to-Pay", "Order-to-Cash",
+];
+
+const stats = [
+  { value: 6,    suffix: "",   label: "Modules SAP" },
+  { value: 240,  suffix: "+",  label: "Concepts couverts" },
+  { value: 100,  suffix: "%",  label: "Gratuit" },
+  { value: 40,   suffix: "+",  label: "Exercices & quiz" },
 ];
 
 const perks = [
   "Contenu rédigé par un consultant SAP",
-  "Modules FI, CO, MM, SD, HCM, PP",
-  "S/4HANA & IA Joule couverts",
+  "S/4HANA & AI Joule couverts",
   "Roadmap personnalisée",
-  "Dashboard de progression",
-  "100% gratuit",
+  "Simulateurs d'examen",
 ];
 
-// --- Animation variants ---
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, delay },
-});
+/* ─── Composant Marquee ────────────────────────────────────── */
+function Marquee() {
+  const track = useRef(null);
 
-const Home = () => (
-  <>
-    <SEO
-      title="HanaFlow"
-      description="Master SAP Learning Platform — Apprends FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium."
-      path="/"
-    />
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    const tween = gsap.to(el, {
+      xPercent: -50,
+      duration: 28,
+      ease: "none",
+      repeat: -1,
+    });
+    return () => tween.kill();
+  }, []);
 
-    {/* ===== HERO ===== */}
-    <section className="relative overflow-hidden bg-gradient-to-br from-sapBlueDark via-sapBlue to-sapAccent">
-      {/* Motif décoratif */}
-      <div className="absolute inset-0 opacity-10" aria-hidden="true">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-white translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-white -translate-x-1/3 translate-y-1/3" />
-      </div>
+  const items = [...marqueeItems, ...marqueeItems];
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 text-center">
-        <motion.div {...fadeUp(0)}>
-          <span className="inline-block px-3 py-1 mb-6 text-xs font-semibold rounded-full bg-white/20 text-white backdrop-blur-sm border border-white/30">
-            Master SAP Learning Platform
+  return (
+    <div className="overflow-hidden border-y border-white/8 py-3 bg-white/3">
+      <div ref={track} className="flex gap-10 whitespace-nowrap w-max">
+        {items.map((item, i) => (
+          <span key={i} className="text-xs font-medium text-slate-400 uppercase tracking-widest flex items-center gap-3">
+            <span className="w-1 h-1 rounded-full bg-sapBlue inline-block" />
+            {item}
           </span>
-        </motion.div>
-
-        <motion.h1 {...fadeUp(0.1)} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 text-balance leading-tight">
-          Maîtrise SAP S/4HANA{" "}
-          <span className="text-sapAccent opacity-90">de zéro à consultant</span>
-        </motion.h1>
-
-        <motion.p {...fadeUp(0.2)} className="text-lg sm:text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed">
-          La plateforme éducative de référence pour apprendre les modules SAP, comprendre S/4HANA et construire une carrière de consultant.
-        </motion.p>
-
-        <motion.div {...fadeUp(0.3)} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            to="/modules-sap"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-sapBlue
-                       text-sm font-bold shadow-large hover:bg-blue-50 transition-all duration-150
-                       active:scale-[0.98]"
-          >
-            Explorer les modules SAP
-            <ArrowRight />
-          </Link>
-          <Link
-            to="/register"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border-2 border-white/50
-                       text-white text-sm font-bold hover:bg-white/10 transition-all duration-150
-                       active:scale-[0.98]"
-          >
-            Créer un compte gratuit
-          </Link>
-        </motion.div>
+        ))}
       </div>
-    </section>
+    </div>
+  );
+}
 
-    {/* ===== STATS ===== */}
-    <section className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
-          {stats.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 * i }}
-              className="text-center"
-            >
-              <p className="text-3xl sm:text-4xl font-extrabold gradient-text mb-1">{s.value}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
-            </motion.div>
-          ))}
+/* ─── Composant Counter animé ──────────────────────────────── */
+function AnimatedCounter({ value, suffix }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obj = { val: 0 };
+    const tween = gsap.to(obj, {
+      val: value,
+      duration: 1.8,
+      ease: "power3.out",
+      scrollTrigger: { trigger: el, start: "top 85%" },
+      onUpdate: () => {
+        el.textContent = Math.round(obj.val) + suffix;
+      },
+    });
+    return () => tween.kill();
+  }, [value, suffix]);
+
+  return <span ref={ref}>0{suffix}</span>;
+}
+
+/* ─── Page principale ──────────────────────────────────────── */
+export default function Home() {
+  const heroRef     = useRef(null);
+  const titleRef    = useRef(null);
+  const subtitleRef = useRef(null);
+  const ctaRef      = useRef(null);
+  const badgeRef    = useRef(null);
+
+  /* Animation GSAP hero au montage */
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.from(badgeRef.current, { opacity: 0, y: 16, duration: 0.6 })
+        .from(
+          titleRef.current.querySelectorAll(".word"),
+          { opacity: 0, y: 40, stagger: 0.08, duration: 0.7 },
+          "-=0.2"
+        )
+        .from(subtitleRef.current, { opacity: 0, y: 20, duration: 0.6 }, "-=0.3")
+        .from(ctaRef.current.children, { opacity: 0, y: 16, stagger: 0.1, duration: 0.5 }, "-=0.3");
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  /* Animation scroll — module cards */
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".bento-card", {
+        opacity: 0,
+        y: 30,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".bento-grid",
+          start: "top 80%",
+        },
+      });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  /* Animation scroll — features */
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".feature-item", {
+        opacity: 0,
+        x: -20,
+        stagger: 0.12,
+        duration: 0.6,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".features-section",
+          start: "top 80%",
+        },
+      });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  const titleWords = ["Maîtrise", "SAP", "S/4HANA", "de zéro", "à consultant"];
+
+  return (
+    <>
+      <SEO
+        title="HanaFlow"
+        description="Master SAP Learning Platform — Apprends FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium."
+        path="/"
+      />
+
+      {/* ══════════════════════════════════════════════
+          HERO — dark, glow, grain
+      ══════════════════════════════════════════════ */}
+      <section
+        ref={heroRef}
+        className="grain relative overflow-hidden bg-slate-950 min-h-[92vh] flex flex-col justify-center"
+      >
+        {/* Glow orbs */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full bg-sapBlue/20 blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] rounded-full bg-sapAccent/15 blur-[100px]" />
         </div>
-      </div>
-    </section>
 
-    {/* ===== MODULES GRID ===== */}
-    <section className="py-16 sm:py-20 px-4 sm:px-6 bg-gray-50 dark:bg-slate-950">
-      <div className="max-w-6xl mx-auto">
-        <motion.div {...fadeUp(0)} className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-3">
-            6 modules SAP couverts
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-            Des fiches complètes sur chaque module fonctionnel, avec les flux, les tables clés et les intégrations.
+        {/* Grille décorative */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: "linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-24 sm:py-32">
+          {/* Badge */}
+          <div ref={badgeRef} className="mb-8">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/8 border border-white/12 text-xs font-medium text-slate-300 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Plateforme SAP éducative — Gratuit
+            </span>
+          </div>
+
+          {/* Titre animé mot par mot */}
+          <h1
+            ref={titleRef}
+            className="font-display text-5xl sm:text-7xl lg:text-8xl font-bold text-white mb-8 leading-none tracking-display"
+          >
+            {titleWords.map((word, i) => (
+              <span key={i} className="word inline-block mr-[0.25em] last:mr-0">
+                {word === "S/4HANA" ? (
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-sapBlue to-sapAccent">
+                    {word}
+                  </span>
+                ) : word === "consultant" ? (
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-sapAccent to-emerald-400">
+                    {word}
+                  </span>
+                ) : word}
+              </span>
+            ))}
+          </h1>
+
+          {/* Sous-titre */}
+          <p
+            ref={subtitleRef}
+            className="text-lg sm:text-xl text-slate-400 mb-12 max-w-2xl leading-relaxed"
+          >
+            La plateforme de référence pour apprendre les modules SAP, comprendre S/4HANA
+            et construire une carrière de consultant.
           </p>
-        </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {modules.map((m, i) => (
-            <motion.div key={m.code} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.08 * i }}>
-              <Link
-                to={m.path}
-                className="group flex flex-col h-full bg-white dark:bg-slate-800 rounded-2xl border
-                           border-gray-100 dark:border-slate-700 p-6 hover:shadow-medium
-                           hover:-translate-y-0.5 transition-all duration-300 overflow-hidden relative"
-              >
-                {/* Badge code module */}
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${m.color} text-white font-bold text-base shadow-soft mb-4 flex-shrink-0`}>
-                  {m.code}
-                </div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2 group-hover:text-sapBlue dark:group-hover:text-sapAccent transition-colors">
-                  {m.name}
-                </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed flex-1">
-                  {m.desc}
+          {/* CTAs */}
+          <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4">
+            <Link
+              to="/modules-sap"
+              className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
+                         bg-white text-slate-900 text-sm font-bold
+                         hover:bg-slate-100 transition-all duration-150 active:scale-[0.98]
+                         shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+            >
+              Explorer les modules SAP
+              <ArrowRight />
+            </Link>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
+                         border border-white/20 text-white text-sm font-semibold
+                         hover:bg-white/8 hover:border-white/40 transition-all duration-150"
+            >
+              Créer un compte — Gratuit
+            </Link>
+          </div>
+
+          {/* Social proof */}
+          <div className="mt-12 flex items-center gap-6 flex-wrap">
+            {perks.map((p) => (
+              <span key={p} className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="text-emerald-400"><CheckIcon /></span>
+                {p}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          MARQUEE
+      ══════════════════════════════════════════════ */}
+      <div className="bg-slate-950">
+        <Marquee />
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          STATS
+      ══════════════════════════════════════════════ */}
+      <section className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 py-14">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <p className="font-display text-4xl sm:text-5xl font-bold gradient-text mb-2 tracking-display">
+                  <AnimatedCounter value={s.value} suffix={s.suffix} />
                 </p>
-                <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-sapBlue dark:text-sapAccent opacity-0 group-hover:opacity-100 transition-opacity">
-                  Accéder au module <ArrowRight />
+                <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          BENTO GRID — modules
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 bg-gray-50 dark:bg-slate-950">
+        <div className="max-w-6xl mx-auto">
+          {/* Header section */}
+          <div className="mb-14">
+            <p className="text-xs font-semibold text-sapBlue uppercase tracking-widest mb-3">Curriculum</p>
+            <h2 className="font-display text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white tracking-display">
+              6 modules SAP couverts
+            </h2>
+            <p className="mt-4 text-slate-500 dark:text-slate-400 max-w-xl">
+              Des fiches complètes sur chaque module fonctionnel, avec les flux, les tables clés et les intégrations inter-modules.
+            </p>
+          </div>
+
+          {/* Bento grid asymétrique */}
+          <div className="bento-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
+
+            {/* FI — grande card (2 colonnes × 2 rangées) */}
+            <Link
+              to={modules[0].path}
+              className="bento-card lg:col-span-2 lg:row-span-2 group relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-8 flex flex-col justify-between"
+              style={{ "--accent": modules[0].accent }}
+            >
+              <div aria-hidden="true"
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: `radial-gradient(ellipse at 30% 40%, ${modules[0].accent}18, transparent 70%)` }}
+              />
+              <div>
+                <span
+                  className="inline-block px-3 py-1 rounded-lg text-xs font-bold mb-6 uppercase tracking-wider"
+                  style={{ background: `${modules[0].accent}22`, color: modules[0].accent }}
+                >
+                  {modules[0].code}
+                </span>
+                <h3 className="font-display text-3xl font-bold text-white mb-3 tracking-tight-xl">
+                  {modules[0].name}
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
+                  {modules[0].desc}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-sm font-semibold transition-all duration-200"
+                style={{ color: modules[0].accent }}>
+                Explorer le module <ArrowRight />
+              </div>
+            </Link>
+
+            {/* CO, MM, SD, HCM, PP — cards normales */}
+            {modules.slice(1).map((m) => (
+              <Link
+                key={m.code}
+                to={m.path}
+                className="bento-card group relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-6 flex flex-col justify-between"
+              >
+                <div aria-hidden="true"
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: `radial-gradient(ellipse at 60% 30%, ${m.accent}14, transparent 70%)` }}
+                />
+                <div>
+                  <span
+                    className="inline-block px-2.5 py-1 rounded-lg text-xs font-bold mb-4 uppercase tracking-wider"
+                    style={{ background: `${m.accent}18`, color: m.accent }}
+                  >
+                    {m.code}
+                  </span>
+                  <h3 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-1.5 tracking-tight-xl">
+                    {m.name}
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed line-clamp-2">
+                    {m.desc}
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1 text-xs font-semibold transition-all duration-200"
+                  style={{ color: m.accent }}>
+                  Voir <ArrowRight />
                 </span>
               </Link>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    {/* ===== FEATURES ===== */}
-    <section className="py-16 sm:py-20 px-4 sm:px-6 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <motion.div {...fadeUp(0)} className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-3">
-            Pourquoi HanaFlow ?
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-            Une plateforme pensée pour les consultants juniors et les étudiants qui veulent apprendre SAP sérieusement.
-          </p>
-        </motion.div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 * i }}
-              className="flex flex-col bg-gray-50 dark:bg-slate-800 rounded-2xl p-6 border
-                         border-gray-100 dark:border-slate-700"
-            >
-              <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl ${f.color} mb-4 flex-shrink-0`}>
-                {f.icon}
-              </div>
-              <h3 className="font-bold text-slate-900 dark:text-white mb-2">{f.title}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    {/* ===== CTA SECTION ===== */}
-    <section className="py-16 sm:py-20 px-4 sm:px-6 bg-gray-50 dark:bg-slate-950">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-gradient-to-br from-sapBlueDark via-sapBlue to-sapAccent rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10" aria-hidden="true">
-            <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white translate-x-1/2 -translate-y-1/2" />
+            ))}
           </div>
-          <div className="relative">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
-              Commence gratuitement aujourd'hui
+
+          <div className="mt-8 text-center">
+            <Link
+              to="/modules-sap"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-200 dark:border-slate-700
+                         text-sm font-semibold text-slate-600 dark:text-slate-300
+                         hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              Voir tous les modules <ArrowRight />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          FEATURES — liste horizontale
+      ══════════════════════════════════════════════ */}
+      <section className="features-section py-20 sm:py-28 px-4 sm:px-6 bg-white dark:bg-slate-900">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          {/* Texte gauche */}
+          <div>
+            <p className="text-xs font-semibold text-sapBlue uppercase tracking-widest mb-3">Pourquoi HanaFlow</p>
+            <h2 className="font-display text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-display">
+              Tout ce qu'il faut<br />pour réussir SAP
             </h2>
-            <p className="text-blue-100 mb-8 max-w-xl mx-auto">
-              Crée ton compte, accède à tous les modules SAP et suis ta progression vers une carrière de consultant.
+            <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed">
+              Une plateforme pensée pour les consultants juniors et les étudiants qui veulent apprendre SAP sérieusement — pas juste survoler les concepts.
             </p>
 
-            <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-8">
-              {perks.map((p) => (
-                <li key={p} className="flex items-center gap-2 text-sm text-blue-100">
-                  <span className="text-emerald-400"><CheckIcon /></span>
-                  {p}
-                </li>
-              ))}
-            </ul>
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-sapBlue text-white text-sm font-bold hover:bg-sapBlueDark transition-colors"
+            >
+              Commencer gratuitement <ArrowRight />
+            </Link>
+          </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-sapBlue
-                           text-sm font-bold shadow-large hover:bg-blue-50 transition-all active:scale-[0.98]"
-              >
-                Créer mon compte — Gratuit
-                <ArrowRight />
-              </Link>
-              <Link
-                to="/modules-sap"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border-2 border-white/40
-                           text-white text-sm font-semibold hover:bg-white/10 transition-all"
-              >
-                Explorer sans compte
-              </Link>
-            </div>
+          {/* Liste features droite */}
+          <div className="space-y-4">
+            {[
+              { emoji: "📚", title: "Contenu structuré par module", desc: "Chaque module SAP est découpé en chapitres progressifs — du fondamental aux cas d'usage avancés." },
+              { emoji: "🎯", title: "Simulateurs d'examen réalistes", desc: "40 questions par module au format SAP officiel. Entraîne-toi avant le vrai examen." },
+              { emoji: "📊", title: "Suivi de progression persisté", desc: "XP, badges et avancement sauvegardés en base — accessibles depuis n'importe quel appareil." },
+              { emoji: "🗺️", title: "Roadmap consultant personnalisée", desc: "Finance, Supply Chain, RH ou IA — une roadmap adaptée à ton profil cible." },
+              { emoji: "🤖", title: "S/4HANA & AI Joule", desc: "Au-delà des modules classiques — architecture HANA, Universal Journal, Fiori, IA intégrée." },
+            ].map((f) => (
+              <div key={f.title} className="feature-item flex gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 hover:border-sapBlue/30 transition-colors">
+                <span className="text-2xl flex-shrink-0">{f.emoji}</span>
+                <div>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm mb-1">{f.title}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
-  </>
-);
+      </section>
 
-export default Home;
+      {/* ══════════════════════════════════════════════
+          CTA FINAL — dark avec glow
+      ══════════════════════════════════════════════ */}
+      <section className="grain py-20 sm:py-28 px-4 sm:px-6 bg-slate-950 relative overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-sapBlue/20 blur-[100px]" />
+        </div>
+        <div className="relative max-w-3xl mx-auto text-center">
+          <h2 className="font-display text-4xl sm:text-6xl font-bold text-white mb-6 tracking-display">
+            Commence gratuitement<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sapBlue to-sapAccent">
+              aujourd'hui
+            </span>
+          </h2>
+          <p className="text-slate-400 mb-10 text-lg max-w-xl mx-auto">
+            Crée ton compte, accède à tous les modules SAP et suis ta progression vers une carrière de consultant.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl
+                         bg-white text-slate-900 text-sm font-bold
+                         hover:bg-slate-100 transition-all active:scale-[0.98]
+                         shadow-[0_0_40px_rgba(255,255,255,0.12)]"
+            >
+              Créer mon compte — Gratuit <ArrowRight />
+            </Link>
+            <Link
+              to="/modules-sap"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl
+                         border border-white/20 text-white text-sm font-semibold
+                         hover:bg-white/8 hover:border-white/40 transition-all"
+            >
+              Explorer sans compte
+            </Link>
+          </div>
+
+          <div className="gradient-line mt-16" />
+          <p className="mt-6 text-xs text-slate-600">
+            Aucune carte bancaire requise · Accès immédiat · 6 modules SAP complets
+          </p>
+        </div>
+      </section>
+    </>
+  );
+}

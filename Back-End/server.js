@@ -9,6 +9,7 @@ const pool = require("./db/pool");
 
 const authRoutes = require("./routes/auth");
 const progressRoutes = require("./routes/progress");
+const gamificationRoutes = require("./routes/gamification");
 const errorHandler = require("./middleware/errorHandler");
 
 // ============================================================
@@ -146,6 +147,9 @@ app.use("/auth", authRoutes);
 
 // Routes de progression
 app.use("/progress", progressRoutes);
+
+// Routes de gamification
+app.use("/gamification", gamificationRoutes);
 
 // ============================================================
 // Gestion des erreurs (doit être en dernier)

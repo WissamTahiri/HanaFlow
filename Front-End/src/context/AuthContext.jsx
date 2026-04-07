@@ -69,6 +69,14 @@ export const AuthProvider = ({ children }) => {
 
   // Restaure la session au montage de l'app
   useEffect(() => {
+    // Nettoyage des anciennes clés localStorage utilisées avant la migration serveur
+    localStorage.removeItem("hanaflow_plan");
+    localStorage.removeItem("hf_xp");
+    localStorage.removeItem("hf_badges");
+    localStorage.removeItem("hf_streak");
+    localStorage.removeItem("hf_last_login");
+    localStorage.removeItem("hf_quiz_pass");
+
     const init = async () => {
       const storedToken = localStorage.getItem("token");
 
@@ -152,6 +160,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         updateProfile,
+        setUser,
       }}
     >
       {children}

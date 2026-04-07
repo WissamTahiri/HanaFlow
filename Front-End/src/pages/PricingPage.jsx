@@ -118,12 +118,22 @@ export default function PricingPage() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
   const [annual, setAnnual] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+  const [upgradeError, setUpgradeError] = useState(null);
 
-  const handleProCta = () => {
+  const handleProCta = async () => {
     if (!isAuthenticated) { navigate("/register"); return; }
-    upgradeToPro();
-    onProActivated();
-    navigate("/dashboard");
+    setUpgrading(true);
+    setUpgradeError(null);
+    try {
+      await upgradeToPro();
+      onProActivated();
+      navigate("/dashboard");
+    } catch {
+      setUpgradeError("Une erreur est survenue. Réessaie dans un instant.");
+    } finally {
+      setUpgrading(false);
+    }
   };
 
   return (
@@ -231,9 +241,10 @@ export default function PricingPage() {
                     ) : (
                       <button
                         onClick={handleProCta}
-                        className={`w-full py-2.5 text-sm font-semibold rounded-xl transition-colors mb-5 ${plan.ctaStyle}`}
+                        disabled={upgrading}
+                        className={`w-full py-2.5 text-sm font-semibold rounded-xl transition-colors mb-5 disabled:opacity-60 disabled:cursor-not-allowed ${plan.ctaStyle}`}
                       >
-                        {plan.cta}
+                        {upgrading ? "Activation…" : plan.cta}
                       </button>
                     )
                   ) : (
@@ -262,6 +273,13 @@ export default function PricingPage() {
             ))}
           </div>
 
+          {/* Erreur upgrade */}
+          {upgradeError && (
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400 text-center">
+              {upgradeError}
+            </div>
+          )}
+
           {/* Banner lancement */}
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }}
@@ -278,9 +296,10 @@ export default function PricingPage() {
             {!isPro && (
               <button
                 onClick={handleProCta}
-                className="flex-shrink-0 px-5 py-2.5 bg-sapBlue text-white rounded-xl text-sm font-bold hover:bg-sapBlueDark transition-colors"
+                disabled={upgrading}
+                className="flex-shrink-0 px-5 py-2.5 bg-sapBlue text-white rounded-xl text-sm font-bold hover:bg-sapBlueDark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Activer Pro gratuitement →
+                {upgrading ? "Activation…" : "Activer Pro gratuitement →"}
               </button>
             )}
           </motion.div>
