@@ -162,4 +162,72 @@
   /* Tracking serré pour les titres display */
   .tracking-display { letter-spacing: -0.03em; }
   .tracking-tight-xl { letter-spacing: -0.02em; }
+
+  /* ── CTA shimmer — effet de lumière au hover ── */
+  .btn-cta {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
+    transform: translateX(-100%);
+  }
+  .btn-cta:hover::before {
+    transform: translateX(100%);
+    transition: transform 0.55s ease;
+  }
+
+  /* ── Card interactive — lift + glow ── */
+  .card-interactive {
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .card-interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(37, 99, 235, 0.12);
+  }
+
+  /* ── Pulse ring — badge / statut live ── */
+  .pulse-ring {
+    animation: pulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes pulseRing {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  /* ── Skeleton loading ── */
+  .skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s ease infinite;
+  }
+  .dark .skeleton {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 200% 100%;
+  }
+  @keyframes skeletonShimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+  }
+}
+
+/* ============================================================
+   Accessibilité — prefers-reduced-motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .btn-cta::before { display: none; }
+  .card-interactive:hover { transform: none; }
+  .pulse-ring { animation: none; }
 }

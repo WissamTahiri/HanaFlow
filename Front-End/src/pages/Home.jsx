@@ -206,7 +206,7 @@ export default function Home() {
           {/* Badge */}
           <div ref={badgeRef} className="mb-8">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/8 border border-white/12 text-xs font-medium text-slate-300 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-ring" />
               Plateforme SAP éducative — Gratuit
             </span>
           </div>
@@ -247,7 +247,7 @@ export default function Home() {
               ref={magPrimary.ref}
               onMouseMove={magPrimary.onMouseMove}
               onMouseLeave={magPrimary.onMouseLeave}
-              className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
+              className="btn-cta inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
                          bg-white text-slate-900 text-sm font-bold
                          hover:bg-slate-100 transition-colors active:scale-[0.98]
                          shadow-[0_0_30px_rgba(255,255,255,0.15)]"
@@ -260,7 +260,7 @@ export default function Home() {
               ref={magSecondary.ref}
               onMouseMove={magSecondary.onMouseMove}
               onMouseLeave={magSecondary.onMouseLeave}
-              className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
+              className="btn-cta inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl
                          border border-white/20 text-white text-sm font-semibold
                          hover:bg-white/8 hover:border-white/40 transition-colors"
             >
@@ -327,7 +327,7 @@ export default function Home() {
             {/* FI — grande card (2 colonnes × 2 rangées) */}
             <Link
               to={modules[0].path}
-              className="bento-card lg:col-span-2 lg:row-span-2 group relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-8 flex flex-col justify-between"
+              className="bento-card card-interactive cursor-pointer lg:col-span-2 lg:row-span-2 group relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-8 flex flex-col justify-between"
               style={{ "--accent": modules[0].accent }}
             >
               <div aria-hidden="true"
@@ -359,7 +359,7 @@ export default function Home() {
               <Link
                 key={m.code}
                 to={m.path}
-                className="bento-card group relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-6 flex flex-col justify-between"
+                className="bento-card card-interactive cursor-pointer group relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-6 flex flex-col justify-between"
               >
                 <div aria-hidden="true"
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -465,7 +465,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/register"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl
+              className="btn-cta inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl
                          bg-white text-slate-900 text-sm font-bold
                          hover:bg-slate-100 transition-all active:scale-[0.98]
                          shadow-[0_0_40px_rgba(255,255,255,0.12)]"
@@ -474,7 +474,7 @@ export default function Home() {
             </Link>
             <Link
               to="/modules-sap"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl
+              className="btn-cta inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl
                          border border-white/20 text-white text-sm font-semibold
                          hover:bg-white/8 hover:border-white/40 transition-all"
             >

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "motion/react";
 import { useSubscription } from "../context/SubscriptionContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useGamification } from "../context/GamificationContext.jsx";
@@ -186,9 +187,12 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-8 pb-16">
           <div className="grid md:grid-cols-3 gap-5">
             {PLANS.map((plan, i) => (
-              <div
+              <motion.div
                 key={plan.id}
-                className={`bg-white dark:bg-slate-900 rounded-2xl border-2 ${plan.color} overflow-hidden flex flex-col`}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className={`card-interactive bg-white dark:bg-slate-900 rounded-2xl border-2 ${plan.color} overflow-hidden flex flex-col ${plan.id === "pro" ? "shadow-soft" : ""}`}
               >
                 {/* Badge */}
                 <div className="h-8 flex items-center justify-center">
@@ -242,7 +246,7 @@ export default function PricingPage() {
                       <button
                         onClick={handleProCta}
                         disabled={upgrading}
-                        className={`w-full py-2.5 text-sm font-semibold rounded-xl transition-colors mb-5 disabled:opacity-60 disabled:cursor-not-allowed ${plan.ctaStyle}`}
+                        className={`btn-cta w-full py-2.5 text-sm font-semibold rounded-xl transition-colors mb-5 disabled:opacity-60 disabled:cursor-not-allowed ${plan.ctaStyle}`}
                       >
                         {upgrading ? "Activation…" : plan.cta}
                       </button>
@@ -269,7 +273,7 @@ export default function PricingPage() {
                     ))}
                   </ul>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
