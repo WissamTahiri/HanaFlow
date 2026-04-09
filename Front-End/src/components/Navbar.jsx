@@ -242,7 +242,7 @@ export default function Navbar() {
                     {[
                       { to: "/dashboard",    label: "Dashboard" },
                       { to: "/profil",       label: "Mon profil" },
-                      { to: "/achievements", label: "🏅 Achievements" },
+                      { to: "/achievements", label: "Achievements" },
                     ].map(({ to, label }) => (
                       <Link key={to} to={to} onClick={() => setOpenUser(false)}
                         className="flex items-center w-full px-3 py-2.5 rounded-xl text-sm
