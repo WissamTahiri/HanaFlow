@@ -4,6 +4,10 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 
+const SproutIcon  = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>;
+const LayersIcon  = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;
+const DropletIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>;
+
 /* ─── Données ─────────────────────────────────────────── */
 
 const keyConcepts = [
@@ -67,7 +71,7 @@ const migrationStrategies = [
   {
     name: "Greenfield",
     color: "emerald",
-    icon: "🌱",
+    icon: <SproutIcon />,
     desc: "Nouvelle implémentation from scratch sur S/4HANA. Permet de repartir sur des processus propres et optimisés.",
     avantages: ["Processus métier repensés", "Pas de dette technique ECC", "Adoption des best practices SAP"],
     risques: ["Perte des personnalisations existantes", "Durée et coût élevés", "Change management fort"],
@@ -75,7 +79,7 @@ const migrationStrategies = [
   {
     name: "Brownfield",
     color: "amber",
-    icon: "🏗️",
+    icon: <LayersIcon />,
     desc: "Conversion du système ECC existant vers S/4HANA (System Conversion). Les données et la config sont conservés.",
     avantages: ["Continuité des données", "Durée réduite", "Moins de disruption business"],
     risques: ["Migration des données complexe", "Personnalisations à vérifier", "Nettoyage de données nécessaire"],
@@ -83,7 +87,7 @@ const migrationStrategies = [
   {
     name: "Bluefield",
     color: "blue",
-    icon: "💧",
+    icon: <DropletIcon />,
     desc: "Selective Data Transition : migration sélective des données et entités. Combine le meilleur des deux approches.",
     avantages: ["Flexibilité maximale", "Migration par entité (société, pays)", "Processus optimisés + données conservées"],
     risques: ["Complexité élevée", "Coût et durée importants", "Coordination IT difficile"],
@@ -545,7 +549,7 @@ const S4HANAOverview = () => {
               }`}
             >
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-xl">{s.icon}</span>
+                <span className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 text-slate-600 dark:text-slate-300">{s.icon}</span>
                 <h3 className="text-base font-bold">{s.name}</h3>
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">{s.desc}</p>
