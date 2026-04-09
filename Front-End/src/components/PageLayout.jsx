@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "motion/react";
 import SEO from "./SEO";
 
 /**
@@ -48,29 +49,41 @@ const PageLayout = ({
 
         <div className="relative max-w-5xl mx-auto">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-slate-500 mb-5" aria-label="Fil d'Ariane">
+          <motion.nav
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center gap-2 text-xs text-slate-500 mb-5"
+            aria-label="Fil d'Ariane"
+          >
             <Link to="/" className="hover:text-slate-300 transition-colors">Accueil</Link>
             <span>/</span>
             <span className="text-slate-400">{label}</span>
-          </nav>
+          </motion.nav>
 
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 mb-4">
-            <span
-              className="px-3 py-1 rounded-full text-xs font-semibold border"
-              style={{ background: `${accent}20`, color: accent, borderColor: `${accent}40` }}
-            >
-              {label}
-            </span>
-            {badge && <span className="text-xs text-slate-500">{badge}</span>}
-          </div>
+          {/* Badge + titre + desc animés */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span
+                className="px-3 py-1 rounded-full text-xs font-semibold border"
+                style={{ background: `${accent}20`, color: accent, borderColor: `${accent}40` }}
+              >
+                {label}
+              </span>
+              {badge && <span className="text-xs text-slate-500">{badge}</span>}
+            </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-display mb-5 leading-tight">
-            {title}
-          </h1>
-          <p className="text-slate-400 max-w-2xl text-base leading-relaxed">
-            {description}
-          </p>
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-display mb-5 leading-tight">
+              {title}
+            </h1>
+            <p className="text-slate-400 max-w-2xl text-base leading-relaxed">
+              {description}
+            </p>
+          </motion.div>
         </div>
       </div>
 

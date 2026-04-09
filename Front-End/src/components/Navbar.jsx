@@ -271,7 +271,7 @@ export default function Navbar() {
                   Connexion
                 </Link>
                 <Link to="/register"
-                  className={`text-sm font-semibold px-4 py-2 rounded-xl transition-colors ${
+                  className={`btn-cta text-sm font-semibold px-4 py-2 rounded-xl transition-colors ${
                     isTransparent
                       ? "bg-white text-slate-900 hover:bg-slate-100"
                       : "bg-sapBlue text-white hover:bg-sapBlueDark shadow-sm"
