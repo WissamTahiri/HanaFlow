@@ -211,7 +211,7 @@ export default function Navbar() {
                     {[
                       { href: "/dashboard",    label: "Dashboard" },
                       { href: "/profil",       label: "Mon profil" },
-                      { href: "/achievements", label: "🏅 Achievements" },
+                      { href: "/achievements", label: "Achievements" },
                     ].map(({ href, label }) => (
                       <Link
                         key={href}

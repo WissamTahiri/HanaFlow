@@ -173,7 +173,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
       {passed && (
         <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
-            <p className="font-semibold text-emerald-800 dark:text-emerald-200 text-sm">🎉 Félicitations ! Télécharge ton certificat de réussite.</p>
+            <p className="font-semibold text-emerald-800 dark:text-emerald-200 text-sm">Félicitations ! Télécharge ton certificat de réussite.</p>
             <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">Certificat PDF personnalisé — {certInfo.code}</p>
           </div>
           <CertificateDownloadButton
