@@ -106,7 +106,7 @@ const AboutPage = () => (
     label="À propos"
     title="HanaFlow & Wissam Tahiri"
     description="HanaFlow est mon laboratoire de consultant SAP — un espace où je structure mes apprentissages sur S/4HANA, FI/CO, MM, SD et l'IA Joule, comme si je préparais une vraie mission."
-    accent="#0F52BA"
+    accent="#2563EB"
     badge="Portfolio SAP · Projet personnel · Open source"
     seoTitle="À propos – HanaFlow & Wissam Tahiri"
     seoDescription="Découvrez HanaFlow, le projet SAP de Wissam Tahiri : plateforme pédagogique sur S/4HANA, FI/CO, MM, SD. Profil consultant SAP junior, stack technique et mission du projet."

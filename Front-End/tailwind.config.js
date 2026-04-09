@@ -8,41 +8,43 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // --- Couleurs primaires SAP (rétrocompatibilité) ---
-        sapBlue:      "#0F52BA",
-        sapBlueDark:  "#0B3C87",
-        sapGrayLight: "#F3F4F6",
+        // --- Couleurs primaires SAP (Corporate Trust palette) ---
+        sapBlue:      "#2563EB",
+        sapBlueDark:  "#1D4ED8",
+        sapGrayLight: "#F8FAFC",
 
-        // --- Tokens manquants (fix LoginPage/RegisterPage) ---
-        sapDark:  "#0F172A",   // fond sombre (slate-950)
+        // --- Tokens sombres ---
+        sapDark:  "#0F172A",   // fond sombre (slate-900)
         sapCard:  "#1E293B",   // carte sombre (slate-800)
         sapMuted: "#64748B",   // texte secondaire (slate-500)
 
-        // --- Palette étendue ---
-        sapAccent:     "#0EA5E9",  // sky-500 — accent/highlight
-        sapAccentDark: "#0284C7",  // sky-600
+        // --- Accent orange (CTA / highlight) ---
+        sapAccent:     "#F97316",  // orange-500
+        sapAccentDark: "#EA580C",  // orange-600
+
+        // --- Sémantiques ---
         sapSuccess:    "#10B981",  // emerald-500
         sapWarning:    "#F59E0B",  // amber-500
         sapError:      "#EF4444",  // red-500
 
         // --- Palette complète avec nuances ---
         sap: {
-          50:  "#EBF2FF",
-          100: "#D6E6FF",
-          200: "#ADC8FF",
-          300: "#84AAFF",
-          400: "#5B8BFF",
-          500: "#0F52BA",  // primary
-          600: "#0B3C87",  // dark
-          700: "#082C61",
-          800: "#051D40",
-          900: "#020F21",
+          50:  "#EFF6FF",
+          100: "#DBEAFE",
+          200: "#BFDBFE",
+          300: "#93C5FD",
+          400: "#60A5FA",
+          500: "#2563EB",  // primary
+          600: "#1D4ED8",  // dark
+          700: "#1E40AF",
+          800: "#1E3A8A",
+          900: "#172554",
         },
       },
 
       fontFamily: {
-        display: ["Clash Display", "system-ui", "sans-serif"],
-        sans:    ["Satoshi", "system-ui", "sans-serif"],
+        display: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        sans:    ["Plus Jakarta Sans", "system-ui", "sans-serif"],
         mono:    ["Fira Code", "Roboto Mono", "monospace"],
       },
 
@@ -51,9 +53,9 @@ module.exports = {
       },
 
       boxShadow: {
-        soft:   "0 4px 24px rgba(15, 82, 186, 0.12)",
-        medium: "0 8px 32px rgba(15, 82, 186, 0.18)",
-        large:  "0 16px 48px rgba(15, 82, 186, 0.24)",
+        soft:   "0 4px 24px rgba(37, 99, 235, 0.10)",
+        medium: "0 8px 32px rgba(37, 99, 235, 0.14)",
+        large:  "0 16px 48px rgba(37, 99, 235, 0.20)",
         card:   "0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
         "card-hover": "0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)",
       },
@@ -96,8 +98,8 @@ module.exports = {
       },
 
       backgroundImage: {
-        "hero-gradient": "linear-gradient(135deg, #0B3C87 0%, #0F52BA 50%, #0EA5E9 100%)",
-        "card-gradient": "linear-gradient(135deg, #EBF2FF 0%, #F8FAFF 100%)",
+        "hero-gradient": "linear-gradient(135deg, #1D4ED8 0%, #2563EB 50%, #3B82F6 100%)",
+        "card-gradient": "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%)",
       },
     },
   },

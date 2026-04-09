@@ -120,7 +120,7 @@ function QuizBlock({ quiz, chapterId, onComplete }) {
             <button key={idx} className={cls} onClick={() => handleSelect(idx)} disabled={showResult}>
               <span className="flex items-center gap-2">
                 <span className="h-5 w-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                  style={{ borderColor: showResult && idx === q.correctIndex ? "#34d399" : showResult && idx === selected && idx !== q.correctIndex ? "#f87171" : selected === idx ? "#0F52BA" : "#cbd5e1" }}>
+                  style={{ borderColor: showResult && idx === q.correctIndex ? "#34d399" : showResult && idx === selected && idx !== q.correctIndex ? "#f87171" : selected === idx ? "#2563EB" : "#cbd5e1" }}>
                   {String.fromCharCode(65 + idx)}
                 </span>
                 {opt}

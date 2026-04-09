@@ -8,7 +8,7 @@ import SEO from "./SEO";
  *   label        — texte du badge + breadcrumb
  *   title        — titre h1
  *   description  — sous-titre
- *   accent       — couleur CSS hex pour le glow (défaut : #0F52BA)
+ *   accent       — couleur CSS hex pour le glow (défaut : #2563EB)
  *   badge        — texte optionnel à droite du badge
  *   seoTitle / seoDescription / seoPath
  */
@@ -16,7 +16,7 @@ const PageLayout = ({
   label,
   title,
   description,
-  accent = "#0F52BA",
+  accent = "#2563EB",
   badge,
   seoTitle,
   seoDescription,
