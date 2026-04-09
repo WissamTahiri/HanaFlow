@@ -127,7 +127,7 @@ export default function ProfilePage() {
           {/* Carte profil flottante */}
           <div className="flex items-center gap-5">
             <div className="h-16 w-16 rounded-2xl flex items-center justify-center text-white font-display font-bold text-xl flex-shrink-0 border border-white/15"
-              style={{ background: "linear-gradient(135deg, #0F52BA, #1a6fd8)" }}>
+              style={{ background: "linear-gradient(135deg, #2563EB, #3B82F6)" }}>
               {initials}
             </div>
             <div>

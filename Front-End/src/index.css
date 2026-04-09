@@ -1,5 +1,6 @@
 /* ============================================================
-   HanaFlow — Design System
+   HanaFlow — Design System (Corporate Trust)
+   Font: Plus Jakarta Sans | Primary: #2563EB | Accent: #F97316
    ============================================================ */
 
 @tailwind base;
@@ -14,27 +15,22 @@
     color-scheme: light dark;
   }
 
-  html {
-    /* Lenis smooth scroll — remplace scroll-behavior: smooth */
-    /* (géré en JS, pas ici) */
-  }
-
   body {
     @apply font-sans antialiased bg-white dark:bg-sapDark text-slate-900 dark:text-slate-100;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Clash Display sur tous les titres sémantiques */
+  /* Plus Jakarta Sans sur tous les titres sémantiques */
   h1, h2 {
-    font-family: "Clash Display", system-ui, sans-serif;
-    font-weight: 600;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-weight: 700;
     letter-spacing: -0.02em;
   }
 
   h3, h4, h5, h6 {
-    font-family: "Clash Display", system-ui, sans-serif;
-    font-weight: 500;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-weight: 600;
     letter-spacing: -0.01em;
   }
 
@@ -106,14 +102,14 @@
   }
 
   .section-title {
-    @apply text-2xl sm:text-3xl font-display font-semibold text-slate-900 dark:text-white;
+    @apply text-2xl sm:text-3xl font-display font-bold text-slate-900 dark:text-white;
     letter-spacing: -0.02em;
   }
 
   /* Titre display grande taille — hero sections */
   .display-title {
-    font-family: "Clash Display", system-ui, sans-serif;
-    font-weight: 700;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.05;
   }
@@ -126,11 +122,11 @@
   .text-balance { text-wrap: balance; }
 
   .font-display {
-    font-family: "Clash Display", system-ui, sans-serif;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #0F52BA, #0EA5E9);
+    background: linear-gradient(135deg, #2563EB, #F97316);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -155,12 +151,12 @@
   /* Ligne animée en dégradé */
   .gradient-line {
     height: 1px;
-    background: linear-gradient(90deg, transparent, #0F52BA, #0EA5E9, transparent);
+    background: linear-gradient(90deg, transparent, #2563EB, #F97316, transparent);
   }
 
   /* Fond glow subtil pour éléments hero */
   .glow-blue {
-    box-shadow: 0 0 60px rgba(15, 82, 186, 0.15), 0 0 120px rgba(14, 165, 233, 0.08);
+    box-shadow: 0 0 60px rgba(37, 99, 235, 0.15), 0 0 120px rgba(249, 115, 22, 0.08);
   }
 
   /* Tracking serré pour les titres display */

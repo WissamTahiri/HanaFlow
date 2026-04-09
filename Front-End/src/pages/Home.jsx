@@ -426,14 +426,14 @@ export default function Home() {
           {/* Liste features droite */}
           <div className="space-y-4">
             {[
-              { emoji: "📚", title: "Contenu structuré par module", desc: "Chaque module SAP est découpé en chapitres progressifs — du fondamental aux cas d'usage avancés." },
-              { emoji: "🎯", title: "Simulateurs d'examen réalistes", desc: "40 questions par module au format SAP officiel. Entraîne-toi avant le vrai examen." },
-              { emoji: "📊", title: "Suivi de progression persisté", desc: "XP, badges et avancement sauvegardés en base — accessibles depuis n'importe quel appareil." },
-              { emoji: "🗺️", title: "Roadmap consultant personnalisée", desc: "Finance, Supply Chain, RH ou IA — une roadmap adaptée à ton profil cible." },
-              { emoji: "🤖", title: "S/4HANA & AI Joule", desc: "Au-delà des modules classiques — architecture HANA, Universal Journal, Fiori, IA intégrée." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>, title: "Contenu structuré par module", desc: "Chaque module SAP est découpé en chapitres progressifs — du fondamental aux cas d'usage avancés." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>, title: "Simulateurs d'examen réalistes", desc: "40 questions par module au format SAP officiel. Entraîne-toi avant le vrai examen." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>, title: "Suivi de progression persisté", desc: "XP, badges et avancement sauvegardés en base — accessibles depuis n'importe quel appareil." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>, title: "Roadmap consultant personnalisée", desc: "Finance, Supply Chain, RH ou IA — une roadmap adaptée à ton profil cible." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>, title: "S/4HANA & AI Joule", desc: "Au-delà des modules classiques — architecture HANA, Universal Journal, Fiori, IA intégrée." },
             ].map((f) => (
-              <div key={f.title} className="feature-item flex gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 hover:border-sapBlue/30 transition-colors">
-                <span className="text-2xl flex-shrink-0">{f.emoji}</span>
+              <div key={f.title} className="feature-item flex gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 hover:border-sapBlue/30 transition-colors cursor-pointer">
+                <span className="flex-shrink-0 h-10 w-10 rounded-xl bg-sapBlue/10 text-sapBlue flex items-center justify-center">{f.icon}</span>
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white text-sm mb-1">{f.title}</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>

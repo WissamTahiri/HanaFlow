@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     left: 16,
     right: 16,
     bottom: 16,
-    border: "2px solid #0F52BA",
+    border: "2px solid #2563EB",
     borderRadius: 4,
   },
   innerBorder: {
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     left: 22,
     right: 22,
     bottom: 22,
-    border: "0.5px solid #ADC8FF",
+    border: "0.5px solid #BFDBFE",
     borderRadius: 2,
   },
 
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   logoHana: {
-    color: "#0F52BA",
+    color: "#2563EB",
   },
   logoFlow: {
     color: "#1E293B",
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   dividerAccent: {
     width: 80,
     height: 3,
-    backgroundColor: "#0F52BA",
+    backgroundColor: "#2563EB",
     borderRadius: 2,
     marginBottom: 32,
     alignSelf: "center",
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   recipientName: {
     fontSize: 32,
     fontFamily: "Helvetica-BoldOblique",
-    color: "#0F52BA",
+    color: "#2563EB",
     textAlign: "center",
     marginBottom: 28,
     letterSpacing: 0.5,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   // Badge module
   moduleBadge: {
     flexDirection: "row",
-    backgroundColor: "#EBF2FF",
+    backgroundColor: "#EFF6FF",
     borderRadius: 20,
     paddingHorizontal: 20,
     paddingVertical: 8,
@@ -138,13 +138,13 @@ const styles = StyleSheet.create({
   },
   moduleBadgeCode: {
     fontSize: 10,
-    color: "#0F52BA",
+    color: "#2563EB",
     fontFamily: "Helvetica-Bold",
     letterSpacing: 1,
   },
   moduleBadgeName: {
     fontSize: 10,
-    color: "#0B3C87",
+    color: "#1D4ED8",
   },
 
   // Stats
@@ -211,22 +211,22 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    border: "2px solid #0F52BA",
+    border: "2px solid #2563EB",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#EBF2FF",
+    backgroundColor: "#EFF6FF",
   },
   sealInner: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    border: "1px solid #ADC8FF",
+    border: "1px solid #BFDBFE",
     alignItems: "center",
     justifyContent: "center",
   },
   sealText: {
     fontSize: 6,
-    color: "#0F52BA",
+    color: "#2563EB",
     fontFamily: "Helvetica-Bold",
     textAlign: "center",
     letterSpacing: 0.3,
@@ -238,10 +238,10 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-  cornerTL: { top: 30, left: 30, borderTop: "2px solid #0F52BA", borderLeft: "2px solid #0F52BA" },
-  cornerTR: { top: 30, right: 30, borderTop: "2px solid #0F52BA", borderRight: "2px solid #0F52BA" },
-  cornerBL: { bottom: 30, left: 30, borderBottom: "2px solid #0F52BA", borderLeft: "2px solid #0F52BA" },
-  cornerBR: { bottom: 30, right: 30, borderBottom: "2px solid #0F52BA", borderRight: "2px solid #0F52BA" },
+  cornerTL: { top: 30, left: 30, borderTop: "2px solid #2563EB", borderLeft: "2px solid #2563EB" },
+  cornerTR: { top: 30, right: 30, borderTop: "2px solid #2563EB", borderRight: "2px solid #2563EB" },
+  cornerBL: { bottom: 30, left: 30, borderBottom: "2px solid #2563EB", borderLeft: "2px solid #2563EB" },
+  cornerBR: { bottom: 30, right: 30, borderBottom: "2px solid #2563EB", borderRight: "2px solid #2563EB" },
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -720,7 +720,7 @@ export default function Roadmap() {
       label="Roadmap"
       title="Roadmap consultant SAP personnalisée"
       description="Réponds à quelques questions sur ton profil et obtiens une roadmap sur-mesure — adaptée à ton niveau, tes objectifs et ta disponibilité."
-      accent="#0F52BA"
+      accent="#2563EB"
       badge="Personnalisée · Tous niveaux · Tous profils"
       seoTitle="Roadmap Consultant SAP Personnalisée"
       seoDescription="Génère ta roadmap SAP personnalisée : niveau, objectif, disponibilité. Finance, Supply Chain, IT ou Sales — un parcours sur-mesure vers la certification."
