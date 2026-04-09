@@ -48,7 +48,7 @@ const PLANS = [
     annualPrice: "79€ / an",
     desc: "Pour préparer sérieusement une certification SAP.",
     color: "border-sapBlue dark:border-blue-500 ring-2 ring-sapBlue/20 dark:ring-blue-500/20",
-    badge: { label: "🚀 Lancement — Accès gratuit", color: "bg-sapBlue text-white" },
+    badge: { label: "Lancement — Accès gratuit", color: "bg-sapBlue text-white" },
     cta: "Activer Pro gratuitement",
     ctaStyle: "bg-sapBlue text-white hover:bg-sapBlueDark",
     features: [
@@ -155,7 +155,7 @@ export default function PricingPage() {
 
           <div className="relative max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-xs font-semibold text-emerald-400 mb-6">
-              🚀 Phase de lancement — Pro gratuit pour tous
+              Phase de lancement — Pro gratuit pour tous
             </div>
             <h1 className="font-display text-5xl sm:text-6xl font-bold text-white tracking-display mb-5">
               Le bon plan pour<br className="hidden sm:block" /> votre objectif SAP
@@ -288,7 +288,7 @@ export default function PricingPage() {
           <div className="mt-8 bg-sapBlue/8 border border-sapBlue/20 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <p className="font-semibold text-slate-900 dark:text-white text-sm">
-                🎉 Phase de lancement — Accès Pro totalement gratuit
+                Phase de lancement — Accès Pro totalement gratuit
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Profitez de toutes les fonctionnalités Pro sans carte bancaire. Vous serez prévenu avant toute activation de la facturation.

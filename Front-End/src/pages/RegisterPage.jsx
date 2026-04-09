@@ -8,11 +8,32 @@ const testimonial = {
   author: "Étudiant M2 Finance",
 };
 
+const CheckCircleIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
+const GraduationIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+  </svg>
+);
+const MapIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+  </svg>
+);
+const AwardIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+  </svg>
+);
+
 const perks = [
-  { emoji: "🆓", text: "100% gratuit pour commencer" },
-  { emoji: "🎓", text: "Simulateurs d'examen SAP" },
-  { emoji: "🗺️", text: "Roadmap consultant personnalisée" },
-  { emoji: "🏆", text: "Gamification — XP & badges" },
+  { icon: <CheckCircleIcon />, text: "100% gratuit pour commencer" },
+  { icon: <GraduationIcon />, text: "Simulateurs d'examen SAP" },
+  { icon: <MapIcon />, text: "Roadmap consultant personnalisée" },
+  { icon: <AwardIcon />, text: "Gamification — XP & badges" },
 ];
 
 export default function RegisterPage() {
@@ -71,7 +92,7 @@ export default function RegisterPage() {
               <div className="space-y-3">
                 {perks.map((p) => (
                   <div key={p.text} className="flex items-center gap-3">
-                    <span className="text-lg">{p.emoji}</span>
+                    <span className="h-7 w-7 rounded-lg bg-sapAccent/15 text-sapAccent flex items-center justify-center flex-shrink-0">{p.icon}</span>
                     <span className="text-sm text-slate-400">{p.text}</span>
                   </div>
                 ))}
@@ -148,7 +169,7 @@ export default function RegisterPage() {
               <button type="submit" disabled={submitting}
                 className="w-full py-3 rounded-xl bg-sapBlue text-white text-sm font-bold
                            hover:bg-sapBlueDark transition-colors disabled:opacity-60 disabled:cursor-not-allowed
-                           shadow-[0_4px_14px_rgba(15,82,186,0.35)]">
+                           shadow-[0_4px_14px_rgba(37,99,235,0.30)]">
                 {submitting ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">

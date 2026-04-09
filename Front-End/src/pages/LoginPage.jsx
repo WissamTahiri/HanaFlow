@@ -14,11 +14,32 @@ const EyeIcon = ({ show }) => show ? (
   </svg>
 );
 
+const BookIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+  </svg>
+);
+const TargetIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+  </svg>
+);
+const ChartIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+  </svg>
+);
+const AwardIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+  </svg>
+);
+
 const features = [
-  { emoji: "📚", text: "6 modules SAP complets" },
-  { emoji: "🎯", text: "Simulateurs d'examen" },
-  { emoji: "📊", text: "Progression persistée" },
-  { emoji: "🏆", text: "XP, badges et niveaux" },
+  { icon: <BookIcon />, text: "6 modules SAP complets" },
+  { icon: <TargetIcon />, text: "Simulateurs d'examen" },
+  { icon: <ChartIcon />, text: "Progression persistée" },
+  { icon: <AwardIcon />, text: "XP, badges et niveaux" },
 ];
 
 export default function LoginPage() {
@@ -80,7 +101,7 @@ export default function LoginPage() {
             <div className="space-y-3">
               {features.map((f) => (
                 <div key={f.text} className="flex items-center gap-3">
-                  <span className="text-lg">{f.emoji}</span>
+                  <span className="h-7 w-7 rounded-lg bg-sapBlue/15 text-sapAccent flex items-center justify-center flex-shrink-0">{f.icon}</span>
                   <span className="text-sm text-slate-400">{f.text}</span>
                 </div>
               ))}
@@ -148,7 +169,7 @@ export default function LoginPage() {
               <button type="submit" disabled={submitting}
                 className="w-full py-3 rounded-xl bg-sapBlue text-white text-sm font-bold
                            hover:bg-sapBlueDark transition-colors disabled:opacity-60 disabled:cursor-not-allowed
-                           shadow-[0_4px_14px_rgba(15,82,186,0.35)]">
+                           shadow-[0_4px_14px_rgba(37,99,235,0.30)]">
                 {submitting ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
