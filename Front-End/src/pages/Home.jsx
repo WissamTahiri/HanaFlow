@@ -312,7 +312,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           {/* Header section */}
           <div className="mb-14">
-            <p className="text-xs font-semibold text-sapBlue uppercase tracking-widest mb-3">Curriculum</p>
+            <p className="text-xs font-semibold text-sapBlueDark dark:text-blue-300 uppercase tracking-widest mb-3">Curriculum</p>
             <h2 className="font-display text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white tracking-display">
               6 modules SAP couverts
             </h2>
@@ -407,7 +407,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
           {/* Texte gauche */}
           <div>
-            <p className="text-xs font-semibold text-sapBlue uppercase tracking-widest mb-3">Pourquoi HanaFlow</p>
+            <p className="text-xs font-semibold text-sapBlueDark dark:text-blue-300 uppercase tracking-widest mb-3">Pourquoi HanaFlow</p>
             <h2 className="font-display text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-display">
               Tout ce qu'il faut<br />pour réussir SAP
             </h2>

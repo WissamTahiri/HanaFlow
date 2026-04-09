@@ -70,7 +70,7 @@ export default function Footer() {
                 <span className="text-white">Flow</span>
               </span>
             </Link>
-            <p className="text-sm text-slate-500 leading-relaxed mb-6 max-w-[220px]">
+            <p className="text-sm text-slate-400 leading-relaxed mb-6 max-w-[220px]">
               La référence pour apprendre SAP S/4HANA et préparer une carrière de consultant.
             </p>
             <div className="flex items-center gap-2.5">
@@ -80,16 +80,16 @@ export default function Footer() {
               ].map(({ href, icon, label }) => (
                 <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}
                   className="h-8 w-8 flex items-center justify-center rounded-lg
-                             bg-white/6 border border-white/8 text-slate-500
-                             hover:bg-white/12 hover:text-white hover:border-white/20
+                             bg-slate-800 border border-slate-700 text-slate-300
+                             hover:bg-slate-700 hover:text-white hover:border-slate-600
                              transition-all duration-150">
                   {icon}
                 </a>
               ))}
               <a href="mailto:contact@hanaflow.fr"
                 className="h-8 px-3 flex items-center gap-1.5 rounded-lg text-xs font-medium
-                           bg-white/6 border border-white/8 text-slate-500
-                           hover:bg-white/12 hover:text-white hover:border-white/20
+                           bg-slate-800 border border-slate-700 text-slate-300
+                           hover:bg-slate-700 hover:text-white hover:border-slate-600
                            transition-all duration-150">
                 Contact
               </a>
@@ -99,14 +99,14 @@ export default function Footer() {
           {/* Colonnes liens */}
           {cols.map((col) => (
             <div key={col.title}>
-              <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-5">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-5">
                 {col.title}
               </p>
               <ul className="space-y-3">
                 {col.links.map(({ to, label }) => (
                   <li key={to}>
                     <Link to={to}
-                      className="text-sm text-slate-500 hover:text-white transition-colors duration-150">
+                      className="text-sm text-slate-400 hover:text-white transition-colors duration-150">
                       {label}
                     </Link>
                   </li>
