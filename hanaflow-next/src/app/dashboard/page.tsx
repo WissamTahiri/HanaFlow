@@ -112,7 +112,7 @@ function DashboardContent() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-                  Bonjour, {user?.name} 👋
+                  Bonjour, {user?.name}
                 </h1>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{user?.email}</p>
                 <div className="flex items-center gap-2 mt-2 flex-wrap">

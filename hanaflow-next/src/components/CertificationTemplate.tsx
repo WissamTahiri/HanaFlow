@@ -367,7 +367,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                   <div className="px-4 py-3 border-t border-gray-100 dark:border-slate-700">
                     {canAccess(true) ? (
                       <Link href={examPath} className="block w-full text-center py-2.5 bg-sap-blue text-white rounded-xl text-sm font-semibold hover:bg-sap-blue-dark transition-colors">
-                        🎯 Simuler l'examen (40 questions)
+                        Simuler l'examen (40 questions)
                       </Link>
                     ) : (
                       <button onClick={() => setShowUpgradeModal(true)} className="w-full text-center py-2.5 bg-gray-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
@@ -447,7 +447,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                   })}
                   <div className="px-4 py-3">
                     {canAccess(true) ? (
-                      <Link href={examPath} className="block w-full text-center py-2.5 bg-sap-blue text-white rounded-xl text-sm font-semibold">🎯 Simuler l'examen</Link>
+                      <Link href={examPath} className="block w-full text-center py-2.5 bg-sap-blue text-white rounded-xl text-sm font-semibold">Simuler l'examen</Link>
                     ) : (
                       <button onClick={() => setShowUpgradeModal(true)} className="w-full text-center py-2.5 bg-gray-100 dark:bg-slate-700 text-slate-500 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
                         <LockIcon /> Simulateur d'examen (Pro)

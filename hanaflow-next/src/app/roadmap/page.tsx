@@ -663,14 +663,15 @@ function RoadmapResult({ roadmap }: { roadmap: RoadmapData }) {
                     <div className="flex flex-wrap gap-2 mb-3">
                       {phase.ressources.map((r) => (
                         <Link key={r.path} href={r.path} className="inline-flex items-center gap-1 text-xs font-semibold text-sap-blue dark:text-sap-accent bg-white dark:bg-slate-800 border border-sap-blue/30 dark:border-sap-accent/30 px-2.5 py-1 rounded-lg hover:bg-sap-blue/10 transition-colors">
-                          📚 {r.label}
+                          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                          {r.label}
                         </Link>
                       ))}
                     </div>
                   )}
                   {phase.conseil && (
                     <p className="text-xs text-slate-500 dark:text-slate-400 italic border-l-2 border-current pl-2 mt-2">
-                      💡 {phase.conseil}
+                      {phase.conseil}
                     </p>
                   )}
                 </div>
@@ -682,7 +683,7 @@ function RoadmapResult({ roadmap }: { roadmap: RoadmapData }) {
 
       {careerTips.length > 0 && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-5">
-          <h3 className="font-bold text-slate-900 dark:text-white mb-3">🎯 Conseils pour ta carrière SAP</h3>
+          <h3 className="font-bold text-slate-900 dark:text-white mb-3">Conseils pour ta carrière SAP</h3>
           <ul className="space-y-2">
             {careerTips.map((tip, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
@@ -849,7 +850,7 @@ export default function RoadmapPage() {
                   disabled={!stepIsValid(0, form) || !stepIsValid(1, form)}
                   className="px-5 py-2 rounded-xl text-sm font-bold bg-sap-blue text-white hover:bg-sap-blue-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  🎯 Générer ma roadmap
+                  Générer ma roadmap
                 </button>
               )}
             </div>
