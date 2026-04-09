@@ -5,6 +5,42 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import PageLayout from "@/components/PageLayout";
 
+const BookIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+  </svg>
+);
+const CpuIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/>
+    <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
+    <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
+    <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/>
+    <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/>
+  </svg>
+);
+const RefreshIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+  </svg>
+);
+const CheckCircleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
+const MapIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+  </svg>
+);
+const BriefcaseIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+  </svg>
+);
+
 const projectStats = [
   { value: "10", label: "pages de contenu SAP" },
   { value: "60+", label: "concepts clés documentés" },
@@ -24,14 +60,14 @@ const sapSkills = [
 ];
 
 const techStack = [
-  { label: "React 18", icon: "⚛️" },
-  { label: "Vite 6", icon: "⚡" },
-  { label: "Tailwind CSS", icon: "🎨" },
-  { label: "Node.js / Express", icon: "🟢" },
-  { label: "PostgreSQL", icon: "🐘" },
-  { label: "JWT Auth", icon: "🔐" },
-  { label: "Vercel", icon: "▲" },
-  { label: "Java", icon: "☕" },
+  { label: "React 18" },
+  { label: "Next.js 16" },
+  { label: "Tailwind CSS v4" },
+  { label: "Node.js / Express" },
+  { label: "PostgreSQL / Neon" },
+  { label: "Prisma ORM" },
+  { label: "JWT Auth" },
+  { label: "Vercel" },
 ];
 
 const faqItems = [
@@ -103,15 +139,15 @@ export default function AboutPage() {
       <Section title="Ce que couvre HanaFlow">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
           {[
-            { title: "6 modules SAP", desc: "FI, CO, MM, SD, HCM, PP — chacun avec hero, concepts clés, processus, quiz et FAQ.", icon: "📚" },
-            { title: "S/4HANA & IA Joule", desc: "Universal Journal, Fiori, migration, agents IA, Joule Studio et cas d'usage.", icon: "🤖" },
-            { title: "Processus métier", desc: "P2P, O2C, R2R expliqués étape par étape avec t-codes et diagrammes de flux.", icon: "🔄" },
-            { title: "Quizzes interactifs", desc: "10 questions par module avec correction instantanée et explications détaillées.", icon: "✅" },
-            { title: "Roadmaps personnalisées", desc: "4 parcours (Finance, Supply, Sales, Tech) avec étapes concrètes par profil.", icon: "🗺️" },
-            { title: "Débouchés métier", desc: "Rôles consultant, compétences recherchées et sens donné à chaque module.", icon: "💼" },
+            { title: "6 modules SAP", desc: "FI, CO, MM, SD, HCM, PP — chacun avec hero, concepts clés, processus, quiz et FAQ.", icon: <BookIcon /> },
+            { title: "S/4HANA & IA Joule", desc: "Universal Journal, Fiori, migration, agents IA, Joule Studio et cas d'usage.", icon: <CpuIcon /> },
+            { title: "Processus métier", desc: "P2P, O2C, R2R expliqués étape par étape avec t-codes et diagrammes de flux.", icon: <RefreshIcon /> },
+            { title: "Quizzes interactifs", desc: "10 questions par module avec correction instantanée et explications détaillées.", icon: <CheckCircleIcon /> },
+            { title: "Roadmaps personnalisées", desc: "4 parcours (Finance, Supply, Sales, Tech) avec étapes concrètes par profil.", icon: <MapIcon /> },
+            { title: "Débouchés métier", desc: "Rôles consultant, compétences recherchées et sens donné à chaque module.", icon: <BriefcaseIcon /> },
           ].map((item) => (
             <div key={item.title} className="rounded-2xl border border-sap-blue/15 p-4 bg-gray-50 dark:bg-slate-800">
-              <span className="text-2xl mb-2 block">{item.icon}</span>
+              <div className="h-9 w-9 rounded-xl bg-sap-blue/10 text-sap-blue dark:text-blue-300 flex items-center justify-center mb-3">{item.icon}</div>
               <p className="text-sm font-semibold mb-1">{item.title}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
             </div>
@@ -180,8 +216,7 @@ export default function AboutPage() {
       <Section title="Stack technique — HanaFlow">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           {techStack.map((t) => (
-            <div key={t.label} className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2.5 bg-gray-50 dark:bg-slate-800">
-              <span className="text-base">{t.icon}</span>
+            <div key={t.label} className="flex items-center rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2.5 bg-gray-50 dark:bg-slate-800">
               <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{t.label}</span>
             </div>
           ))}
