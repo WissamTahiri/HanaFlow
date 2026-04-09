@@ -5,15 +5,35 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import PageLayout from "@/components/PageLayout";
 
+/* ── SVG Icons ── */
+const LeafIcon     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>;
+const BookOpenIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+const SettingsIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+const AwardIcon    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>;
+const DollarIcon   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
+const BarChartIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
+const MonitorIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>;
+const WrenchIcon   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>;
+const TrendUpIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>;
+const GradCapIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>;
+const PackageIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>;
+const UsersIcon    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+const GlobeIcon    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
+const TargetIcon   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
+const MedalIcon    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></svg>;
+const ArrowUpIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>;
+const RefreshIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>;
+const ClipboardIcon= () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>;
+
 // ═══════════════════════════════════════════════════════════════════
 // DONNÉES DU FORMULAIRE
 // ═══════════════════════════════════════════════════════════════════
 
 const NIVEAUX_SAP = [
-  { key: "aucun",         label: "Aucun",              desc: "Je n'ai jamais touché à SAP",                  icon: "🌱" },
-  { key: "notions",       label: "Quelques notions",   desc: "J'ai vu SAP mais je ne maîtrise pas encore",   icon: "📖" },
-  { key: "intermediaire", label: "Intermédiaire",       desc: "Je connais 1-2 modules, j'ai pratiqué",        icon: "⚙️" },
-  { key: "confirme",      label: "Confirmé",            desc: "J'ai participé à des projets SAP",             icon: "🏆" },
+  { key: "aucun",         label: "Aucun",              desc: "Je n'ai jamais touché à SAP",                  icon: <LeafIcon /> },
+  { key: "notions",       label: "Quelques notions",   desc: "J'ai vu SAP mais je ne maîtrise pas encore",   icon: <BookOpenIcon /> },
+  { key: "intermediaire", label: "Intermédiaire",       desc: "Je connais 1-2 modules, j'ai pratiqué",        icon: <SettingsIcon /> },
+  { key: "confirme",      label: "Confirmé",            desc: "J'ai participé à des projets SAP",             icon: <AwardIcon /> },
 ];
 
 const EXPERIENCES = [
@@ -25,29 +45,29 @@ const EXPERIENCES = [
 ];
 
 const DOMAINES = [
-  { key: "finance_compta", label: "Finance / Comptabilité", icon: "💶" },
-  { key: "gestion",        label: "Gestion / Management",   icon: "📊" },
-  { key: "informatique",   label: "Informatique / Digital", icon: "💻" },
-  { key: "ingenierie",     label: "Ingénierie / Industrie", icon: "🔧" },
-  { key: "commerce",       label: "Commerce / Marketing",   icon: "📈" },
-  { key: "autre",          label: "Autre domaine",          icon: "🎓" },
+  { key: "finance_compta", label: "Finance / Comptabilité", icon: <DollarIcon /> },
+  { key: "gestion",        label: "Gestion / Management",   icon: <BarChartIcon /> },
+  { key: "informatique",   label: "Informatique / Digital", icon: <MonitorIcon /> },
+  { key: "ingenierie",     label: "Ingénierie / Industrie", icon: <WrenchIcon /> },
+  { key: "commerce",       label: "Commerce / Marketing",   icon: <TrendUpIcon /> },
+  { key: "autre",          label: "Autre domaine",          icon: <GradCapIcon /> },
 ];
 
 const PROFILS_CIBLES = [
-  { key: "finance",    label: "Finance / Contrôle de gestion", desc: "Modules FI, CO — comptabilité, reporting, clôture", icon: "💰", color: "blue" },
-  { key: "supply",     label: "Supply Chain / Logistique",     desc: "Modules MM, SD, PP — achats, stocks, production",  icon: "📦", color: "orange" },
-  { key: "sales",      label: "Sales / Relation client",       desc: "Modules SD, CX — ventes, O2C, relation client",    icon: "📈", color: "purple" },
-  { key: "tech",       label: "IT / Data / IA",                desc: "ABAP, BTP, Fiori, intégrations, analytics SAP",    icon: "⚙️", color: "emerald" },
-  { key: "hcm",        label: "RH / Paie",                     desc: "Module HCM — paie, gestion des talents, formation", icon: "👥", color: "rose" },
-  { key: "consultant", label: "Consultant SAP généraliste",    desc: "Vision multi-modules pour du conseil end-to-end",  icon: "🌐", color: "indigo" },
+  { key: "finance",    label: "Finance / Contrôle de gestion", desc: "Modules FI, CO — comptabilité, reporting, clôture", icon: <DollarIcon />,   color: "blue" },
+  { key: "supply",     label: "Supply Chain / Logistique",     desc: "Modules MM, SD, PP — achats, stocks, production",  icon: <PackageIcon />,  color: "orange" },
+  { key: "sales",      label: "Sales / Relation client",       desc: "Modules SD, CX — ventes, O2C, relation client",    icon: <TrendUpIcon />,  color: "purple" },
+  { key: "tech",       label: "IT / Data / IA",                desc: "ABAP, BTP, Fiori, intégrations, analytics SAP",    icon: <SettingsIcon />, color: "emerald" },
+  { key: "hcm",        label: "RH / Paie",                     desc: "Module HCM — paie, gestion des talents, formation", icon: <UsersIcon />,   color: "rose" },
+  { key: "consultant", label: "Consultant SAP généraliste",    desc: "Vision multi-modules pour du conseil end-to-end",  icon: <GlobeIcon />,    color: "indigo" },
 ];
 
 const OBJECTIFS = [
-  { key: "premier_emploi", label: "Trouver mon premier emploi SAP",        icon: "🎯" },
-  { key: "certification",  label: "Obtenir une certification SAP",          icon: "🏅" },
-  { key: "evolution",      label: "Évoluer dans mon poste actuel",          icon: "🚀" },
-  { key: "reconversion",   label: "Me reconvertir vers le conseil SAP",     icon: "🔄" },
-  { key: "projet",         label: "Réussir un projet S/4HANA en cours",     icon: "📋" },
+  { key: "premier_emploi", label: "Trouver mon premier emploi SAP",        icon: <TargetIcon /> },
+  { key: "certification",  label: "Obtenir une certification SAP",          icon: <MedalIcon /> },
+  { key: "evolution",      label: "Évoluer dans mon poste actuel",          icon: <ArrowUpIcon /> },
+  { key: "reconversion",   label: "Me reconvertir vers le conseil SAP",     icon: <RefreshIcon /> },
+  { key: "projet",         label: "Réussir un projet S/4HANA en cours",     icon: <ClipboardIcon /> },
 ];
 
 const DISPONIBILITES = [
@@ -426,7 +446,7 @@ function Step1({ form, setForm }: { form: FormData; setForm: React.Dispatch<Reac
           {NIVEAUX_SAP.map((n) => (
             <SelectCard key={n.key} selected={form.niveauSAP === n.key} onClick={() => setForm(f => ({ ...f, niveauSAP: n.key }))}>
               <span className="flex items-center gap-2 mb-0.5">
-                <span>{n.icon}</span>
+                <span className="h-5 w-5 flex items-center justify-center flex-shrink-0">{n.icon}</span>
                 <span className="font-semibold">{n.label}</span>
               </span>
               <p className="text-xs text-slate-500 dark:text-slate-400 ml-6">{n.desc}</p>
@@ -452,7 +472,7 @@ function Step1({ form, setForm }: { form: FormData; setForm: React.Dispatch<Reac
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {DOMAINES.map((d) => (
             <SelectCard key={d.key} selected={form.domaine === d.key} onClick={() => setForm(f => ({ ...f, domaine: d.key }))}>
-              <span className="text-lg mb-1 block">{d.icon}</span>
+              <span className="h-8 w-8 rounded-lg bg-sap-blue/10 text-sap-blue dark:text-blue-300 flex items-center justify-center mb-2">{d.icon}</span>
               <span className="font-medium text-xs">{d.label}</span>
             </SelectCard>
           ))}
@@ -491,7 +511,7 @@ function Step2({ form, setForm }: { form: FormData; setForm: React.Dispatch<Reac
               }`}
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xl">{p.icon}</span>
+                <span className="h-6 w-6 flex items-center justify-center flex-shrink-0 text-slate-600 dark:text-slate-300">{p.icon}</span>
                 <span className="font-semibold text-sm text-slate-900 dark:text-white">{p.label}</span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 ml-8">{p.desc}</p>
@@ -506,7 +526,7 @@ function Step2({ form, setForm }: { form: FormData; setForm: React.Dispatch<Reac
           {OBJECTIFS.map((o) => (
             <SelectCard key={o.key} selected={form.objectif === o.key} onClick={() => setForm(f => ({ ...f, objectif: o.key }))}>
               <span className="flex items-center gap-2">
-                <span className="text-lg">{o.icon}</span>
+                <span className="h-5 w-5 flex items-center justify-center flex-shrink-0">{o.icon}</span>
                 <span className="font-semibold text-sm">{o.label}</span>
               </span>
             </SelectCard>
