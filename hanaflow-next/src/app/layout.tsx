@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta-sans",
+  display: "swap",
+});
 import { Providers } from "./providers";
 import { ThemeScript } from "@/components/ThemeScript";
 import Navbar from "@/components/Navbar";
@@ -48,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning className={plusJakartaSans.variable}>
       <head>
         <ThemeScript />
         <JsonLd data={{
