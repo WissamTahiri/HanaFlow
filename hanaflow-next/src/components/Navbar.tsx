@@ -244,11 +244,7 @@ export default function Navbar() {
                 >
                   Connexion
                 </Link>
-                <Link
-                  href="/register"
-                  className="text-sm font-semibold bg-sap-blue text-white px-4 py-2 rounded-xl
-                             hover:bg-sap-blue-dark transition-colors shadow-sm"
-                >
+                <Link href="/register" className="btn-cta px-4 py-2 text-sm">
                   S'inscrire
                 </Link>
               </div>
@@ -362,7 +358,7 @@ export default function Navbar() {
                 >
                   Connexion
                 </Link>
-                <Link href="/register" className="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-semibold bg-sap-blue text-white hover:bg-sap-blue-dark transition-colors">
+                <Link href="/register" className="btn-cta block w-full text-center px-4 py-2.5 text-sm">
                   S'inscrire gratuitement
                 </Link>
               </>

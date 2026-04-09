@@ -3,6 +3,27 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 
+const GraduationIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+  </svg>
+);
+const AwardIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+  </svg>
+);
+const ZapIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+);
+const MapIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+  </svg>
+);
+
 const modules = [
   { code: "FI", name: "Finance", href: "/modules-sap/fi", color: "from-blue-500 to-blue-700", desc: "Comptabilité générale, fournisseurs, clients et immobilisations." },
   { code: "CO", name: "Controlling", href: "/modules-sap/co", color: "from-indigo-500 to-indigo-700", desc: "Centres de coûts, ordres internes et contrôle de gestion." },
@@ -13,10 +34,10 @@ const modules = [
 ];
 
 const features = [
-  { icon: "🎓", title: "Cours structurés", desc: "Contenus pédagogiques par module SAP, du concept à la pratique." },
-  { icon: "🏆", title: "Certifications", desc: "Simulateurs d'examens avec corrections détaillées et certificats PDF." },
-  { icon: "🚀", title: "Gamification", desc: "Badges, XP et niveaux pour rester motivé tout au long de ton parcours." },
-  { icon: "🗺️", title: "Roadmap consultant", desc: "Chemin balisé pour devenir consultant SAP junior en partant de zéro." },
+  { icon: <GraduationIcon />, title: "Cours structurés", desc: "Contenus pédagogiques par module SAP, du concept à la pratique." },
+  { icon: <AwardIcon />,      title: "Certifications", desc: "Simulateurs d'examens avec corrections détaillées et certificats PDF." },
+  { icon: <ZapIcon />,        title: "Gamification", desc: "Badges, XP et niveaux pour rester motivé tout au long de ton parcours." },
+  { icon: <MapIcon />,        title: "Roadmap consultant", desc: "Chemin balisé pour devenir consultant SAP junior en partant de zéro." },
 ];
 
 export default function Home() {
@@ -32,7 +53,8 @@ export default function Home() {
             transition={{ duration: 0.55 }}
           >
             <span className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-white/15 text-white text-sm font-medium backdrop-blur-sm border border-white/20">
-              🎯 Plateforme SAP éducative gratuite
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              Plateforme SAP éducative gratuite
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6">
               Maîtrise SAP S/4HANA<br className="hidden sm:block" /> de zéro à consultant
@@ -129,7 +151,7 @@ export default function Home() {
                 transition={{ delay: i * 0.08 }}
                 className="card p-6 text-center"
               >
-                <div className="text-3xl mb-3">{f.icon}</div>
+                <div className="h-12 w-12 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue dark:text-blue-300 flex items-center justify-center mb-4">{f.icon}</div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-2">{f.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
               </motion.div>

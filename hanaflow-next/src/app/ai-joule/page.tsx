@@ -4,6 +4,45 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import PageLayout from "@/components/PageLayout";
 
+const TrendingUpIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+  </svg>
+);
+const TruckIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+    <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+  </svg>
+);
+const UsersIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+const SettingsIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+);
+const MessageIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+);
+const BotIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/>
+    <line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/>
+  </svg>
+);
+const ZapIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+);
+
 const keyConcepts = [
   { code: "JOULE", title: "Joule", desc: "Assistant d'IA générative de SAP intégré dans S/4HANA Cloud, BTP et SuccessFactors. Répond en langage naturel.", color: "violet" },
   { code: "AGENTS", title: "Agents IA", desc: "Agents semi-autonomes préconfigurés (Finance, Supply, RH…) qui automatisent les tâches et exécutent des actions SAP.", color: "purple" },
@@ -24,7 +63,7 @@ const colorMap: Record<string, string> = {
 
 const useCases = [
   {
-    domain: "Finance (FI/CO)", icon: "💰", color: "blue",
+    domain: "Finance (FI/CO)", icon: <TrendingUpIcon />, color: "blue",
     cases: [
       "\"Montre-moi le profit du trimestre par région vs budget\"",
       "Validation automatique de factures et détection d'anomalies",
@@ -33,7 +72,7 @@ const useCases = [
     ],
   },
   {
-    domain: "Supply Chain (MM/SD/PP)", icon: "📦", color: "orange",
+    domain: "Supply Chain (MM/SD/PP)", icon: <TruckIcon />, color: "orange",
     cases: [
       "\"Quels Purchase Orders sont en retard aujourd'hui ?\"",
       "Détection proactive des risques de rupture de stock",
@@ -42,7 +81,7 @@ const useCases = [
     ],
   },
   {
-    domain: "RH (HCM / SuccessFactors)", icon: "👥", color: "red",
+    domain: "RH (HCM / SuccessFactors)", icon: <UsersIcon />, color: "red",
     cases: [
       "Gestion assistée des demandes de congés et approbations",
       "Onboarding guidé pour les nouveaux collaborateurs",
@@ -51,7 +90,7 @@ const useCases = [
     ],
   },
   {
-    domain: "IT / Technique", icon: "⚙️", color: "emerald",
+    domain: "IT / Technique", icon: <SettingsIcon />, color: "emerald",
     cases: [
       "Joule Studio pour créer des agents IA sur mesure",
       "BTP AI Foundation pour déployer ses propres LLMs",
@@ -217,12 +256,12 @@ export default function AIJoulePage() {
         </p>
         <div className="grid sm:grid-cols-3 gap-4">
           {[
-            { title: "Assistant conversationnel", desc: "Pose une question en langage naturel dans n'importe quelle app Fiori. Joule combine les données S/4HANA, CO-PA, SuccessFactors en quelques secondes.", icon: "💬" },
-            { title: "Agents IA métier", desc: "Des agents spécialisés (Finance, Achats, Supply, RH) automatisent des tâches comme la validation de factures, l'analyse de variance ou la détection d'anomalies.", icon: "🤖" },
-            { title: "Requêtes temps réel", desc: "Accès instantané aux données FI/CO, ventes, stocks, RH via SAP HANA et Business Data Cloud — sans quitter son application.", icon: "⚡" },
+            { title: "Assistant conversationnel", desc: "Pose une question en langage naturel dans n'importe quelle app Fiori. Joule combine les données S/4HANA, CO-PA, SuccessFactors en quelques secondes.", icon: <MessageIcon /> },
+            { title: "Agents IA métier", desc: "Des agents spécialisés (Finance, Achats, Supply, RH) automatisent des tâches comme la validation de factures, l'analyse de variance ou la détection d'anomalies.", icon: <BotIcon /> },
+            { title: "Requêtes temps réel", desc: "Accès instantané aux données FI/CO, ventes, stocks, RH via SAP HANA et Business Data Cloud — sans quitter son application.", icon: <ZapIcon /> },
           ].map((item) => (
             <div key={item.title} className="rounded-2xl border border-violet-500/15 p-4 bg-gray-50 dark:bg-slate-800">
-              <span className="text-2xl mb-3 block">{item.icon}</span>
+              <div className="h-9 w-9 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-300 flex items-center justify-center mb-3">{item.icon}</div>
               <p className="text-sm font-semibold mb-2">{item.title}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
             </div>
@@ -236,7 +275,9 @@ export default function AIJoulePage() {
           {useCases.map((uc) => (
             <div key={uc.domain} className={`rounded-2xl border p-4 ${domainColors[uc.color]}`}>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">{uc.icon}</span>
+                <span className={`h-7 w-7 rounded-lg flex items-center justify-center flex-shrink-0 ${domainTitleColors[uc.color]} bg-current/10`} style={{ backgroundColor: "transparent" }}>
+                  <span className={domainTitleColors[uc.color]}>{uc.icon}</span>
+                </span>
                 <h3 className={`text-sm font-bold ${domainTitleColors[uc.color]}`}>{uc.domain}</h3>
               </div>
               <ul className="space-y-1.5">
