@@ -54,7 +54,7 @@ const quickLinks = [
   { href: "/s4hana",           label: "S/4HANA",         color: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" },
   { href: "/ai-joule",         label: "SAP AI Joule",     color: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" },
   { href: "/processus-metier", label: "Processus",        color: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400" },
-  { href: "/roadmap",          label: "Ma Roadmap",       color: "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400" },
+  { href: "/roadmap",          label: "Ma Roadmap",       color: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400" },
 ];
 
 function DashboardContent() {
@@ -213,7 +213,7 @@ function DashboardContent() {
           {/* Plan */}
           <div className={`rounded-2xl border shadow-card p-5
                            ${isPro
-                             ? "bg-linear-to-br from-amber-50 to-orange-50 border-amber-200 dark:from-amber-900/10 dark:to-orange-900/10 dark:border-amber-700/40"
+                             ? "bg-linear-to-br from-amber-50 to-amber-50 border-amber-200 dark:from-amber-900/10 dark:to-amber-900/10 dark:border-amber-700/40"
                              : "bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700"
                            }`}>
             <div className="flex items-center gap-3 mb-3">
@@ -264,7 +264,7 @@ function DashboardContent() {
                 initial={{ width: 0 }}
                 animate={{ width: `${levelInfo.progress}%` }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full"
+                className="h-full bg-linear-to-r from-amber-400 to-amber-500 rounded-full"
               />
             </div>
             <p className="text-xs text-slate-400 mt-1.5">
@@ -286,7 +286,7 @@ function DashboardContent() {
               <div className="flex gap-3">
                 {recentBadges.map((badge) => badge && (
                   <div key={badge.id} className="flex flex-col items-center gap-1">
-                    <div className="h-10 w-10 rounded-xl bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center text-xl">
+                    <div className="h-10 w-10 rounded-xl bg-linear-to-br from-amber-400 to-amber-500 flex items-center justify-center text-xl">
                       {badge.icon}
                     </div>
                     <p className="text-[10px] text-center text-slate-500 dark:text-slate-400 leading-tight max-w-[56px]">{badge.name}</p>

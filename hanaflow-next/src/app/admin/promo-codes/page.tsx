@@ -242,7 +242,7 @@ export default function AdminPromoCodesPage() {
                               onClick={() => toggleActive(c.id, c.isActive)}
                               className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                                 c.isActive
-                                  ? "bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400"
+                                  ? "bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400"
                                   : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
                               }`}
                             >

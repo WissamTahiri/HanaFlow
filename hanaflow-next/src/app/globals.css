@@ -16,8 +16,8 @@
   --color-sap-dark:       #0F172A;
   --color-sap-card:       #1E293B;
   --color-sap-muted:      #64748B;
-  --color-sap-accent:     #F97316;
-  --color-sap-accent-dark:#EA580C;
+  --color-sap-accent:     #60A5FA;
+  --color-sap-accent-dark:#3B82F6;
   --color-sap-success:    #10B981;
   --color-sap-warning:    #F59E0B;
   --color-sap-error:      #EF4444;
@@ -155,14 +155,14 @@ a, button, input, select, textarea, [role="button"] {
   .text-balance { text-wrap: balance; }
 
   .gradient-text {
-    background: linear-gradient(135deg, #2563EB, #F97316);
+    background: linear-gradient(135deg, #1D4ED8, #60A5FA);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-line {
-    background: linear-gradient(90deg, transparent, #2563EB, #F97316, transparent);
+    background: linear-gradient(90deg, transparent, #1D4ED8, #60A5FA, transparent);
   }
 
   .pulse-ring {

@@ -46,7 +46,7 @@ const KEY_CONCEPTS = [
     code: "AA",
     label: "Asset Accounting",
     description: "Suivi complet des immobilisations : acquisition, mise en service, calcul des amortissements, cession. Impact direct sur les comptes GL.",
-    color: "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-400",
+    color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400",
   },
   {
     code: "P2P",

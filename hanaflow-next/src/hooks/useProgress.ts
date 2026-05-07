@@ -7,7 +7,7 @@ export const SAP_MODULES = [
   { slug: "fi",  label: "FI — Finance",             path: "/modules-sap/fi",  color: "bg-blue-500"   },
   { slug: "co",  label: "CO — Controlling",          path: "/modules-sap/co",  color: "bg-purple-500" },
   { slug: "mm",  label: "MM — Gestion des stocks",   path: "/modules-sap/mm",  color: "bg-green-500"  },
-  { slug: "sd",  label: "SD — Ventes",               path: "/modules-sap/sd",  color: "bg-orange-500" },
+  { slug: "sd",  label: "SD — Ventes",               path: "/modules-sap/sd",  color: "bg-amber-500" },
   { slug: "hcm", label: "HCM — Ressources humaines", path: "/modules-sap/hcm", color: "bg-pink-500"   },
   { slug: "pp",  label: "PP — Production",           path: "/modules-sap/pp",  color: "bg-teal-500"   },
 ];

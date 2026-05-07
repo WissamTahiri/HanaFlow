@@ -72,7 +72,7 @@ const useCases = [
     ],
   },
   {
-    domain: "Supply Chain (MM/SD/PP)", icon: <TruckIcon />, color: "orange",
+    domain: "Supply Chain (MM/SD/PP)", icon: <TruckIcon />, color: "amber",
     cases: [
       "\"Quels Purchase Orders sont en retard aujourd'hui ?\"",
       "Détection proactive des risques de rupture de stock",
@@ -102,14 +102,14 @@ const useCases = [
 
 const domainColors: Record<string, string> = {
   blue: "border-blue-500/20 bg-blue-50 dark:bg-blue-900/10",
-  orange: "border-orange-500/20 bg-orange-50 dark:bg-orange-900/10",
+  amber: "border-amber-500/20 bg-amber-50 dark:bg-amber-900/10",
   red: "border-rose-500/20 bg-rose-50 dark:bg-rose-900/10",
   emerald: "border-emerald-500/20 bg-emerald-50 dark:bg-emerald-900/10",
 };
 
 const domainTitleColors: Record<string, string> = {
   blue: "text-blue-700 dark:text-blue-300",
-  orange: "text-orange-700 dark:text-orange-300",
+  amber: "text-amber-700 dark:text-amber-300",
   red: "text-rose-700 dark:text-rose-300",
   emerald: "text-emerald-700 dark:text-emerald-300",
 };

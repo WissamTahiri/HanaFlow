@@ -24,7 +24,7 @@ export default function BadgeToast() {
           className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-2xl px-4 py-3 max-w-xs cursor-pointer"
           onClick={dismissNotification}
         >
-          <div className="h-11 w-11 flex items-center justify-center rounded-xl bg-linear-to-br from-amber-400 to-orange-500 text-2xl flex-shrink-0">
+          <div className="h-11 w-11 flex items-center justify-center rounded-xl bg-linear-to-br from-amber-400 to-amber-500 text-2xl flex-shrink-0">
             {notification.badge.icon}
           </div>
           <div>

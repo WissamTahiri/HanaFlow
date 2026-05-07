@@ -17,7 +17,7 @@ function AchievementsContent() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sap-dark">
       {/* Hero */}
-      <div className="bg-linear-to-br from-slate-900 via-amber-900 to-orange-700 text-white">
+      <div className="bg-linear-to-br from-slate-900 via-amber-900 to-amber-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
           <nav className="flex items-center gap-2 text-xs text-white/60 mb-4">
             <Link href="/" className="hover:text-white">Accueil</Link>
@@ -40,7 +40,7 @@ function AchievementsContent() {
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-bold text-white/60 uppercase tracking-wider">Niveau {current.level}</span>
                 {streak > 0 && (
-                  <span className="text-xs bg-orange-500/30 text-orange-200 border border-orange-400/30 px-2 py-0.5 rounded-full font-semibold">
+                  <span className="text-xs bg-amber-500/30 text-amber-200 border border-amber-400/30 px-2 py-0.5 rounded-full font-semibold">
                     🔥 {streak} jours
                   </span>
                 )}
@@ -49,7 +49,7 @@ function AchievementsContent() {
               <div className="h-2.5 bg-white/20 rounded-full overflow-hidden mb-2">
                 <motion.div
                   initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 1, delay: 0.3 }}
-                  className="h-full bg-linear-to-r from-amber-400 to-orange-400 rounded-full"
+                  className="h-full bg-linear-to-r from-amber-400 to-amber-400 rounded-full"
                 />
               </div>
               <p className="text-xs text-white/60">
@@ -73,7 +73,7 @@ function AchievementsContent() {
           <div className="h-3 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }} animate={{ width: `${(unlockedCount / totalBadges) * 100}%` }} transition={{ duration: 1 }}
-              className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full"
+              className="h-full bg-linear-to-r from-amber-400 to-amber-500 rounded-full"
             />
           </div>
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -81,7 +81,7 @@ function AchievementsContent() {
               { label: "XP total",  value: xp.toLocaleString(),                                     color: "text-amber-600 dark:text-amber-400" },
               { label: "Niveau",    value: current.name,                                             color: "text-purple-600 dark:text-purple-400" },
               { label: "Badges",    value: `${unlockedCount}/${totalBadges}`,                        color: "text-emerald-600 dark:text-emerald-400" },
-              { label: "Série",     value: streak > 0 ? `🔥 ${streak} jours` : "—",                color: "text-orange-600 dark:text-orange-400" },
+              { label: "Série",     value: streak > 0 ? `🔥 ${streak} jours` : "—",                color: "text-amber-600 dark:text-amber-400" },
             ].map((s) => (
               <div key={s.label} className="bg-gray-50 dark:bg-slate-700/50 rounded-xl p-3 text-center">
                 <p className={`text-lg font-black ${s.color}`}>{s.value}</p>
