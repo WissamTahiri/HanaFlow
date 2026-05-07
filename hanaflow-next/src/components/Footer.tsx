@@ -109,6 +109,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {[
                 { href: "/a-propos", label: "Le projet" },
+                { href: "/contact",  label: "Contact" },
                 { href: "/register", label: "S'inscrire gratuitement" },
                 { href: "/login",    label: "Se connecter" },
               ].map(({ href, label }) => (
@@ -122,13 +123,31 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-slate-400 dark:text-slate-500">
-            © {new Date().getFullYear()} HanaFlow — Par Wissam Tahiri.
-          </p>
-          <p className="text-xs text-slate-400 dark:text-slate-500">
-            Plateforme éducative SAP · Non affilié à SAP SE
-          </p>
+        <div className="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col gap-4">
+          <nav aria-label="Liens légaux" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            {[
+              { href: "/cgu",              label: "CGU" },
+              { href: "/confidentialite",  label: "Confidentialité" },
+              { href: "/mentions-legales", label: "Mentions légales" },
+              { href: "/contact",          label: "Contact" },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="text-xs text-slate-500 dark:text-slate-400 hover:text-sap-blue transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              © {new Date().getFullYear()} HanaFlow — Par Wissam Tahiri.
+            </p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              Plateforme éducative SAP · Non affilié à SAP SE
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
 interface AdminUser {
@@ -97,9 +98,49 @@ export default function AdminUsersPage() {
     }
   };
 
+  const exportCsv = async () => {
+    if (!token) return;
+    try {
+      const r = await fetch("/api/admin/users/export", {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setError(d.message ?? "Échec export");
+        return;
+      }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const cd = r.headers.get("Content-Disposition") ?? "";
+      const match = cd.match(/filename="([^"]+)"/);
+      a.download = match?.[1] ?? `hanaflow-users.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError("Erreur réseau");
+    }
+  };
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Utilisateurs</h1>
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Utilisateurs</h1>
+        <button
+          onClick={exportCsv}
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export CSV
+        </button>
+      </div>
 
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
@@ -185,6 +226,12 @@ export default function AdminUsersPage() {
                           <div className="w-4 h-4 border-2 border-sap-blue border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <>
+                            <Link
+                              href={`/admin/users/${u.id}`}
+                              className="px-2.5 py-1 rounded-md text-xs font-medium bg-sap-blue/10 text-sap-blue hover:bg-sap-blue/20 dark:bg-sap-blue/20 dark:text-blue-300 transition-colors"
+                            >
+                              Détails
+                            </Link>
                             <button
                               onClick={() => patchUser(u.id, { isPro: !u.isPro })}
                               className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
