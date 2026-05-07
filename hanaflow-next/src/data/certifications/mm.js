@@ -2,7 +2,9 @@
  * Contenu de la certification C_TS4MM_2023
  * SAP Certified Associate – SAP S/4HANA for Materials Management
  *
- * 7 chapitres · leçons · quiz · 40 questions simulateur
+ * 7 chapitres couvrant 100% du périmètre de l'examen officiel
+ * 14 leçons (2 par chapitre) — concepts, T-codes, scénarios métier
+ * Quiz par chapitre + 80 questions simulateur (format examen réel)
  */
 
 export const mmCertification = {
@@ -13,7 +15,7 @@ export const mmCertification = {
   level: "Associate",
   examDuration: 180,
   examQuestions: 80,
-  simulatorQuestions: 40,
+  simulatorQuestions: 80,
   passingScore: 65,
   officialLink: "https://training.sap.com/certification/c_ts4mm_2023",
   color: "from-emerald-900 via-emerald-700 to-emerald-500",
@@ -327,6 +329,35 @@ export const mmCertification = {
             { code: "MB1A", description: "Sortie de marchandises (méthode alternative)" },
           ],
         },
+        {
+          id: "l3-2",
+          title: "Cycle counting, valorisation des mouvements et stocks spéciaux avancés",
+          content: [
+            "Le Cycle Counting est une méthode d'inventaire continue qui complète l'inventaire annuel. Au lieu de compter tout le stock en une fois, les articles sont répartis en classes ABC selon leur valeur ou leur fréquence de mouvement, puis comptés selon une fréquence adaptée. Classe A (forte valeur, comptage 4-12 fois/an), classe B (valeur moyenne, 2-4 fois/an), classe C (faible valeur, 1 fois/an). Activé via la transaction MIBC et le code de cycle dans la fiche article.",
+            "L'Inventaire Tournant Continu (Continuous Inventory) est une variante où les comptages sont planifiés tout au long de l'année avec un calendrier. Avantage : aucune interruption de production, charge de travail lissée. Le compteur n'a pas à connaître la quantité système (comptage à l'aveugle ou non, paramétrable).",
+            "Lors d'un mouvement de stock, SAP génère plusieurs documents simultanément : un Document Matière (Material Document, table MKPF/MSEG) qui trace le flux physique ; une ou plusieurs Pièces Comptables FI (table BKPF/BSEG dans ECC, ACDOCA dans S/4HANA) pour l'impact financier ; une Pièce Contrôle de Gestion CO si centre de coûts impliqué (mouvements 201, 261). La transaction MB03 affiche un document matière avec ses pièces FI/CO liées.",
+            "Les types de mouvement à connaître absolument pour la certification : 101 (entrée GR contre BC), 102 (annulation 101), 122 (retour fournisseur), 161 (retour client en magasin), 201 (sortie pour centre de coûts), 202 (annulation 201), 251 (sortie pour vente — utilisé par SD), 261 (sortie pour ordre fab), 311 (transfert magasin en 1-step), 313/315 (transfert 2-step), 411 (transfert vers stock projet), 501 (entrée sans BC), 551 (mise au rebut), 601 (sortie pour livraison client).",
+            "Le stock projet (Project Stock) est un stock affecté à un WBS ou à un ordre — il n'est consommable que pour ce projet. Très utilisé dans les industries projet (BTP, défense, aéronautique). Le mouvement 411-Q transfère du stock libre vers le stock projet. Le stock client (E) appartient au client mais est physiquement dans nos entrepôts, typique du Make-to-Order. Le stock fournisseur consigné (K) reste propriété fournisseur jusqu'à consommation (mouvement spécial 411-K pour retirer du stock consigné vers stock libre lors de l'utilisation).",
+            "Les blocages de stock (Stock Block) peuvent être manuels (transaction MB1B avec mouvement 344 pour bloquer, 343 pour débloquer) ou automatiques (résultat d'un contrôle qualité). Un stock bloqué reste comptabilisé dans la valeur du stock total mais ne participe pas au calcul MRP — il n'est pas considéré disponible. À la différence du stock QI (en contrôle qualité) qui peut basculer en stock libre après acceptation du contrôle (mouvement 321) ou être renvoyé fournisseur (mouvement 122)."
+          ],
+          keyConcepts: [
+            { term: "Cycle Counting (CC)", definition: "Inventaire continu basé sur classes ABC. Articles A comptés fréquemment, C rarement. Activé via MIBC et code cycle dans fiche article." },
+            { term: "Document matière (MKPF/MSEG)", definition: "Pièce MM créée à chaque mouvement. MKPF = en-tête, MSEG = lignes. Numérotation séquentielle, immuable." },
+            { term: "Stock projet (Q)", definition: "Stock affecté à un WBS ou ordre. Consommable uniquement pour ce projet. Mouvement 411-Q pour affecter." },
+            { term: "Stock client (E)", definition: "Stock appartenant au client mais chez nous. Make-to-Order. Géré séparément du stock libre." },
+            { term: "Stock consigné (K)", definition: "Stock du fournisseur chez nous. Propriété fournisseur jusqu'à consommation. Pas de valeur dans nos comptes tant que non consommé." },
+            { term: "Mouvement 311", definition: "Transfert entre magasins dans la même division, en 1-step (immédiat). Pour 2-step longue distance, utiliser 313+315." },
+            { term: "Mouvement 551", definition: "Mise au rebut (Scrapping). Sortie définitive du stock avec écriture en compte de pertes. Utilisé pour articles obsolètes ou détériorés." },
+          ],
+          tcodes: [
+            { code: "MIBC", description: "Activer le Cycle Counting et définir les classes ABC" },
+            { code: "MI31", description: "Créer un document d'inventaire en masse" },
+            { code: "MI24", description: "Liste de comptage à imprimer pour le terrain" },
+            { code: "MB03", description: "Afficher un document matière et ses pièces comptables liées" },
+            { code: "MB1B", description: "Transferts de stock (changement type de stock)" },
+            { code: "MMBE", description: "Stock par article : libre, bloqué, QI, projet, client, transit" },
+          ],
+        },
       ],
       quiz: [
         {
@@ -431,6 +462,35 @@ export const mmCertification = {
             { code: "MR11", description: "Entretien du compte GR/IR (régularisation)" },
           ],
         },
+        {
+          id: "l4-2",
+          title: "Écarts de prix, révaluation, dépréciation et split valuation",
+          content: [
+            "Les Écarts de Prix (Price Differences) apparaissent lorsque le prix réel d'achat diffère du prix standard. Avec un article à prix standard (S), l'écart est immédiatement comptabilisé sur un compte d'écart (Price Difference Account). Avec un prix moyen mobile (V), l'écart modifie le MAP — sauf si le stock est insuffisant pour absorber l'écart (cas de stock négatif ou faible), où l'écart va aussi sur un compte d'écart de prix.",
+            "La détermination automatique des comptes (Automatic Account Determination) est une configuration centrale : la transaction OBYC définit, pour chaque type de transaction (clé OBYC : BSX pour stocks, WRX pour GR/IR, PRD pour écarts de prix, GBB pour sorties, etc.), le compte de grand livre à mouvementer en fonction du groupe d'évaluation et du type d'article. C'est le pont essentiel entre MM et FI — un consultant MM doit comprendre ce paramétrage.",
+            "La Révaluation des stocks (Material Revaluation, MR21) permet de modifier manuellement le prix d'un article. Cas typiques : ajustement à la valeur de marché, correction d'erreur, prix obsolète. La transaction génère une écriture de révaluation : Débit/Crédit Stock pour l'écart valeur × quantité, contrepartie sur compte d'écart. À ne pas confondre avec MR22 qui n'écrit pas dans la base.",
+            "La Dépréciation (Lowest Value Principle / Niederstwertprinzip) est une obligation légale en clôture annuelle : les stocks doivent être valorisés au plus bas entre coût d'acquisition et valeur de marché actuelle. Les transactions MRN0 (analyse mouvement de stock), MRN1 (valeur de marché), MRN2 (rotation lente) calculent automatiquement les dépréciations. La dépréciation est ensuite comptabilisée par MR21 ou MRDD.",
+            "La Split Valuation permet de valoriser le même article à des prix différents selon des critères de séparation (split). Exemples : par origine fournisseur (interne vs externe), par lot, par qualité (premier choix vs second choix). On crée des Catégories de Valorisation (Valuation Category, ex: B pour Batch, H pour Origin) et des Types de Valorisation (Valuation Type, ex: INTERN, EXTERN). Le stock est tenu et valorisé séparément pour chaque type. Activation : OMWC + vue Comptabilité de la fiche article.",
+            "Les écritures comptables typiques d'un écart en MIRO avec prix standard : Débit GR/IR 1000€ (solde transition), Crédit Fournisseur 1100€ (dette), Débit Compte écart de prix 100€ (constatation de l'écart). Si le prix MAP est utilisé et stock suffisant : pas de compte d'écart, le MAP se recalcule automatiquement. Cette différence comptable est une question récurrente à l'examen."
+          ],
+          keyConcepts: [
+            { term: "OBYC", definition: "Transaction de paramétrage de la détermination automatique des comptes MM-FI. Clés BSX (stocks), WRX (GR/IR), PRD (écarts), GBB (sorties)." },
+            { term: "Compte d'écart de prix (PRD)", definition: "Compte recevant la différence prix réel / prix standard. Utilisé seulement avec prix S, ou prix V si stock insuffisant." },
+            { term: "MR21 — Révaluation", definition: "Modification manuelle du prix article. Génère une écriture comptable de révaluation. Utilisée pour correction ou ajustement à la valeur de marché." },
+            { term: "Dépréciation (Lowest Value)", definition: "Principe du moins-disant en clôture : stock valorisé au minimum entre coût et valeur de marché. Calculé par MRN0/MRN1/MRN2." },
+            { term: "Split Valuation", definition: "Valorisation séparée d'un même article selon critères (origine, lot, qualité). Catégorie + Type. Activée par OMWC." },
+            { term: "Compte BSX", definition: "Clé OBYC pour le compte de stock du grand livre. Définit l'imputation Débit lors d'une GR." },
+            { term: "Compte GBB", definition: "Clé OBYC pour les contre-parties des sorties de stock (consommation). Sous-clés VBR (centre coûts), VAX (vente), AUF (ordre fab)." },
+          ],
+          tcodes: [
+            { code: "OBYC", description: "Configuration : détermination automatique des comptes MM-FI" },
+            { code: "MR21", description: "Révaluation manuelle du prix d'un article" },
+            { code: "MRN0", description: "Analyse de la rotation des stocks pour dépréciation" },
+            { code: "MRN1", description: "Valorisation au plus bas (valeur de marché)" },
+            { code: "OMWC", description: "Configuration de la Split Valuation" },
+            { code: "MR51", description: "Documents matières par article et période" },
+          ],
+        },
       ],
       quiz: [
         {
@@ -527,6 +587,35 @@ export const mmCertification = {
             { code: "MD04", description: "Afficher la liste MRP (vue planificateur)" },
             { code: "MD07", description: "Vue d'ensemble des stocks et besoins (liste courante)" },
             { code: "MD06", description: "Afficher les exceptions MRP (articles nécessitant action)" },
+          ],
+        },
+        {
+          id: "l5-2",
+          title: "MRP Live S/4HANA, MPS, prévisions et stratégies de planification",
+          content: [
+            "MRP Live (transaction MD01N) est la nouvelle version du MRP introduite avec S/4HANA. Au lieu d'écrire d'abord en mémoire puis de sauvegarder en base (comme le MRP classique MD01), MRP Live exécute toute la planification directement dans HANA via des procédures stockées. Résultats : performance × 5 à 10, planification de millions d'articles en quelques minutes. Les paramètres sont conservés mais la mécanique interne est totalement différente.",
+            "Le MPS (Master Production Scheduling) est une variante du MRP pour les articles stratégiques (produits finis, articles à long délai, composants critiques). Le type MRP M0/M1/M2 active le MPS. Le planificateur valide manuellement les propositions MPS avant qu'elles ne déclenchent le MRP des composants. Permet de stabiliser la production : les articles stratégiques ne sont planifiés que par exception, et leurs sous-composants suivent.",
+            "Les Stratégies de Planification (Planning Strategy) déterminent la logique de couverture des besoins. Les principales : Stratégie 10 (Make-to-Stock pur — production sur prévision uniquement), Stratégie 20 (Make-to-Order — production sur commande client uniquement), Stratégie 40 (Planning with Final Assembly — prévisions + commandes consommées), Stratégie 50 (Planning without Final Assembly — semi-finis sur prévision, assemblage à la commande). Définies dans la fiche article vue MRP 3 (paramètre Strategy Group).",
+            "Les Prévisions (Forecasting) sont calculées par SAP via des modèles statistiques sur l'historique de consommation. Méthodes disponibles : moyenne mobile, lissage exponentiel (1, 2 ou 3 ordres), saisonnalité, tendance. La transaction MP30/MP38 lance le forecast au niveau article. Le résultat alimente la planification basée sur la consommation (Consumption-Based Planning). À distinguer de la planification SOP (Sales & Operations Planning) qui est plus stratégique.",
+            "Le Pegging (Demand-Driven Pegging dans S/4HANA) trace l'origine des besoins : le système peut afficher pour une proposition de fabrication, quel besoin client ou quelle exigence l'a déclenchée. Cette traçabilité est essentielle pour la priorisation : si un client important attend une commande, on peut suivre la chaîne d'approvisionnement amont qui en dépend. Vue accessible dans MD04 via l'icône Pegging.",
+            "Les Exceptions MRP (MD06) sont des messages générés par le MRP pour signaler les situations à traiter par le planificateur : 'Avancer la livraison', 'Reculer la livraison', 'Réduire la quantité', 'Annulation possible', 'Stock négatif prévu'. Le planificateur doit les analyser quotidiennement. Chaque exception a un code (groupe d'exceptions 1-8) et une priorité. La discipline du planificateur fait la différence entre un MRP qui produit des plans réalistes et un MRP générant du bruit ignoré."
+          ],
+          keyConcepts: [
+            { term: "MRP Live (S/4HANA)", definition: "Nouvelle version du MRP exécutée directement dans HANA via procédures stockées. Performance × 5-10. Toujours préférable au MRP classique." },
+            { term: "MPS (Master Production Scheduling)", definition: "Planification dédiée aux articles stratégiques (M0/M1/M2). Validation manuelle avant déclenchement MRP des composants." },
+            { term: "Stratégie 10 (MTS)", definition: "Make-to-Stock : production sur prévision pure. Stock alimenté à l'avance, ventes prélevées du stock." },
+            { term: "Stratégie 20 (MTO)", definition: "Make-to-Order : production seulement sur commande client. Pas de stock anticipé. Délai client = délai production." },
+            { term: "Stratégie 40", definition: "Planning with Final Assembly. Prévisions consommées par les commandes réelles. Compromis MTS/MTO le plus utilisé en industrie." },
+            { term: "Pegging", definition: "Traçabilité de la chaîne besoin → approvisionnement. Permet de savoir pourquoi un ordre existe et qui en dépend." },
+            { term: "Exception MRP", definition: "Message MRP signalant une situation à traiter (avancer, reculer, annuler). Visible dans MD06. Discipline planificateur clé pour MRP utile." },
+          ],
+          tcodes: [
+            { code: "MD01N", description: "MRP Live S/4HANA — exécution division (HANA optimized)" },
+            { code: "MD06", description: "Exceptions MRP par division — outil quotidien planificateur" },
+            { code: "MD05", description: "Liste MRP gelée (résultat dernier run)" },
+            { code: "MP30", description: "Lancer le forecast statistique sur l'historique de consommation" },
+            { code: "MD61", description: "Maintenir les besoins planifiés indépendants (PIR / prévisions)" },
+            { code: "MC88", description: "SOP — Sales and Operations Planning (planification stratégique)" },
           ],
         },
       ],
@@ -637,6 +726,35 @@ export const mmCertification = {
             { code: "ME1M", description: "Rapport : info-records par article" },
           ],
         },
+        {
+          id: "l6-2",
+          title: "Évaluation fournisseurs, conditions d'achat et détermination de source",
+          content: [
+            "L'Évaluation Fournisseur (Vendor Evaluation, ME6H/ME61) est un système de notation automatique des fournisseurs sur 5 critères paramétrables : Prix (compétitivité), Qualité (taux de non-conformité), Service (respect des délais), Livraison (quantités correctes), Service externe (pour les sous-traitants). Chaque critère reçoit une note de 1 à 100. La note globale, pondérée selon des poids configurés, oriente le choix du fournisseur lors des futures commandes.",
+            "La Détermination de Source (Source Determination) est le processus par lequel SAP affecte automatiquement un fournisseur à une demande d'achat. La hiérarchie des sources : 1) Quota Arrangement (répartition pourcentage entre plusieurs fournisseurs, ME01 onglet Quota), 2) Source List avec source fixe, 3) Contrats-cadres actifs, 4) Info-records valides. Si plusieurs sources sont éligibles, l'évaluation fournisseur peut servir de critère de choix. Activation : OMR0 + Source List avec indicator Source Det.",
+            "Le Quota Arrangement (ME01 onglet Quota) répartit l'approvisionnement d'un article entre plusieurs fournisseurs selon des pourcentages : par exemple Fournisseur A 60%, Fournisseur B 30%, Fournisseur C 10%. SAP rééquilibre les quotas en fonction de l'historique des commandes pour respecter le ratio cumulé. Utile pour réduire le risque de dépendance à un seul fournisseur (single sourcing) ou pour partager le volume entre partenaires stratégiques.",
+            "Les Conditions d'Achat (Purchasing Conditions) suivent une hiérarchie : Conditions générales du fournisseur (par devise, organisation d'achats), Conditions de l'info-record (article/fournisseur), Conditions de contrat-cadre, Conditions du BC (saisies manuellement). Les conditions plus précises remplacent les plus générales. Les types de conditions : prix de base (PB00), remise quantitative (RA01), surcharge fret (FRB1), TVA (NAVS), droits de douane.",
+            "Les Tolérances Fournisseur (Vendor Tolerances) limitent les écarts acceptables : tolérance sur la quantité livrée (sur-livraison ou sous-livraison en %), tolérance sur le prix de la facture (différence prix BC vs facture). Configurées par fournisseur dans la fiche BP, elles permettent à SAP de bloquer ou alerter automatiquement en cas de dépassement. Ex : tolérance prix 5% — au-delà, MIRO bloque la facture pour validation manuelle.",
+            "Les Conditions de Paiement (Terms of Payment, OBB8) définissent les délais et escomptes accordés. Code 0001 = 30 jours net, Code 0002 = 14 jours 2% / 30 jours net (escompte 2% si payé en 14 jours). Configurées dans la fiche fournisseur, elles sont automatiquement appliquées dans les BC et factures. Les escomptes saisis lors de MIRO sont automatiquement comptabilisés en compte de produits financiers (gain d'escompte) au moment du paiement par F110."
+          ],
+          keyConcepts: [
+            { term: "Vendor Evaluation (ME6H)", definition: "Système de notation automatique fournisseurs : Prix, Qualité, Service, Livraison. Note 1-100 par critère, pondérée." },
+            { term: "Quota Arrangement", definition: "Répartition pourcentage entre fournisseurs (ex: A 60%, B 40%). SAP équilibre selon historique. Réduit dépendance single-source." },
+            { term: "Source Determination", definition: "Affectation auto fournisseur à DA. Hiérarchie : quota → source list → contrat → info-record. Activée par indicator Source Det." },
+            { term: "Tolérance prix MIRO", definition: "Écart prix BC/facture toléré sans blocage. Au-delà, MIRO bloque pour validation. Configurée par fournisseur." },
+            { term: "Conditions paiement (OBB8)", definition: "Délais et escomptes : 0001=30j net, 0002=14j 2% / 30j. Liées à fiche fournisseur, appliquées dans BC et factures." },
+            { term: "Type de condition PB00", definition: "Prix de base dans les BC. Type principal de la structure de prix. Suivi par remises (RA01), majorations (FRB1)." },
+            { term: "Single sourcing", definition: "Approvisionnement d'un seul fournisseur — risque de rupture. Le quota arrangement permet de diversifier intelligemment." },
+          ],
+          tcodes: [
+            { code: "ME6H", description: "Évaluation fournisseur (notes globale et par critère)" },
+            { code: "ME61", description: "Maintenir l'évaluation manuelle d'un fournisseur" },
+            { code: "OBB8", description: "Configurer les conditions de paiement" },
+            { code: "OMR0", description: "Configurer la détermination de source" },
+            { code: "MEK1", description: "Créer une condition d'achat (prix, remise, majoration)" },
+            { code: "ME1L", description: "Rapport : commandes ouvertes par fournisseur" },
+          ],
+        },
       ],
       quiz: [
         {
@@ -727,6 +845,35 @@ export const mmCertification = {
             { code: "MR11", description: "Entretien compte GR/IR — régularisation fin de période" },
             { code: "MB5S", description: "Rapport : écarts compte GR/IR par article" },
             { code: "MBGR", description: "Rapport : mouvements de marchandises par raison" },
+          ],
+        },
+        {
+          id: "l7-2",
+          title: "Stock Transport Order (STO), Inter-Company et flux logistiques avancés",
+          content: [
+            "Le Stock Transport Order (STO) est un type spécial de bon de commande pour les transferts de stock entre divisions. Il existe deux variantes : STO sans facturation (transfert physique pur, mouvement 351 ou 641 selon le scénario) et STO avec facturation (Inter-Company, lorsque les divisions appartiennent à des sociétés différentes). Le STO standard utilise le type de document UB (sans SD) ou NB (avec SD pour la livraison sortante).",
+            "Le scénario STO avec SD intégré (Cross-Company STO) génère un flux logistique complet : 1) Création STO division destinatrice (ME21N type NB), 2) Création livraison sortante division émettrice (VL10B), 3) Picking et expédition (VL02N), 4) Goods Issue divisionnaire (mouvement 641 ou 643), 5) Réception division destinatrice (MIGO 101). Chaque étape génère ses propres documents et écritures comptables. C'est un sujet complexe mais récurrent à l'examen.",
+            "L'Inter-Company Billing (Facturation Inter-sociétés) intervient quand le STO est entre deux sociétés différentes du groupe. Une facture inter-company (VF01 type IV) est émise par la société émettrice à la société destinatrice. Cette facture sert au reporting consolidé (élimination des marges intra-groupe) et au respect des prix de transfert (transfer pricing) imposés par les règles fiscales internationales. Configuration via OBYA et VOFM.",
+            "Le Cross-Docking est un scénario logistique où la marchandise reçue est expédiée directement sans passer par le stock principal. Optimisation : réduction du temps de stockage, économie de manutention. SAP supporte le cross-docking via le Warehouse Management (WM) ou Extended Warehouse Management (EWM) avec des règles de routage spécifiques.",
+            "L'External Service (Service externe, type d'article DIEN) gère les achats de prestations sans flux physique : conseil, maintenance, formation. Le BC de service utilise une structure spéciale : ligne de service avec définition d'unité (heures, jours, forfait) et limite (montant max). La réception (Service Entry Sheet, ML81N) confirme la prestation effectuée. La facture suit un flux MIRO standard. Les services sont passés en charge directement (pas de stock).",
+            "Le Subcontracting Cockpit (ME2O) est un outil de pilotage de la sous-traitance qui affiche pour chaque article sous-traité : la quantité commandée au sous-traitant, les composants à lui fournir, le stock déjà chez lui (Stock at Subcontractor — type O), les besoins. Permet au planificateur de gérer les flux composants → sous-traitant et la régularisation des stocks. La transaction MIGO mouvement 541 envoie les composants au sous-traitant, 542 les récupère."
+          ],
+          keyConcepts: [
+            { term: "Stock Transport Order (STO)", definition: "BC spécial pour transfert entre divisions. Type UB (sans SD) ou NB (avec SD). Mouvements 351, 641, 643 selon scénario." },
+            { term: "Cross-Company STO", definition: "STO entre sociétés différentes. Génère facturation inter-company (VF01 type IV) pour reporting consolidé et transfer pricing." },
+            { term: "Inter-Company Billing", definition: "Facture entre sociétés du groupe. Importante pour consolidation (élimination marges intra-groupe) et règles fiscales internationales." },
+            { term: "Stock at Subcontractor (O)", definition: "Stock physiquement chez le sous-traitant. Reste propriété de l'entreprise. Suivi via ME2O. Mouvements 541 (envoi) / 542 (retour)." },
+            { term: "Service Entry Sheet (ML81N)", definition: "Document confirmant une prestation de service externe. Équivalent de la GR pour les services. Déclenche la facture fournisseur de service." },
+            { term: "Cross-Docking", definition: "Réception et expédition sans passage par stock. Optimisation logistique. Géré via WM ou EWM avec routage spécifique." },
+            { term: "Type document achat UB/NB", definition: "UB = STO simple sans SD. NB = STO avec SD intégré (livraison sortante via VL10B). Choix selon besoin de gestion logistique." },
+          ],
+          tcodes: [
+            { code: "ME21N type UB", description: "Créer un STO simple (Stock Transport Order sans SD)" },
+            { code: "ME21N type NB", description: "Créer un STO avec processus SD (livraison sortante intégrée)" },
+            { code: "VL10B", description: "Créer une livraison sortante depuis un STO" },
+            { code: "ML81N", description: "Saisir un Service Entry Sheet (réception prestation service)" },
+            { code: "ME2O", description: "Subcontracting Cockpit — pilotage des sous-traitants" },
+            { code: "OBYA", description: "Configuration de la facturation inter-company (transfer pricing)" },
           ],
         },
       ],
@@ -847,4 +994,51 @@ export const mmMockExamQuestions = [
   { id:"e38", chapter:"Clôture MM", question:"Le type de planification VB (point de réapprovisionnement) déclenche une DA :", options:["Lors de l'exécution quotidienne du MRP MD01N","Quand le stock disponible descend sous le point de commande prédéfini","Lors de la réception d'une commande client","Lors de la clôture mensuelle MM"], correctIndex:1, explanation:"VB surveille le stock disponible en temps réel. Dès que le stock passe sous le point de commande (défini dans MRP 1), une DA est automatiquement créée pour la quantité de réappro." },
   { id:"e39", chapter:"Clôture MM", question:"La gestion des lots (Batch Management) est indispensable dans :", options:["La comptabilité analytique CO","Les industries pharmaceutiques et agro-alimentaires pour la traçabilité","La gestion des projets SAP PS","Le calcul des prix standards CO-PC"], correctIndex:1, explanation:"La gestion par lots est réglementairement obligatoire dans pharma/agro : traçabilité amont/aval, rappel de lot, date d'expiration, lien lot MP / lot PF." },
   { id:"e40", chapter:"Clôture MM", question:"MB5S dans SAP MM est un rapport qui affiche :", options:["Les mouvements de stock de la période","Les écarts du compte GR/IR (livraisons non facturées ou factures sans livraison)","Les articles sous le stock de sécurité","Les BC ouverts par fournisseur"], correctIndex:1, explanation:"MB5S (GR/IR Clearing Analysis) liste les positions du compte GR/IR non soldées : commandes livrées non facturées, ou factures reçues sans livraison correspondante. Complément de MR11." },
+  // — Ch1 Structures (5 questions supplémentaires) ─────────────
+  { id:"e41", chapter:"Structures organisationnelles", question:"Le domaine de valorisation (Valuation Area) en SAP standard est défini au niveau :", options:["Du mandant","De la société","De la division","Du magasin"], correctIndex:2, explanation:"En SAP standard, le domaine de valorisation = la division (Plant). Cela signifie qu'un même article peut avoir des prix différents selon la division qui le tient. Configuration alternative possible au niveau société mais rare." },
+  { id:"e42", chapter:"Données de base", question:"La transaction MM50 sert à :", options:["Créer une fiche article complète","Compléter les vues manquantes pour des articles existants","Supprimer une fiche article","Lister les articles obsolètes"], correctIndex:1, explanation:"MM50 (List Extendable Materials) liste les articles auxquels il manque une vue à compléter. Très utile pour étendre des articles existants à de nouvelles divisions ou organisations d'achats." },
+  { id:"e43", chapter:"Données de base", question:"Le numéro d'article SAP peut être :", options:["Uniquement interne (généré par SAP)","Uniquement externe (saisi par l'entreprise)","Interne ou externe selon le paramétrage du type d'article","Toujours alphanumerique de 18 caractères"], correctIndex:2, explanation:"Le paramétrage du type d'article (OMS2) définit si la numérotation est interne (auto-générée), externe (saisie manuelle) ou les deux. Permet d'adopter la convention de codification de l'entreprise." },
+  { id:"e44", chapter:"Données de base", question:"Le type d'article HIBE (Hilfsbedarf) correspond à :", options:["Une matière première","Un semi-fini","Un article consommable de fonctionnement (frais généraux)","Un produit fini"], correctIndex:2, explanation:"HIBE = Hilfs- und Betriebsstoffe = articles consommables de fonctionnement (papeterie, fournitures, petit outillage). Passé directement en charges, pas valorisé en stock comme un actif." },
+  { id:"e45", chapter:"Structures organisationnelles", question:"Une division (Plant) peut être rattachée à :", options:["Plusieurs sociétés simultanément","Une seule société","Aucune société (autonome)","Un mandant uniquement"], correctIndex:1, explanation:"Une division est toujours rattachée à exactement une société (Company Code). C'est ce rattachement qui détermine la comptabilité légale dans laquelle les mouvements de stock se traduisent en écritures FI." },
+  // — Ch2 Processus P2P (7 questions supplémentaires) ──────────
+  { id:"e46", chapter:"Processus P2P", question:"Le mouvement de type 122 dans MIGO correspond à :", options:["Réception contre BC","Retour de marchandises au fournisseur","Sortie pour ordre de fabrication","Transfert inter-divisions"], correctIndex:1, explanation:"Mouvement 122 = retour fournisseur. Annule (partiellement ou totalement) une GR antérieure. Génère écriture inverse : Crédit Stock / Débit GR/IR." },
+  { id:"e47", chapter:"Processus P2P", question:"Une demande d'achat peut être créée :", options:["Uniquement manuellement par l'utilisateur","Uniquement automatiquement par le MRP","Manuellement (ME51N) ou automatiquement (par MRP, par ordre de fabrication, par projet)","Uniquement à partir d'une commande client"], correctIndex:2, explanation:"La DA peut être créée par plusieurs sources : manuellement (ME51N), automatiquement par le MRP, par les ordres de fabrication (composants externes), par les projets (PS), par les ordres de maintenance (PM)." },
+  { id:"e48", chapter:"Processus P2P", question:"La transaction ME22N permet de :", options:["Créer un bon de commande","Modifier un bon de commande existant","Annuler un bon de commande","Afficher un bon de commande"], correctIndex:1, explanation:"ME22N modifie un BC. ME21N le crée, ME23N l'affiche en lecture seule. La modification d'un BC déjà partiellement réceptionné/facturé est limitée pour préserver la cohérence." },
+  { id:"e49", chapter:"Processus P2P", question:"Un Service Entry Sheet (ML81N) est utilisé pour :", options:["Saisir une facture de service","Confirmer la réception d'une prestation de service externe","Créer un BC de service","Évaluer un prestataire"], correctIndex:1, explanation:"Le Service Entry Sheet (ML81N) est l'équivalent de la GR pour les services. Il confirme qu'une prestation a été effectuée selon le BC de service. Déclenche le flux de facturation MIRO." },
+  { id:"e50", chapter:"Processus P2P", question:"Dans S/4HANA, la transaction MIGO peut être complétée par l'application Fiori :", options:["Post Goods Movement","Manage Material Documents","Both — Fiori est l'interface moderne pour les mouvements de stock","Aucune Fiori n'existe pour MIGO"], correctIndex:2, explanation:"S/4HANA Fiori propose 'Post Goods Movement' (MIGO simplifié) et 'Manage Material Documents' (recherche/affichage). MIGO classique reste disponible pour les utilisateurs experts." },
+  { id:"e51", chapter:"Processus P2P", question:"Le rapport ME2N affiche :", options:["Les BC ouverts par fournisseur","Les BC par numéro de document","Les positions BC ouvertes par division","Les BC clôturés du mois"], correctIndex:1, explanation:"ME2N liste les BC par numéro de document. ME2L = par fournisseur, ME2M = par article, ME2K = par compte d'imputation. Famille de rapports d'analyse des achats très utile en pratique." },
+  { id:"e52", chapter:"Processus P2P", question:"L'imputation comptable d'un BC pour un consommable destiné à un centre de coûts (type K) :", options:["Débit Stock à la GR","Débit Centre de coûts à la GR (passage en charge directe)","Débit Immobilisations","Débit GR/IR uniquement"], correctIndex:1, explanation:"BC type K (Cost Center) : à la GR, l'imputation est directe en charge sur le centre de coûts (Débit Charges/Centre de coûts) au lieu de Débit Stock. Pas de stock géré pour ces achats de fonctionnement." },
+  // — Ch3 Stocks & mouvements (5 questions supplémentaires) ─────
+  { id:"e53", chapter:"Gestion des stocks", question:"Le Cycle Counting est :", options:["Un inventaire annuel exhaustif","Un inventaire continu basé sur les classes ABC, avec fréquences différentes","Un inventaire mensuel par magasin","Un inventaire automatique sans comptage physique"], correctIndex:1, explanation:"Le Cycle Counting répartit les articles en classes ABC selon leur valeur ou rotation. Classe A comptée 4-12×/an, B 2-4×/an, C 1×/an. Lisse la charge de comptage et concentre l'effort sur les articles critiques." },
+  { id:"e54", chapter:"Gestion des stocks", question:"Le mouvement 411-Q transfère :", options:["Du stock libre vers stock projet","Du stock projet vers stock libre","Du stock client vers stock libre","Du stock fournisseur vers stock libre"], correctIndex:0, explanation:"411-Q affecte du stock libre vers le stock d'un projet (WBS). 411-K transfère du stock libre depuis le stock consigné fournisseur. Les types Q (projet), E (client), K (consigné) ont leurs mouvements 411 spécifiques." },
+  { id:"e55", chapter:"Gestion des stocks", question:"Le mouvement de type 551 dans SAP correspond à :", options:["Un transfert magasin","Une mise au rebut (Scrapping)","Une consommation pour ordre","Une réception sans BC"], correctIndex:1, explanation:"551 = Scrapping = mise au rebut. Sortie définitive du stock pour articles obsolètes ou détériorés. Génère écriture en compte de pertes (rebuts) au lieu de la contrepartie standard de consommation." },
+  { id:"e56", chapter:"Gestion des stocks", question:"Le stock 'en transit' apparaît lors :", options:["D'un transfert 1-step (mouvement 311)","D'un transfert 2-step (entre le 313 et le 315)","De la réception d'une commande client","De l'inventaire physique"], correctIndex:1, explanation:"Le transfert 2-step crée un stock 'en transit' visible dans MMBE entre le mouvement 313 (prélèvement émetteur) et 315 (mise en stock destinataire). Le 1-step est instantané, sans phase intermédiaire." },
+  { id:"e57", chapter:"Gestion des stocks", question:"Un document matière (Material Document) est :", options:["Modifiable jusqu'à la clôture mensuelle","Immuable — seule une contre-passation (annulation) est possible","Modifiable par l'utilisateur original uniquement","Modifiable avec autorisation admin"], correctIndex:1, explanation:"Tout document matière est immuable une fois créé pour préserver l'intégrité du stock et de la comptabilité. Pour corriger, on contre-passe (mouvement inverse) puis on saisit un nouveau mouvement correct." },
+  // — Ch4 Évaluation (5 questions supplémentaires) ─────────────
+  { id:"e58", chapter:"Évaluation des stocks", question:"La transaction OBYC sert à :", options:["Configurer les comptes de grand livre auto-déterminés pour MM-FI","Créer une fiche article","Saisir un BC","Lancer le MRP"], correctIndex:0, explanation:"OBYC est le paramétrage central de la détermination automatique des comptes MM-FI. Pour chaque clé (BSX stock, WRX GR/IR, PRD écart prix, GBB sortie), on définit le compte GL à mouvementer selon le groupe d'évaluation et le type d'article." },
+  { id:"e59", chapter:"Évaluation des stocks", question:"La transaction MR21 permet de :", options:["Saisir une facture fournisseur","Réévaluer manuellement le prix d'un article (changement de valeur stock)","Créer un avoir fournisseur","Annuler une facture"], correctIndex:1, explanation:"MR21 est la révaluation manuelle d'un article : modification du prix standard ou du MAP, génération automatique d'une écriture comptable d'ajustement de la valeur du stock (Débit ou Crédit Stock, contrepartie en compte d'écart)." },
+  { id:"e60", chapter:"Évaluation des stocks", question:"La Split Valuation est utilisée quand :", options:["Le même article doit être valorisé différemment selon des critères (origine, lot, qualité)","Plusieurs articles ont le même prix","On change de devise de stock","Le stock dépasse une certaine valeur"], correctIndex:0, explanation:"Split Valuation : un même numéro d'article peut avoir plusieurs valorisations distinctes selon des critères. Ex : article fabriqué en interne (INTERN) vs acheté (EXTERN) avec des prix séparés. Activé via OMWC + vue Comptabilité." },
+  { id:"e61", chapter:"Vérification facture", question:"Les factures bloquées par MIRO sont libérées via :", options:["MIRO en mode correction","MRBR (Release Blocked Invoices)","FB60","MR11"], correctIndex:1, explanation:"MRBR (Release Blocked Invoices) débloque les factures que MIRO a bloquées automatiquement pour écart de prix ou quantité au-delà des tolérances. Validation par l'acheteur ou le comptable après vérification de l'écart." },
+  { id:"e62", chapter:"Vérification facture", question:"L'écart de prix lors d'une MIRO en prix MAP avec stock suffisant :", options:["Est comptabilisé en compte d'écart de prix","Met à jour le MAP automatiquement (recalcul)","Bloque systématiquement la facture","N'est pas géré par SAP"], correctIndex:1, explanation:"Avec prix MAP (V) et stock suffisant pour absorber l'écart, le nouveau MAP se recalcule automatiquement intégrant la nouvelle valeur. Pas de compte d'écart. Avec prix standard (S), l'écart va toujours sur compte d'écart de prix." },
+  // — Ch5 MRP (5 questions supplémentaires) ────────────────────
+  { id:"e63", chapter:"MRP", question:"MRP Live dans S/4HANA :", options:["Est identique au MRP classique","Est une version moins performante","Exécute la planification directement dans HANA via procédures stockées (× 5-10 plus rapide)","N'est disponible qu'en option"], correctIndex:2, explanation:"MRP Live (MD01N) utilise les capacités HANA pour exécuter le MRP directement en mémoire via procédures stockées. Performance ×5 à 10 vs MRP classique. C'est le standard recommandé en S/4HANA." },
+  { id:"e64", chapter:"MRP", question:"La stratégie de planification 20 (Make-to-Order) signifie :", options:["Production sur prévision pure","Production uniquement sur commande client","Production sur commande consommée par prévisions","Production en flux tiré"], correctIndex:1, explanation:"Stratégie 20 = MTO pur. La production démarre uniquement sur commande client. Pas de stock anticipé. Le délai client = délai production. Utilisé pour produits configurés ou customisés." },
+  { id:"e65", chapter:"MRP", question:"Le MPS (Master Production Scheduling) s'applique :", options:["À tous les articles MRP","Aux articles stratégiques (produits finis, composants critiques) avec validation manuelle","Uniquement aux matières premières","Aux articles consommables"], correctIndex:1, explanation:"MPS (type MRP M0/M1/M2) cible les articles stratégiques. Le planificateur valide manuellement les propositions MPS avant déclenchement MRP des composants. Stabilise la production en évitant la nervosité du plan." },
+  { id:"e66", chapter:"MRP", question:"Le Pegging dans S/4HANA permet :", options:["De bloquer du stock pour un client","De tracer la chaîne besoin → approvisionnement (origine d'une proposition)","De geler le MRP pendant la clôture","De prioriser les ordres urgents"], correctIndex:1, explanation:"Le Demand-Driven Pegging trace l'origine de chaque proposition : pour un Planned Order ou une PR, on peut afficher quel besoin client ou prévision l'a déclenché. Essentiel pour la priorisation et l'analyse d'impact." },
+  { id:"e67", chapter:"MRP", question:"Une exception MRP du type 'Avancer la livraison' indique :", options:["Que le besoin a été reporté","Que la livraison planifiée arrivera trop tard et doit être avancée pour éviter la rupture","Que la quantité est trop faible","Que le fournisseur est en retard"], correctIndex:1, explanation:"Exception 'Avancer' (Reschedule In) : SAP détecte qu'une entrée planifiée arrivera après le besoin. Le planificateur doit contacter le fournisseur ou avancer la production. Visible dans MD06." },
+  // — Ch6 Fournisseurs (5 questions supplémentaires) ──────────
+  { id:"e68", chapter:"Gestion fournisseurs", question:"L'évaluation fournisseur (ME6H) note les fournisseurs sur :", options:["Un seul critère global","5 critères : Prix, Qualité, Service, Livraison, Service externe","2 critères : Prix et Qualité","La fréquence des commandes"], correctIndex:1, explanation:"L'évaluation fournisseur SAP comporte 5 critères paramétrables : Prix (compétitivité), Qualité (taux conformité), Service (délais), Livraison (quantités), Service externe (sous-traitants). Notes 1-100, pondérées." },
+  { id:"e69", chapter:"Gestion fournisseurs", question:"Le Quota Arrangement permet de :", options:["Limiter le volume d'achat total","Répartir l'approvisionnement entre plusieurs fournisseurs selon des pourcentages","Bloquer les achats non budgétés","Imposer un fournisseur unique"], correctIndex:1, explanation:"Quota Arrangement (ME01 onglet Quota) : répartition pourcentage entre fournisseurs (ex: A 60%, B 40%). SAP rééquilibre selon historique pour respecter les ratios. Réduit la dépendance à un fournisseur unique." },
+  { id:"e70", chapter:"Gestion fournisseurs", question:"Les conditions de paiement 0002 (14 jours 2% / 30 jours net) signifient :", options:["Paiement obligatoire à 14 jours","2% d'intérêts si non payé à 14 jours","Escompte 2% si payé en 14 jours, sinon paiement à 30 jours","Délai de 14 ou 30 jours au choix"], correctIndex:2, explanation:"Code 0002 = escompte commercial : si payé en 14 jours, 2% de remise sur le montant facturé. Sinon paiement plein à 30 jours. Configuré dans OBB8, lié à la fiche fournisseur, automatiquement appliqué dans MIRO." },
+  { id:"e71", chapter:"Gestion fournisseurs", question:"Le type de condition PB00 dans les conditions d'achat est :", options:["Une remise quantitative","Le prix de base","Une majoration transport","La TVA"], correctIndex:1, explanation:"PB00 = Prix de base (Gross Price). Type de condition principal d'un BC. RA01 = Remise quantitative, FRB1 = Surcharge fret, NAVS = TVA. La hiérarchie de conditions définit le calcul du prix net." },
+  { id:"e72", chapter:"Gestion fournisseurs", question:"La détermination automatique de source par MRP utilise en priorité :", options:["L'info-record le plus récent","Le quota arrangement, puis source list (source fixe), contrats, info-records","Le fournisseur avec la meilleure note","Le contrat-cadre actif"], correctIndex:1, explanation:"Hiérarchie source determination : 1) Quota Arrangement (répartition % entre fournisseurs), 2) Source List avec source fixe, 3) Contrats-cadres actifs, 4) Info-records valides. Le MRP affecte automatiquement le fournisseur selon cette priorité." },
+  // — Ch7 Clôture & spéciaux (8 questions supplémentaires) ─────
+  { id:"e73", chapter:"Clôture MM", question:"Le Stock Transport Order (STO) type UB est :", options:["Un STO avec processus SD intégré","Un STO simple sans livraison sortante SD","Un BC inter-company","Un service externe"], correctIndex:1, explanation:"STO type UB : transfert simple entre divisions sans flux SD. Mouvement direct 351 (transfert) ou 641 selon paramétrage. Type NB intègre la création d'une livraison sortante via VL10B (utilisé pour le cross-company)." },
+  { id:"e74", chapter:"Clôture MM", question:"L'Inter-Company Billing intervient :", options:["À chaque mouvement entre divisions","Lors d'un STO entre deux sociétés différentes du groupe","À la fin du mois en clôture","Uniquement à la demande du contrôle de gestion"], correctIndex:1, explanation:"Inter-Company Billing (VF01 type IV) : facture entre deux sociétés du même groupe lors d'un STO cross-company. Importante pour le reporting consolidé (élimination marges intra-groupe) et le respect du transfer pricing fiscal." },
+  { id:"e75", chapter:"Clôture MM", question:"La transaction ME2O (Subcontracting Cockpit) affiche :", options:["Les BC de matières premières uniquement","Pour chaque article sous-traité : composants à fournir, stock chez le sous-traitant, besoins","Les évaluations des sous-traitants","La facturation sous-traitance"], correctIndex:1, explanation:"ME2O est le tableau de bord de la sous-traitance : par BC sous-traité, on voit les composants à fournir, le stock déjà chez le sous-traitant (type O), les besoins. Le planificateur pilote ainsi les flux composants." },
+  { id:"e76", chapter:"Clôture MM", question:"Le mouvement 541 dans MIGO correspond à :", options:["Une réception sans BC","Un envoi de composants au sous-traitant","Une mise au rebut","Un transfert entre divisions"], correctIndex:1, explanation:"Mouvement 541 = envoi de composants au sous-traitant (Provide to Vendor). Le stock devient 'Stock chez sous-traitant' (type O), reste propriété de l'entreprise. 542 = retour des composants non consommés. 543 = sortie auto à la GR sous-traitance." },
+  { id:"e77", chapter:"Clôture MM", question:"Dans S/4HANA, la fiche fournisseur unifiée (Business Partner) :", options:["Remplace définitivement FK01/XK01","Est obligatoire pour créer un nouveau fournisseur (BP est le standard)","Coexiste avec les anciennes transactions mais BP est la voie principale","Est uniquement pour les clients"], correctIndex:2, explanation:"Dans S/4HANA, le Business Partner (transaction BP) est l'objet unifié pour fournisseurs et clients. Les anciennes transactions FK01/XK01 sont conservées pour compatibilité mais déclenchent BP en arrière-plan. BP est le standard." },
+  { id:"e78", chapter:"Clôture MM", question:"Un BC type K (Cost Center) :", options:["Génère une entrée en stock à la GR","Passe directement en charge sur un centre de coûts à la GR","N'a pas d'impact comptable","Crée une immobilisation"], correctIndex:1, explanation:"BC type K : à la GR, l'imputation comptable est directement en charge sur le centre de coûts indiqué (Débit Charges centre coûts / Crédit GR/IR). Pas de stock géré. Utilisé pour les achats consommables non stockés (fournitures bureau)." },
+  { id:"e79", chapter:"Clôture MM", question:"Le mouvement 543 (sortie sous-traitance) génère :", options:["Une entrée en stock chez le sous-traitant","Une sortie automatique des composants envoyés (lors de la GR du produit fini)","Un transfert entre divisions","Une mise au rebut des composants"], correctIndex:1, explanation:"543 = consommation automatique des composants chez le sous-traitant lors de la GR du produit transformé. Génère simultanément à la GR (101) du produit fini, la sortie automatique de tous les composants utilisés selon la nomenclature du produit." },
+  { id:"e80", chapter:"Clôture MM", question:"L'objectif principal de MR11 dans la clôture mensuelle est :", options:["Régulariser les écarts du compte GR/IR (provisions de fin de période)","Lancer le MRP de clôture","Calculer les nouveaux prix moyens","Fermer les BC en retard"], correctIndex:0, explanation:"MR11 (Maintain GR/IR Clearing Account) régularise le compte GR/IR en fin de période : identifie les positions non soldées (livraisons sans facture, factures sans livraison) et permet leur traitement (provision comptable ou correction)." },
 ];
