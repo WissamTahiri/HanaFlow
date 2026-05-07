@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, err } from "@/lib/apiHelpers";
+import { logAudit } from "@/lib/audit";
 
 const escapeCsv = (value: unknown): string => {
   if (value === null || value === undefined) return "";
@@ -46,6 +47,13 @@ export async function GET(req: NextRequest) {
     const bom = "﻿"; // pour Excel UTF-8
 
     const filename = `hanaflow-users-${new Date().toISOString().slice(0, 10)}.csv`;
+
+    await logAudit({
+      actor: auth.user,
+      action: "user.export",
+      metadata: { count: users.length },
+      req,
+    });
 
     return new Response(bom + csv, {
       status: 200,

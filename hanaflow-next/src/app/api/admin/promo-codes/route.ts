@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, ok, err, validateBody } from "@/lib/apiHelpers";
+import { logAudit } from "@/lib/audit";
 
 const createSchema = z.object({
   code: z.string().trim().min(3).max(50).toUpperCase(),
@@ -44,6 +45,14 @@ export async function POST(req: NextRequest) {
         usageLimit: data.usageLimit,
         expiresAt: data.expiresAt ? new Date(data.expiresAt) : undefined,
       },
+    });
+    await logAudit({
+      actor: auth.user,
+      action: "promo.create",
+      targetType: "promo_code",
+      targetId: code.id,
+      metadata: { code: code.code },
+      req,
     });
     return ok({ code }, 201);
   } catch {

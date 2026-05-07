@@ -3,6 +3,7 @@ import { z } from "zod";
 import argon2 from "argon2";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, ok, err, validateBody } from "@/lib/apiHelpers";
+import { logAudit } from "@/lib/audit";
 
 const patchSchema = z.object({
   isPro: z.boolean().optional(),
@@ -89,6 +90,15 @@ export async function PATCH(
       await prisma.refreshToken.deleteMany({ where: { userId } });
     }
 
+    await logAudit({
+      actor: auth.user,
+      action: password ? "user.password_reset" : "user.update",
+      targetType: "user",
+      targetId: userId,
+      metadata: { changes: Object.keys(rest), passwordReset: Boolean(password) },
+      req,
+    });
+
     return ok({ user, passwordReset: Boolean(password) });
   } catch {
     return err("Utilisateur introuvable", 404);
@@ -109,7 +119,16 @@ export async function DELETE(
   if (auth.user.userId === userId) return err("Impossible de supprimer son propre compte", 400);
 
   try {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
     await prisma.user.delete({ where: { id: userId } });
+    await logAudit({
+      actor: auth.user,
+      action: "user.delete",
+      targetType: "user",
+      targetId: userId,
+      metadata: { email: user?.email, name: user?.name },
+      req,
+    });
     return ok({ message: "Utilisateur supprimé" });
   } catch {
     return err("Utilisateur introuvable", 404);

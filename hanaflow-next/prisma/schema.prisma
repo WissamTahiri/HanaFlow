@@ -63,3 +63,30 @@ model UserProgress {
   @@index([userId])
   @@map("user_progress")
 }
+
+model AdminAuditLog {
+  id           Int      @id @default(autoincrement())
+  actorId      Int?     @map("actor_id")
+  actorEmail   String   @map("actor_email") @db.VarChar(255)
+  action       String   @db.VarChar(64)
+  targetType   String?  @map("target_type") @db.VarChar(32)
+  targetId     String?  @map("target_id") @db.VarChar(64)
+  metadata     Json?
+  ipAddress    String?  @map("ip_address") @db.VarChar(64)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([createdAt])
+  @@index([actorId])
+  @@index([action])
+  @@map("admin_audit_log")
+}
+
+model SiteSetting {
+  key       String   @id @db.VarChar(64)
+  value     String   @db.Text
+  category  String   @default("general") @db.VarChar(32)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  updatedBy String?  @map("updated_by") @db.VarChar(255)
+
+  @@map("site_settings")
+}
