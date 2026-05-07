@@ -138,7 +138,7 @@ export default function ProcessusMetierPage() {
         </p>
         <div className="grid sm:grid-cols-3 gap-4">
           {[
-            { code: "P2P", title: "Procure-to-Pay", subtitle: "Achats", desc: "De l'expression du besoin au paiement fournisseur. Modules : MM + FI", color: "bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/30" },
+            { code: "P2P", title: "Procure-to-Pay", subtitle: "Achats", desc: "De l'expression du besoin au paiement fournisseur. Modules : MM + FI", color: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30" },
             { code: "O2C", title: "Order-to-Cash", subtitle: "Ventes", desc: "De la commande client à l'encaissement. Modules : SD + FI", color: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30" },
             { code: "R2R", title: "Record-to-Report", subtitle: "Finance", desc: "De l'enregistrement comptable aux états financiers. Modules : FI + CO", color: "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30" },
           ].map((c) => (
@@ -156,7 +156,7 @@ export default function ProcessusMetierPage() {
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mb-5 leading-relaxed">
           P2P couvre toutes les étapes de l'expression de besoin jusqu'au paiement fournisseur. Il contrôle comment l'argent sort de l'entreprise et mobilise principalement les modules MM et FI.
         </p>
-        <ProcessSteps steps={p2pSteps} accentColor="bg-orange-500" />
+        <ProcessSteps steps={p2pSteps} accentColor="bg-amber-500" />
         <MermaidBlock title="Schéma P2P" code={p2pMermaid} />
       </Section>
 
@@ -182,7 +182,7 @@ export default function ProcessusMetierPage() {
         </p>
         <div className="grid sm:grid-cols-3 gap-4">
           {[
-            { cycle: "P2P", modules: ["MM (PR, PO, GR)", "FI (IR, paiement)", "CO (imputation)"], color: "border-orange-500/20 bg-orange-50 dark:bg-orange-900/10", badge: "bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/30" },
+            { cycle: "P2P", modules: ["MM (PR, PO, GR)", "FI (IR, paiement)", "CO (imputation)"], color: "border-amber-500/20 bg-amber-50 dark:bg-amber-900/10", badge: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30" },
             { cycle: "O2C", modules: ["SD (Sales Order, Delivery, Billing)", "FI (revenus, AR)", "CO (CO-PA, marge)"], color: "border-purple-500/20 bg-purple-50 dark:bg-purple-900/10", badge: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30" },
             { cycle: "R2R", modules: ["FI (clôture, états)", "CO (reporting gestion)", "BI/Fiori (analytique)"], color: "border-blue-500/20 bg-blue-50 dark:bg-blue-900/10", badge: "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30" },
           ].map((m) => (

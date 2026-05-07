@@ -66,9 +66,9 @@ function QuizBlock({ quiz, onComplete }: { quiz: QuizQuestion[]; onComplete?: (s
     const passed = pct >= 65;
     return (
       <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
-        className={`rounded-2xl p-6 text-center border-2 ${passed ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20" : "border-orange-400 bg-orange-50 dark:bg-orange-900/20"}`}>
-        <div className={`text-4xl font-black mb-2 ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-orange-500"}`}>{score}/{quiz.length}</div>
-        <p className={`text-lg font-bold ${passed ? "text-emerald-700 dark:text-emerald-300" : "text-orange-600 dark:text-orange-400"}`}>{passed ? "✓ Chapitre maîtrisé !" : "À retravailler"}</p>
+        className={`rounded-2xl p-6 text-center border-2 ${passed ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20" : "border-amber-400 bg-amber-50 dark:bg-amber-900/20"}`}>
+        <div className={`text-4xl font-black mb-2 ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-amber-500"}`}>{score}/{quiz.length}</div>
+        <p className={`text-lg font-bold ${passed ? "text-emerald-700 dark:text-emerald-300" : "text-amber-600 dark:text-amber-400"}`}>{passed ? "✓ Chapitre maîtrisé !" : "À retravailler"}</p>
         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Score : {pct}% {passed ? "— Seuil de réussite atteint (65%)" : "— Seuil de réussite : 65%"}</p>
         <button onClick={() => { setCurrent(0); setSelected(null); setShowResult(false); setAnswers([]); setDone(false); setScore(0); }}
           className="mt-4 px-4 py-2 bg-sap-blue text-white rounded-xl text-sm font-semibold hover:bg-sap-blue-dark transition-colors">
@@ -397,7 +397,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                         </button>
                       ))}
                       <button onClick={() => setShowQuiz(true)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${showQuiz ? "bg-orange-500 text-white" : "bg-gray-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600"}`}>
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${showQuiz ? "bg-amber-500 text-white" : "bg-gray-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600"}`}>
                         Quiz du chapitre ({chapter.quiz?.length ?? 0} questions)
                       </button>
                     </div>

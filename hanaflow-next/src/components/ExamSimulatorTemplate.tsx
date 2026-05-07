@@ -136,9 +136,9 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto space-y-5">
-      <div className={`rounded-2xl p-8 text-center border-2 ${passed ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20" : "border-orange-400 bg-orange-50 dark:bg-orange-900/20"}`}>
-        <div className={`text-6xl font-black mb-2 ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-orange-500"}`}>{pct}%</div>
-        <p className={`text-xl font-bold mb-1 ${passed ? "text-emerald-700 dark:text-emerald-300" : "text-orange-600 dark:text-orange-400"}`}>{passed ? "✓ Examen réussi !" : "Examen non réussi"}</p>
+      <div className={`rounded-2xl p-8 text-center border-2 ${passed ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20" : "border-amber-400 bg-amber-50 dark:bg-amber-900/20"}`}>
+        <div className={`text-6xl font-black mb-2 ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-amber-500"}`}>{pct}%</div>
+        <p className={`text-xl font-bold mb-1 ${passed ? "text-emerald-700 dark:text-emerald-300" : "text-amber-600 dark:text-amber-400"}`}>{passed ? "✓ Examen réussi !" : "Examen non réussi"}</p>
         <p className="text-slate-600 dark:text-slate-400">{score}/{questions.length} bonnes réponses · Temps utilisé : {formatTime(timeUsed)}</p>
         <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
           Seuil de réussite : 65% {passed ? `· Vous avez dépassé le seuil de ${pct - 65} points` : `· Il vous manque ${65 - pct} points`}
@@ -157,7 +157,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
                   <p className="text-xs font-bold text-slate-900 dark:text-white">{data.correct}/{data.total}</p>
                 </div>
                 <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${chPct >= 65 ? "bg-emerald-500" : chPct >= 40 ? "bg-orange-400" : "bg-red-500"}`} style={{ width: `${chPct}%` }} />
+                  <div className={`h-full rounded-full transition-all ${chPct >= 65 ? "bg-emerald-500" : chPct >= 40 ? "bg-amber-400" : "bg-red-500"}`} style={{ width: `${chPct}%` }} />
                 </div>
               </div>
             );
@@ -280,7 +280,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
 
   const answeredCount = answers.filter((a) => a !== null).length;
   const q = questions[currentQ];
-  const timerColor = timeLeft < 300 ? "text-red-500" : timeLeft < 900 ? "text-orange-500" : "text-slate-700 dark:text-slate-200";
+  const timerColor = timeLeft < 300 ? "text-red-500" : timeLeft < 900 ? "text-amber-500" : "text-slate-700 dark:text-slate-200";
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sap-dark">

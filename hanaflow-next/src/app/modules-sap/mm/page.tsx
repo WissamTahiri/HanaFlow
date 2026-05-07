@@ -12,7 +12,7 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
 );
 
 const KEY_CONCEPTS = [
-  { code: "P2P",    label: "Procure-to-Pay",                   description: "Du besoin d'achat au paiement fournisseur : PR → PO → GR → MIRO → F110. Chaque étape génère des impacts dans MM et FI.", color: "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-400" },
+  { code: "P2P",    label: "Procure-to-Pay",                   description: "Du besoin d'achat au paiement fournisseur : PR → PO → GR → MIRO → F110. Chaque étape génère des impacts dans MM et FI.", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400" },
   { code: "GR",     label: "Goods Receipt",                    description: "Réception de marchandises (MIGO). Met à jour le stock physique et déclenche une écriture FI : débit stock, crédit GR/IR.", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400" },
   { code: "GR/IR",  label: "Goods Receipt / Invoice Receipt",   description: "Compte transitoire FI-MM. Il se crédite au GR (attente facture) et se débite à la réception de la facture MIRO — clé de l'intégration.", color: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-400" },
   { code: "MM01",   label: "Material Master",                   description: "Fiche article centrale : type de matériel, unité, groupe de marchandises, vues achats/stock/compta. Base de la valorisation.", color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400" },
@@ -50,7 +50,7 @@ const OrgStructure = () => (
         { term: "Purchasing Group", def: "Équipe ou acheteur responsable d'un portefeuille de matériaux ou catégories d'achats." },
       ].map(({ term, def }) => (
         <div key={term} className="flex gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-700">
-          <div className="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0" />
+          <div className="w-2 h-2 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{term}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{def}</p>
@@ -74,11 +74,11 @@ const P2PCycle = () => (
         { step: "4", code: "MIRO",  label: "Invoice Receipt", desc: "3-way match PO–GR–Facture. Écriture FI : débit GR/IR / crédit fournisseur (création de la dette fournisseur)." },
         { step: "5", code: "F110",  label: "Payment", desc: "Traitement du paiement fournisseur (FI-AP). Écriture FI : débit fournisseur / crédit banque. Clôture du cycle P2P." },
       ].map(({ step, code, label, desc }) => (
-        <div key={step} className="flex gap-4 p-4 rounded-xl bg-orange-50/50 dark:bg-orange-900/5 border border-orange-100 dark:border-orange-900/20">
-          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-bold flex items-center justify-center">{step}</span>
+        <div key={step} className="flex gap-4 p-4 rounded-xl bg-amber-50/50 dark:bg-amber-900/5 border border-amber-100 dark:border-amber-900/20">
+          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center justify-center">{step}</span>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-bold text-orange-600 dark:text-orange-400">{code}</span>
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{code}</span>
               <span className="text-sm font-semibold text-slate-900 dark:text-white">{label}</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
@@ -121,8 +121,8 @@ const S4HANAFeatures = () => (
         { title: "Fiori apps pour acheteurs", desc: "Gestion des PR, approbation de PO, confirmations fournisseurs, workflows d'achat — sans SAP GUI." },
         { title: "Visibilité temps réel", desc: "Vue consolidée sur les stocks, engagements budgétaires, compte GR/IR, dettes fournisseurs et cash-flow prévu." },
       ].map(({ title, desc }) => (
-        <div key={title} className="flex gap-3 p-4 rounded-xl bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800/40">
-          <div className="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0" />
+        <div key={title} className="flex gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40">
+          <div className="w-2 h-2 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
@@ -135,7 +135,7 @@ const S4HANAFeatures = () => (
 
 const CareerBenefits = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }}
-    className="bg-linear-to-br from-orange-900 to-amber-700 rounded-2xl p-6 text-white">
+    className="bg-linear-to-br from-amber-900 to-amber-700 rounded-2xl p-6 text-white">
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser MM ?</h2>
     <p className="text-sm text-white/70 mb-5">MM est présent dans chaque projet S/4HANA industriel ou de distribution. Le P2P est l'un des processus les plus déployés.</p>
     <div className="grid sm:grid-cols-2 gap-4">
@@ -185,7 +185,7 @@ const MmQuiz = () => {
                 const selected = answers[q.id] === idx;
                 const isCorrect = q.answer === idx;
                 let cls = "w-full text-left text-sm px-4 py-2.5 rounded-xl border transition-all duration-150 ";
-                if (!submitted) cls += selected ? "border-orange-400 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 font-medium" : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-orange-400/60";
+                if (!submitted) cls += selected ? "border-amber-400 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 font-medium" : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-amber-400/60";
                 else if (isCorrect) cls += "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium";
                 else if (selected) cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
                 else cls += "border-gray-100 dark:border-slate-700 text-slate-400 dark:text-slate-500";
@@ -249,9 +249,9 @@ const MmResources = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Contenus à jour pour approfondir MM et le cycle P2P.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {RESOURCES.map((r) => (
-        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-orange-400/50 hover:shadow-md transition-all group">
-          <span className="text-xs text-orange-500 dark:text-orange-400 font-medium">{r.source}</span>
-          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors leading-snug">{r.title}</span>
+        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-amber-400/50 hover:shadow-md transition-all group">
+          <span className="text-xs text-amber-500 dark:text-amber-400 font-medium">{r.source}</span>
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors leading-snug">{r.title}</span>
         </a>
       ))}
     </div>
@@ -264,7 +264,7 @@ export default function MM() {
       code="MM"
       title="Materials Management"
       description="Maîtrisez le cycle Procure-to-Pay SAP : achats, réception des marchandises, vérification de factures et intégration FI-MM sur S/4HANA."
-      gradient="from-orange-900 via-orange-600 to-amber-400"
+      gradient="from-amber-900 via-amber-600 to-amber-400"
       badge="Achats · Stocks · P2P"
     >
       <KeyConcepts />

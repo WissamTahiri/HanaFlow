@@ -44,7 +44,7 @@ const LEARNING_GOALS = [
   { value: "fi",        label: "Consultant SAP FI",    color: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" },
   { value: "co",        label: "Consultant SAP CO",    color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400" },
   { value: "mm",        label: "Consultant SAP MM",    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400" },
-  { value: "sd",        label: "Consultant SAP SD",    color: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400" },
+  { value: "sd",        label: "Consultant SAP SD",    color: "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400" },
   { value: "hcm",       label: "Consultant SAP HCM",   color: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" },
   { value: "pp",        label: "Consultant SAP PP",    color: "bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400" },
   { value: "s4hana",    label: "Architecte S/4HANA",   color: "bg-sky-100 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400" },
@@ -337,7 +337,7 @@ function ProfileContent() {
         {/* Plan & abonnement */}
         <div className={`rounded-2xl border shadow-card p-6
                          ${isPro
-                           ? "bg-linear-to-br from-amber-50 to-orange-50 border-amber-200 dark:from-amber-900/10 dark:to-orange-900/10 dark:border-amber-700/40"
+                           ? "bg-linear-to-br from-amber-50 to-amber-50 border-amber-200 dark:from-amber-900/10 dark:to-amber-900/10 dark:border-amber-700/40"
                            : "bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700"
                          }`}>
           <div className="flex items-center gap-2 mb-4">
@@ -361,8 +361,8 @@ function ProfileContent() {
               <button
                 onClick={() => router.push("/pricing")}
                 className="flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 bg-linear-to-r
-                           from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-xl
-                           hover:from-amber-600 hover:to-orange-600 transition-colors shadow-sm"
+                           from-amber-500 to-amber-500 text-white text-sm font-semibold rounded-xl
+                           hover:from-amber-600 hover:to-amber-600 transition-colors shadow-sm"
               >
                 <StarIcon /> Passer à Pro
               </button>

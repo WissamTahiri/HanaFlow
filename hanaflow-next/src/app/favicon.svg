@@ -11,7 +11,7 @@
   <rect x="12" y="29" width="16" height="6" rx="2" fill="white"/>
   <rect x="22" y="16" width="6" height="32" rx="2" fill="white"/>
   <!-- Lettre F -->
-  <rect x="34" y="16" width="6" height="32" rx="2" fill="#F97316"/>
-  <rect x="34" y="16" width="14" height="5" rx="2" fill="#F97316"/>
-  <rect x="34" y="28" width="11" height="5" rx="2" fill="#F97316"/>
+  <rect x="34" y="16" width="6" height="32" rx="2" fill="white"/>
+  <rect x="34" y="16" width="14" height="5" rx="2" fill="white"/>
+  <rect x="34" y="28" width="11" height="5" rx="2" fill="white"/>
 </svg>

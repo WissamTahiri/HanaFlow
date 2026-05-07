@@ -44,7 +44,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-linear-to-br from-sap-blue-dark via-sap-blue to-sap-accent py-24 sm:py-32">
+      <section className="relative overflow-hidden bg-linear-to-br from-sap-blue-dark via-sap-blue to-sap-400 py-24 sm:py-32">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
@@ -120,7 +120,7 @@ export default function Home() {
                   </div>
                   <h3 className="font-bold text-slate-900 dark:text-white mb-1.5">{mod.name}</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed flex-1">{mod.desc}</p>
-                  <span className="mt-4 text-sm font-semibold text-sap-blue dark:text-sap-accent group-hover:underline">
+                  <span className="mt-4 text-sm font-semibold text-sap-blue dark:text-sap-300 group-hover:underline">
                     Voir le module →
                   </span>
                 </Link>
@@ -163,7 +163,7 @@ export default function Home() {
       {/* CTA */}
       <section className="py-20 bg-sap-gray-light dark:bg-sap-dark">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="card p-10 text-center bg-linear-to-br from-sap-blue to-sap-accent border-0">
+          <div className="card p-10 text-center bg-linear-to-br from-sap-blue-dark to-sap-blue border-0">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
               Prêt à démarrer ta carrière SAP ?
             </h2>

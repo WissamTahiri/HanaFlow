@@ -68,7 +68,7 @@ const modules = [
     slug: "sd", code: "SD", title: "Sales & Distribution",
     description: "Devis, commandes clients, livraisons, facturation, pricing conditionnel et flux Order-to-Cash complet.",
     path: "/modules-sap/sd",
-    gradient: "from-orange-500 to-orange-700",
+    gradient: "from-amber-500 to-amber-700",
     tags: ["Ventes", "Livraison", "O2C"],
     difficulty: "Fondamental",
     diffColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400",

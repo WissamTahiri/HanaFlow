@@ -55,7 +55,7 @@ const DOMAINES = [
 
 const PROFILS_CIBLES = [
   { key: "finance",    label: "Finance / Contrôle de gestion", desc: "Modules FI, CO — comptabilité, reporting, clôture", icon: <DollarIcon />,   color: "blue" },
-  { key: "supply",     label: "Supply Chain / Logistique",     desc: "Modules MM, SD, PP — achats, stocks, production",  icon: <PackageIcon />,  color: "orange" },
+  { key: "supply",     label: "Supply Chain / Logistique",     desc: "Modules MM, SD, PP — achats, stocks, production",  icon: <PackageIcon />,  color: "amber" },
   { key: "sales",      label: "Sales / Relation client",       desc: "Modules SD, CX — ventes, O2C, relation client",    icon: <TrendUpIcon />,  color: "purple" },
   { key: "tech",       label: "IT / Data / IA",                desc: "ABAP, BTP, Fiori, intégrations, analytics SAP",    icon: <SettingsIcon />, color: "emerald" },
   { key: "hcm",        label: "RH / Paie",                     desc: "Module HCM — paie, gestion des talents, formation", icon: <UsersIcon />,   color: "rose" },
@@ -88,7 +88,7 @@ const MODULES_DISPOS = [
   { key: "fi",     label: "FI",      name: "Financial Accounting",   color: "blue" },
   { key: "co",     label: "CO",      name: "Controlling",            color: "indigo" },
   { key: "mm",     label: "MM",      name: "Materials Management",   color: "emerald" },
-  { key: "sd",     label: "SD",      name: "Sales & Distribution",   color: "orange" },
+  { key: "sd",     label: "SD",      name: "Sales & Distribution",   color: "amber" },
   { key: "hcm",    label: "HCM",     name: "Human Capital Mgmt",     color: "purple" },
   { key: "pp",     label: "PP",      name: "Production Planning",    color: "rose" },
   { key: "s4hana", label: "S/4HANA", name: "Architecture S/4HANA",  color: "violet" },
@@ -414,7 +414,7 @@ const colorClasses: Record<string, { card: string; badge: string; dot: string; n
 
 const profilColorMap: Record<string, string> = {
   blue:    "border-blue-400 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700",
-  orange:  "border-orange-400 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-700",
+  amber:   "border-amber-400 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700",
   purple:  "border-purple-400 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-700",
   emerald: "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-700",
   rose:    "border-rose-400 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-700",
@@ -558,7 +558,7 @@ function Step3({ form, setForm }: { form: FormData; setForm: React.Dispatch<Reac
 
   const modColors: Record<string, string> = {
     blue: "text-blue-600", indigo: "text-indigo-500", emerald: "text-emerald-600",
-    orange: "text-orange-500", purple: "text-purple-600", rose: "text-rose-500",
+    amber: "text-amber-500", purple: "text-purple-600", rose: "text-rose-500",
     violet: "text-violet-600", cyan: "text-cyan-600",
   };
 
