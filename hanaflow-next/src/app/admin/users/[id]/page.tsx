@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import type { User } from "@/types";
 
 const MODULES = [
   { id: "fi",  label: "FI — Financial Accounting" },
@@ -29,7 +30,7 @@ interface UserDetail {
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { token, user: me } = useAuth();
+  const { token, user: me, startImpersonation } = useAuth();
   const [data, setData] = useState<UserDetail | null>(null);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
@@ -92,6 +93,56 @@ export default function AdminUserDetailPage() {
     );
     setNewPassword("");
     setShowResetForm(false);
+  };
+
+  const handleImpersonate = async () => {
+    if (!data || !token) return;
+    if (!confirm(`Vous connecter en tant que ${data.name} (${data.email}) pour 15 minutes ?\n\nVous verrez le site comme cet utilisateur. Vous pourrez quitter à tout moment via la bannière en haut.`)) return;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await fetch(`/api/admin/users/${data.id}/impersonate`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      const d = await r.json();
+      if (!r.ok) { setError(d.message ?? "Erreur"); return; }
+      startImpersonation({
+        token: d.token,
+        user: d.user as User,
+        impersonatedBy: d.impersonatedBy,
+      });
+      router.push("/dashboard");
+    } catch {
+      setError("Erreur réseau");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRevokeSessions = async () => {
+    if (!data || !token) return;
+    if (data._count.refreshTokens === 0) return;
+    if (!confirm(`Révoquer les ${data._count.refreshTokens} session(s) actives de ${data.name} ? L'utilisateur sera déconnecté immédiatement de tous ses appareils.`)) return;
+    setBusy(true);
+    setError("");
+    setInfo("");
+    try {
+      const r = await fetch(`/api/admin/users/${data.id}/revoke-sessions`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      const d = await r.json();
+      if (!r.ok) { setError(d.message ?? "Erreur"); return; }
+      setInfo(`${d.revoked} session(s) révoquée(s)`);
+      await fetchUser();
+    } catch {
+      setError("Erreur réseau");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -161,7 +212,18 @@ export default function AdminUserDetailPage() {
           </div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Sessions actives</p>
-            <p className="text-slate-900 dark:text-white">{data._count.refreshTokens}</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-slate-900 dark:text-white">{data._count.refreshTokens}</p>
+              {data._count.refreshTokens > 0 && (
+                <button
+                  onClick={handleRevokeSessions}
+                  disabled={busy}
+                  className="text-xs px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 transition-colors disabled:opacity-40"
+                >
+                  Révoquer
+                </button>
+              )}
+            </div>
           </div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Modules visités</p>
@@ -236,6 +298,24 @@ export default function AdminUserDetailPage() {
           )}
         </div>
       </section>
+
+      {/* Impersonation */}
+      {!isSelf && !data.isSuspended && (
+        <section className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-wider">Impersonation</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+            Connectez-vous temporairement en tant que cet utilisateur pour vérifier ce qu&apos;il voit (15 minutes max).
+            Une bannière restera visible et vous pourrez quitter à tout moment.
+          </p>
+          <button
+            onClick={handleImpersonate}
+            disabled={busy}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium bg-amber-500 text-white hover:bg-amber-600 transition-colors disabled:opacity-40"
+          >
+            Se connecter en tant que {data.name}
+          </button>
+        </section>
+      )}
 
       {/* Reset password */}
       <section className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">

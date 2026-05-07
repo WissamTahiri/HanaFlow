@@ -13,6 +13,7 @@ import { ThemeScript } from "@/components/ThemeScript";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BadgeToast from "@/components/BadgeToast";
+import ImpersonationBanner from "@/components/ImpersonationBanner";
 import { JsonLd } from "@/components/JsonLd";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -83,6 +84,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-sap-dark text-slate-900 dark:text-slate-100 antialiased">
         <Providers>
+          <ImpersonationBanner />
           <Navbar />
           <main className="flex-1 pt-[4.5rem]">
             <ErrorBoundary>{children}</ErrorBoundary>
