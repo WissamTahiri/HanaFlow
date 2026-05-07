@@ -2,12 +2,18 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err, validateBody } from "@/lib/apiHelpers";
+import { getPublicSettings } from "@/lib/settings";
 
 const redeemSchema = z.object({
   code: z.string().trim().min(1).toUpperCase(),
 });
 
 export async function POST(req: NextRequest) {
+  const settings = await getPublicSettings();
+  if (!settings.promoCodesEnabled) {
+    return err("Les codes promo sont temporairement désactivés.", 403);
+  }
+
   const auth = requireAuth(req);
   if ("status" in auth) return auth;
 

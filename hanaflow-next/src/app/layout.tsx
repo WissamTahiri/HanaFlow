@@ -14,6 +14,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BadgeToast from "@/components/BadgeToast";
 import ImpersonationBanner from "@/components/ImpersonationBanner";
+import SiteBanner from "@/components/SiteBanner";
+import MaintenanceGate from "@/components/MaintenanceGate";
+import { getPublicSettings } from "@/lib/settings";
 import { JsonLd } from "@/components/JsonLd";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -51,11 +54,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getPublicSettings();
   return (
     <html lang="fr" suppressHydrationWarning className={plusJakartaSans.variable}>
       <head>
@@ -85,9 +89,14 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-white dark:bg-sap-dark text-slate-900 dark:text-slate-100 antialiased">
         <Providers>
           <ImpersonationBanner />
+          <SiteBanner enabled={settings.bannerEnabled} message={settings.bannerMessage} link={settings.bannerLink} />
           <Navbar />
           <main className="flex-1 pt-[4.5rem]">
-            <ErrorBoundary>{children}</ErrorBoundary>
+            <ErrorBoundary>
+              <MaintenanceGate enabled={settings.maintenanceEnabled} message={settings.maintenanceMessage}>
+                {children}
+              </MaintenanceGate>
+            </ErrorBoundary>
           </main>
           <Footer />
           <BadgeToast />

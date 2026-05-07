@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { signAccessToken, hashToken, getRefreshTokenExpiry } from "@/lib/auth";
 import { validateBody, err, rateLimit, COOKIE_OPTIONS } from "@/lib/apiHelpers";
+import { getPublicSettings } from "@/lib/settings";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Nom trop long"),
@@ -23,6 +24,11 @@ const registerSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const settings = await getPublicSettings();
+  if (!settings.registrationEnabled) {
+    return err("Les inscriptions sont temporairement désactivées.", 403);
+  }
+
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
   if (!rateLimit(`register:${ip}`)) {
     return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
