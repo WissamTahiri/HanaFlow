@@ -62,6 +62,8 @@ export function requireAdmin(
   const user = getAuthUser(req);
   if (!user) return err("Non authentifié", 401);
   if (user.role !== "admin") return err("Accès refusé", 403);
+  // Une session impersonée ne peut pas exécuter d'actions admin
+  if (user.impersonatedBy) return err("Action admin interdite en mode impersonation", 403);
   return { user };
 }
 

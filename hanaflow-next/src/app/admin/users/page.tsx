@@ -21,6 +21,16 @@ interface UsersResponse {
   totalPages: number;
 }
 
+type BulkAction = "pro" | "unpro" | "suspend" | "unsuspend" | "delete";
+
+const BULK_LABELS: Record<BulkAction, { label: string; confirm: string; danger?: boolean }> = {
+  pro:        { label: "Passer Pro",         confirm: "Activer Pro pour {n} utilisateur(s) ?" },
+  unpro:      { label: "Retirer Pro",        confirm: "Retirer Pro pour {n} utilisateur(s) ?" },
+  suspend:    { label: "Suspendre",          confirm: "Suspendre {n} utilisateur(s) ? Toutes leurs sessions seront déconnectées." },
+  unsuspend:  { label: "Réactiver",          confirm: "Réactiver {n} utilisateur(s) ?" },
+  delete:     { label: "Supprimer",          confirm: "SUPPRIMER définitivement {n} utilisateur(s) ? Cette action est irréversible.", danger: true },
+};
+
 export default function AdminUsersPage() {
   const { token, user: me } = useAuth();
   const [data, setData] = useState<UsersResponse | null>(null);
@@ -29,6 +39,10 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [bulkAction, setBulkAction] = useState<BulkAction | "">("");
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     if (!token) return;
@@ -98,6 +112,54 @@ export default function AdminUsersPage() {
     }
   };
 
+  const toggleSelected = (id: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (!data) return;
+    const allOnPage = data.users.filter((u) => u.id !== me?.id).map((u) => u.id);
+    const allSelected = allOnPage.every((id) => selected.has(id));
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allSelected) allOnPage.forEach((id) => next.delete(id));
+      else allOnPage.forEach((id) => next.add(id));
+      return next;
+    });
+  };
+
+  const runBulk = async () => {
+    if (!bulkAction || !token || selected.size === 0) return;
+    const meta = BULK_LABELS[bulkAction];
+    if (!confirm(meta.confirm.replace("{n}", String(selected.size)))) return;
+    setBulkBusy(true);
+    setError("");
+    setInfo("");
+    try {
+      const r = await fetch("/api/admin/users/bulk", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ userIds: Array.from(selected), action: bulkAction }),
+      });
+      const d = await r.json();
+      if (!r.ok) { setError(d.message ?? "Erreur"); return; }
+      setInfo(`${meta.label} appliqué sur ${d.affected} utilisateur(s)${d.skippedSelf ? " (vous-même ignoré)" : ""}`);
+      setSelected(new Set());
+      setBulkAction("");
+      await fetchUsers();
+    } catch {
+      setError("Erreur réseau");
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
   const exportCsv = async () => {
     if (!token) return;
     try {
@@ -147,16 +209,53 @@ export default function AdminUsersPage() {
           {error}
         </div>
       )}
+      {info && (
+        <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm">
+          {info}
+        </div>
+      )}
 
-      {/* Search */}
-      <div className="flex gap-3 mb-4">
+      {/* Search + bulk actions */}
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
         <input
           type="text"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           placeholder="Rechercher par nom ou email..."
-          className="flex-1 px-4 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/50"
+          className="flex-1 min-w-[200px] px-4 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/50"
         />
+        {selected.size > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{selected.size} sélectionné{selected.size > 1 ? "s" : ""}</span>
+            <select
+              value={bulkAction}
+              onChange={(e) => setBulkAction(e.target.value as BulkAction | "")}
+              className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
+            >
+              <option value="">Action…</option>
+              {(Object.keys(BULK_LABELS) as BulkAction[]).map((a) => (
+                <option key={a} value={a}>{BULK_LABELS[a].label}</option>
+              ))}
+            </select>
+            <button
+              disabled={!bulkAction || bulkBusy}
+              onClick={runBulk}
+              className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                bulkAction && BULK_LABELS[bulkAction].danger
+                  ? "bg-red-600 text-white hover:bg-red-700"
+                  : "bg-sap-blue text-white hover:bg-sap-blue-dark"
+              }`}
+            >
+              {bulkBusy ? "…" : "Appliquer"}
+            </button>
+            <button
+              onClick={() => { setSelected(new Set()); setBulkAction(""); }}
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white px-2 py-1"
+            >
+              Annuler
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -165,6 +264,15 @@ export default function AdminUsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50">
+                <th className="px-3 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    aria-label="Tout sélectionner"
+                    checked={Boolean(data && data.users.length > 0 && data.users.filter((u) => u.id !== me?.id).every((u) => selected.has(u.id)))}
+                    onChange={toggleSelectAll}
+                    className="cursor-pointer accent-sap-blue"
+                  />
+                </th>
                 <th className="text-left px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Nom</th>
                 <th className="text-left px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Email</th>
                 <th className="text-left px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Rôle</th>
@@ -176,17 +284,30 @@ export default function AdminUsersPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-slate-400">
+                  <td colSpan={7} className="text-center py-10 text-slate-400">
                     <div className="inline-block w-5 h-5 border-2 border-sap-blue border-t-transparent rounded-full animate-spin" />
                   </td>
                 </tr>
               ) : data?.users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-slate-400">Aucun utilisateur trouvé</td>
+                  <td colSpan={7} className="text-center py-10 text-slate-400">Aucun utilisateur trouvé</td>
                 </tr>
               ) : (
                 data?.users.map((u) => (
-                  <tr key={u.id} className="border-b border-gray-50 dark:border-slate-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                  <tr key={u.id} className={`border-b border-gray-50 dark:border-slate-700/50 last:border-0 transition-colors ${selected.has(u.id) ? "bg-sap-blue/5 dark:bg-sap-blue/10" : "hover:bg-gray-50 dark:hover:bg-slate-700/30"}`}>
+                    <td className="px-3 py-3">
+                      {u.id !== me?.id ? (
+                        <input
+                          type="checkbox"
+                          aria-label={`Sélectionner ${u.name}`}
+                          checked={selected.has(u.id)}
+                          onChange={() => toggleSelected(u.id)}
+                          className="cursor-pointer accent-sap-blue"
+                        />
+                      ) : (
+                        <span className="text-[10px] text-slate-400">vous</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{u.name}</td>
                     <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{u.email}</td>
                     <td className="px-4 py-3">

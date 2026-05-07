@@ -20,15 +20,24 @@ const apiFetch = (path: string, options: RequestInit = {}) =>
     headers: { "Content-Type": "application/json", ...options.headers },
   });
 
+interface ImpersonationInfo {
+  id: number;
+  email: string;
+}
+
 interface AuthContextValue {
   user: User | null;
   token: string | null;
   loading: boolean;
   isAuthenticated: boolean;
+  isImpersonating: boolean;
+  impersonatedBy: ImpersonationInfo | null;
   login: (credentials: { email: string; password: string }) => Promise<User>;
   register: (data: { name: string; email: string; password: string }) => Promise<User>;
   logout: () => Promise<void>;
   updateProfile: (data: { name?: string; password?: string }) => Promise<User>;
+  startImpersonation: (data: { token: string; user: User; impersonatedBy: ImpersonationInfo }) => void;
+  stopImpersonation: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -43,10 +52,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [impersonatedBy, setImpersonatedBy] = useState<ImpersonationInfo | null>(null);
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const scheduleRefresh = (accessToken: string) => {
+  const scheduleRefresh = (accessToken: string, skip = false) => {
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+    if (skip) return;
     try {
       const payload = JSON.parse(atob(accessToken.split(".")[1]));
       const delay = payload.exp * 1000 - Date.now() - 2 * 60 * 1000;
@@ -58,22 +69,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const setSession = (newToken: string, newUser: User) => {
+  const setSession = (newToken: string, newUser: User, opts?: { skipRefresh?: boolean }) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("token", newToken);
     }
     setToken(newToken);
     setUser(newUser);
-    scheduleRefresh(newToken);
+    scheduleRefresh(newToken, opts?.skipRefresh);
   };
 
   const clearSession = () => {
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
     }
     setToken(null);
     setUser(null);
+    setImpersonatedBy(null);
   };
 
   const silentRefresh = async (): Promise<boolean> => {
@@ -93,20 +107,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const init = async () => {
       const storedToken =
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const adminToken =
+        typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
 
       if (storedToken) {
+        // Détecter mode impersonation depuis le token JWT
+        const impInfo = decodeImpersonatedBy(storedToken);
+
         try {
           const res = await apiFetch("/auth/me", {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
           if (res.ok) {
             const data = await res.json();
-            setSession(storedToken, data.user);
+            setSession(storedToken, data.user, { skipRefresh: Boolean(impInfo) });
+            setImpersonatedBy(impInfo);
             setLoading(false);
             return;
           }
         } catch {
           // réseau indisponible
+        }
+
+        // Si on était en impersonation et que le token est invalide, restaurer l'admin
+        if (impInfo && adminToken) {
+          try {
+            const res = await apiFetch("/auth/me", {
+              headers: { Authorization: `Bearer ${adminToken}` },
+            });
+            if (res.ok) {
+              const data = await res.json();
+              localStorage.removeItem("admin_token");
+              localStorage.removeItem("admin_user");
+              setSession(adminToken, data.user);
+              setLoading(false);
+              return;
+            }
+          } catch {
+            // ignored
+          }
         }
       }
 
@@ -164,6 +203,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearSession();
   };
 
+  const startImpersonation = ({
+    token: impToken,
+    user: targetUser,
+    impersonatedBy: by,
+  }: {
+    token: string;
+    user: User;
+    impersonatedBy: ImpersonationInfo;
+  }) => {
+    if (typeof window === "undefined") return;
+    // Sauvegarder le contexte admin courant
+    if (token) localStorage.setItem("admin_token", token);
+    if (user) localStorage.setItem("admin_user", JSON.stringify(user));
+    setImpersonatedBy(by);
+    setSession(impToken, targetUser, { skipRefresh: true });
+  };
+
+  const stopImpersonation = async () => {
+    if (typeof window === "undefined") return;
+    const adminToken = localStorage.getItem("admin_token");
+    const adminUserStr = localStorage.getItem("admin_user");
+    if (adminToken && adminUserStr) {
+      try {
+        const adminUser = JSON.parse(adminUserStr) as User;
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_user");
+        setImpersonatedBy(null);
+        setSession(adminToken, adminUser);
+        return;
+      } catch {
+        // fallback : tenter de récupérer via refresh
+      }
+    }
+    // Si aucun admin_token sauvegardé, on tente un silent refresh
+    setImpersonatedBy(null);
+    const refreshed = await silentRefresh();
+    if (!refreshed) clearSession();
+  };
+
   const updateProfile = async ({
     name,
     password,
@@ -191,13 +269,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         token,
         loading,
         isAuthenticated: !!user,
+        isImpersonating: !!impersonatedBy,
+        impersonatedBy,
         login,
         register,
         logout,
         updateProfile,
+        startImpersonation,
+        stopImpersonation,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
+}
+
+function decodeImpersonatedBy(token: string): ImpersonationInfo | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1]));
+    if (payload?.impersonatedBy?.id && payload.impersonatedBy.email) {
+      return { id: payload.impersonatedBy.id, email: payload.impersonatedBy.email };
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
