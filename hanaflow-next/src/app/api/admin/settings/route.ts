@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, ok, err, validateBody } from "@/lib/apiHelpers";
 import { logAudit } from "@/lib/audit";
+import { invalidateSettingsCache } from "@/lib/settings";
 
 const updateSchema = z.object({
   settings: z.array(
@@ -62,6 +63,8 @@ export async function PATCH(req: NextRequest) {
         },
       });
     }
+
+    invalidateSettingsCache();
 
     await logAudit({
       actor: auth.user,

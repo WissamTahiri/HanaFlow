@@ -389,6 +389,36 @@ export default function AdminUserDetailPage() {
         </div>
       </section>
 
+      {/* Timeline d'activité */}
+      {data.progress.length > 0 && (
+        <section className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-4 uppercase tracking-wider">Activité chronologique</h2>
+          <ol className="relative border-l-2 border-gray-200 dark:border-slate-700 ml-2 space-y-4">
+            {data.progress.map((p, i) => {
+              const moduleLabel = MODULES.find((m) => m.id === p.module)?.label ?? p.module.toUpperCase();
+              const dt = new Date(p.visitedAt);
+              const isFirst = i === 0;
+              return (
+                <li key={`${p.module}-${p.visitedAt}`} className="ml-6">
+                  <span className={`absolute -left-[7px] flex items-center justify-center w-3 h-3 rounded-full ring-4 ring-white dark:ring-slate-800 ${isFirst ? "bg-sap-blue" : "bg-gray-300 dark:bg-slate-600"}`} aria-hidden="true" />
+                  <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      Visite du module <span className="text-sap-blue dark:text-blue-300">{moduleLabel}</span>
+                    </p>
+                    <time className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                      {dt.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                      {" · "}
+                      {dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                    </time>
+                  </div>
+                  {isFirst && <p className="text-[11px] text-sap-blue dark:text-blue-300 mt-0.5">Plus récente</p>}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      )}
+
       {/* Zone dangereuse */}
       {!isSelf && (
         <section className="bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-200 dark:border-red-900/40 p-5">
