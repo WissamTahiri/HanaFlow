@@ -9,14 +9,17 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  name         String   @db.VarChar(100)
-  email        String   @unique @db.VarChar(255)
-  passwordHash String   @map("password_hash") @db.VarChar(255)
-  role         String   @default("student") @db.VarChar(20)
-  isPro        Boolean  @default(false) @map("is_pro")
-  isSuspended  Boolean  @default(false) @map("is_suspended")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  email           String    @unique @db.VarChar(255)
+  passwordHash    String    @map("password_hash") @db.VarChar(255)
+  role            String    @default("student") @db.VarChar(20)
+  isPro           Boolean   @default(false) @map("is_pro")
+  isSuspended     Boolean   @default(false) @map("is_suspended")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  totpSecret      String?   @map("totp_secret") @db.VarChar(255)
+  totpEnabled     Boolean   @default(false) @map("totp_enabled")
+  totpEnabledAt   DateTime? @map("totp_enabled_at") @db.Timestamptz
 
   refreshTokens RefreshToken[]
   progress      UserProgress[]

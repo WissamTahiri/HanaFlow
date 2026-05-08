@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { id: auth.user.userId },
-    select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true, createdAt: true, totpEnabled: true },
   });
 
   if (!user) return err("Utilisateur introuvable", 404);

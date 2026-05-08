@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { signAccessToken, hashToken, getRefreshTokenExpiry } from "@/lib/auth";
 import { validateBody, err, rateLimit, COOKIE_OPTIONS } from "@/lib/apiHelpers";
 import { getPublicSettings } from "@/lib/settings";
+import { sendEmail, templates, getAdminEmail } from "@/lib/email";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Nom trop long"),
@@ -58,6 +59,15 @@ export async function POST(req: NextRequest) {
       expiresAt: getRefreshTokenExpiry(),
     },
   });
+
+  // Notifications email — best effort, ne bloque pas l'inscription
+  const welcomeTpl = templates.welcome(user.name);
+  void sendEmail({ to: user.email, ...welcomeTpl });
+  const adminEmail = getAdminEmail();
+  if (adminEmail) {
+    const adminTpl = templates.adminNewSignup({ name: user.name, email: user.email });
+    void sendEmail({ to: adminEmail, ...adminTpl });
+  }
 
   const res = NextResponse.json({ user, token: accessToken }, { status: 201 });
   res.cookies.set("refreshToken", rawRefresh, COOKIE_OPTIONS);

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { signAccessToken, hashToken, getRefreshTokenExpiry } from "@/lib/auth";
 import { validateBody, err, rateLimit, COOKIE_OPTIONS } from "@/lib/apiHelpers";
+import { verifyTotp } from "@/lib/totp";
 
 const loginSchema = z.object({
   email: z
@@ -13,6 +14,7 @@ const loginSchema = z.object({
     .email("Email invalide")
     .transform((v) => v.toLowerCase()),
   password: z.string().min(1, "Mot de passe requis"),
+  totpCode: z.string().trim().min(6).max(8).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -35,6 +37,22 @@ export async function POST(req: NextRequest) {
   }
 
   if (user.isSuspended) return err("Compte suspendu. Contactez le support.", 403);
+
+  // Étape 2FA si activée sur le compte
+  if (user.totpEnabled && user.totpSecret) {
+    if (!data.totpCode) {
+      return NextResponse.json(
+        { message: "Code 2FA requis", requires2fa: true },
+        { status: 401 },
+      );
+    }
+    if (!verifyTotp(data.totpCode, user.totpSecret)) {
+      return NextResponse.json(
+        { message: "Code 2FA invalide", requires2fa: true },
+        { status: 401 },
+      );
+    }
+  }
 
   const accessToken = signAccessToken({ userId: user.id, email: user.email, role: user.role });
   const rawRefresh = crypto.randomBytes(64).toString("hex");
