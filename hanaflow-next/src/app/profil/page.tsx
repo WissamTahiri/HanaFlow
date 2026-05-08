@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/hooks/useProgress";
 import { useSubscription } from "@/context/SubscriptionContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import TwoFactorSection from "@/components/TwoFactorSection";
 
 const CheckIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -410,6 +411,10 @@ function ProfileContent() {
               </div>
             </>
           )}
+        </div>
+
+        <div className="mt-6">
+          <TwoFactorSection />
         </div>
 
       </div>

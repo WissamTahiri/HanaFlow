@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err, validateBody } from "@/lib/apiHelpers";
 import { getPublicSettings } from "@/lib/settings";
+import { sendEmail, templates } from "@/lib/email";
 
 const redeemSchema = z.object({
   code: z.string().trim().min(1).toUpperCase(),
@@ -39,6 +40,9 @@ export async function POST(req: NextRequest) {
     prisma.user.update({ where: { id: auth.user.userId }, data: { isPro: true } }),
     prisma.promoCode.update({ where: { id: promoCode.id }, data: { usageCount: { increment: 1 } } }),
   ]);
+
+  const tpl = templates.proActivated(user.name);
+  void sendEmail({ to: user.email, ...tpl });
 
   return ok({ message: "Code activé ! Tu es maintenant Pro." });
 }

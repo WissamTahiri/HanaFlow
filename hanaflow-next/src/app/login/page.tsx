@@ -25,16 +25,24 @@ export default function LoginPage() {
   const [showPwd, setShowPwd]       = useState(false);
   const [error, setError]           = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [needs2fa, setNeeds2fa]     = useState(false);
+  const [totpCode, setTotpCode]     = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
     try {
-      await login({ email, password });
+      await login({ email, password, totpCode: needs2fa ? totpCode : undefined });
       router.push("/dashboard");
     } catch (err) {
-      setError((err as Error).message || "Identifiants invalides.");
+      const e = err as Error & { requires2fa?: boolean };
+      if (e.requires2fa) {
+        setNeeds2fa(true);
+        setError(needs2fa && totpCode ? "Code 2FA invalide" : "");
+      } else {
+        setError(e.message || "Identifiants invalides.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -93,6 +101,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={needs2fa}
                 />
                 <button
                   type="button"
@@ -105,9 +114,32 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {needs2fa && (
+              <div>
+                <label htmlFor="totpCode" className="label">Code de vérification (2FA)</label>
+                <input
+                  id="totpCode"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  className="input text-center tracking-[0.4em] font-mono text-lg"
+                  placeholder="••••••"
+                  value={totpCode}
+                  onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  required
+                  autoFocus
+                />
+                <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                  Saisissez le code à 6 chiffres généré par votre app d&apos;authentification.
+                </p>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || (needs2fa && totpCode.length < 6)}
               className="w-full btn-primary justify-center py-3 text-base"
             >
               {submitting ? (
@@ -118,8 +150,18 @@ export default function LoginPage() {
                   </svg>
                   Connexion en cours...
                 </span>
-              ) : "Se connecter"}
+              ) : needs2fa ? "Vérifier et se connecter" : "Se connecter"}
             </button>
+
+            {needs2fa && (
+              <button
+                type="button"
+                onClick={() => { setNeeds2fa(false); setTotpCode(""); setError(""); }}
+                className="w-full text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white -mt-2"
+              >
+                ← Modifier email/mot de passe
+              </button>
+            )}
           </form>
 
           <p className="mt-5 text-sm text-center text-slate-500 dark:text-slate-400">

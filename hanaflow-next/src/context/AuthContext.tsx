@@ -32,7 +32,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isImpersonating: boolean;
   impersonatedBy: ImpersonationInfo | null;
-  login: (credentials: { email: string; password: string }) => Promise<User>;
+  login: (credentials: { email: string; password: string; totpCode?: string }) => Promise<User>;
   register: (data: { name: string; email: string; password: string }) => Promise<User>;
   logout: () => Promise<void>;
   updateProfile: (data: { name?: string; password?: string }) => Promise<User>;
@@ -165,16 +165,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async ({
     email,
     password,
+    totpCode,
   }: {
     email: string;
     password: string;
+    totpCode?: string;
   }) => {
     const res = await apiFetch("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, totpCode }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Erreur de connexion");
+    if (!res.ok) {
+      const error = new Error(data.message || "Erreur de connexion") as Error & { requires2fa?: boolean };
+      if (data.requires2fa) error.requires2fa = true;
+      throw error;
+    }
     setSession(data.token, data.user);
     return data.user;
   };

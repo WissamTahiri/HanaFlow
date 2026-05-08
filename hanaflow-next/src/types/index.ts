@@ -6,6 +6,7 @@ export interface User {
   isPro: boolean;
   isSuspended: boolean;
   createdAt: string;
+  totpEnabled?: boolean;
 }
 
 export interface AuthResponse {

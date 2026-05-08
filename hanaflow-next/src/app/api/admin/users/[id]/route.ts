@@ -4,6 +4,7 @@ import argon2 from "argon2";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, ok, err, validateBody } from "@/lib/apiHelpers";
 import { logAudit } from "@/lib/audit";
+import { sendEmail, templates } from "@/lib/email";
 
 const patchSchema = z.object({
   isPro: z.boolean().optional(),
@@ -88,6 +89,12 @@ export async function PATCH(
     if (password) {
       // Invalider toutes les sessions existantes après reset
       await prisma.refreshToken.deleteMany({ where: { userId } });
+      const tpl = templates.passwordReset(user.name);
+      void sendEmail({ to: user.email, ...tpl });
+    }
+    if (rest.isSuspended === true) {
+      const tpl = templates.accountSuspended(user.name);
+      void sendEmail({ to: user.email, ...tpl });
     }
 
     await logAudit({
