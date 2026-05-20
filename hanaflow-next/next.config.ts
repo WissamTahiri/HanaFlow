@@ -39,6 +39,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // @react-pdf/renderer est un package ESM-only. Webpack côté serveur ne sait
+  // pas le résoudre nativement et tombe en "Module not found: ESM packages
+  // need to be imported". transpilePackages force Next à le passer par sa
+  // chaîne de transpilation TypeScript/SWC, ce qui règle le problème.
+  // Le composant CvDocument reste de toute façon chargé via next/dynamic
+  // ssr:false côté client uniquement.
+  transpilePackages: ["@react-pdf/renderer"],
   async headers() {
     return [
       {
