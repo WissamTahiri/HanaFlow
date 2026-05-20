@@ -72,3 +72,6 @@ src/middleware.ts
 
 # Husky internals (générés par `husky` au prepare)
 .husky/_/
+
+# Rapport généré par scripts/sap-cert-watch.mjs (uploadé en artefact CI)
+cert-watch-report.json

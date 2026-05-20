@@ -1,0 +1,95 @@
+name: SAP cert watch
+
+on:
+  schedule:
+    # Tous les lundis à 09:00 UTC (10:00 ou 11:00 Europe/Paris selon DST)
+    - cron: "0 9 * * 1"
+  workflow_dispatch: # déclenchable à la main depuis l'onglet Actions
+
+# Évite d'empiler des runs si plusieurs commits / triggers la même minute
+concurrency:
+  group: sap-cert-watch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hanaflow-next
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Run cert watch (detect changes + apply if any)
+        id: watch
+        # Le script renvoie exit 1 si des changements sont détectés.
+        # On capture le code retour pour brancher dessus à l'étape suivante.
+        run: |
+          set +e
+          node scripts/sap-cert-watch.mjs --apply
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          # Affiche le rapport pour les logs
+          if [ -f cert-watch-report.json ]; then
+            echo "=== Rapport ==="
+            cat cert-watch-report.json
+          fi
+
+      - name: Upload report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sap-cert-watch-report
+          path: hanaflow-next/cert-watch-report.json
+          retention-days: 30
+
+      - name: Open PR if changes detected
+        if: steps.watch.outputs.exit_code == '1'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          # Le script a déjà modifié cert-catalog.json
+          add-paths: hanaflow-next/src/data/cert-catalog.json
+          commit-message: "chore(certs): MAJ codes certifs SAP détectés par cert-watch"
+          branch: sap-cert-watch/auto-${{ github.run_number }}
+          delete-branch: true
+          title: "[cert-watch] Mise à jour codes certifs SAP"
+          labels: cert-watch,automated
+          body: |
+            ## Détection automatique de mise à jour SAP
+
+            Le script `scripts/sap-cert-watch.mjs` a détecté des codes de
+            certification SAP différents de ceux actuellement référencés dans
+            `src/data/cert-catalog.json`.
+
+            Le diff dans cette PR reflète les changements détectés.
+
+            ### Avant de merger
+
+            1. Vérifie manuellement les nouveaux codes sur
+               [learning.sap.com/certifications](https://learning.sap.com/certifications)
+            2. Inspecte le rapport complet en téléchargeant l'artefact
+               `sap-cert-watch-report` de ce run
+            3. Si tu vois une erreur de scrap (faux positif), tu peux fermer
+               la PR et laisser le catalogue en l'état
+
+            Run : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Print summary
+        if: always()
+        run: |
+          if [ "${{ steps.watch.outputs.exit_code }}" = "0" ]; then
+            echo "✓ Aucun changement détecté, catalogue à jour"
+          elif [ "${{ steps.watch.outputs.exit_code }}" = "1" ]; then
+            echo "⚡ Changements détectés, PR ouverte"
+          else
+            echo "✗ Erreur (exit ${{ steps.watch.outputs.exit_code }})"
+          fi
