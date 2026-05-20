@@ -191,6 +191,8 @@ export default function Navbar() {
                                 p-2 z-50">
                   {[
                     { href: "/entretien", label: "Mock Interview IA", desc: "Entretien IA avec scoring détaillé" },
+                    { href: "/cv-builder", label: "CV Builder ATS", desc: "Génère un CV SAP optimisé ATS" },
+                    { href: "/flashcards", label: "Flashcards SAP", desc: "Révision active spaced repetition" },
                     { href: "/roadmap", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil" },
                     { href: "/certifications/comparer", label: "Comparateur certifs", desc: "Compare les certifs SAP" },
                   ].map(({ href, label, desc }) => (
@@ -353,6 +355,8 @@ export default function Navbar() {
             { href: "/processus-metier", label: "Processus métier" },
             { href: "/roadmap",          label: "Roadmap IA" },
             { href: "/entretien",        label: "Mock Interview IA" },
+            { href: "/cv-builder",       label: "CV Builder ATS" },
+            { href: "/flashcards",       label: "Flashcards SAP" },
             { href: "/a-propos",         label: "À propos" },
             { href: "/certifications",   label: "Certifications" },
             { href: "/certifications/comparer", label: "Comparer certifs" },
