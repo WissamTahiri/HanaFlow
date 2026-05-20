@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // PWA / Workbox runtime généré au build : du JS minifié qu'on ne lint pas
+    "public/sw.js",
+    "public/sw.js.map",
+    "public/workbox-*.js",
+    "public/workbox-*.js.map",
+    "public/worker-*.js",
+    "public/fallback-*.js",
   ]),
   {
     rules: {
