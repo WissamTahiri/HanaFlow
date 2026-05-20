@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI, Type } from "@google/genai";
 import { z } from "zod";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import {
   requireAuth,
   rateLimit,
@@ -15,17 +14,19 @@ import certCatalog from "@/data/cert-catalog.json";
 /**
  * POST /api/roadmap/generate
  *
- * Génère une roadmap SAP personnalisée pour un user authentifié via Claude API.
+ * Génère une roadmap SAP personnalisée via Google Gemini 2.0 Flash.
  *
- * Entrées : profil (niveau, objectif, dispo/semaine, secteur, préférence module).
- * Sortie : roadmap structurée (modules ordonnés + milestones + nextSteps).
+ * Pourquoi Gemini plutôt qu'Anthropic ici :
+ *  - Free tier Google AI Studio : ~1500 req/jour gratuites
+ *  - Pas de carte bancaire requise → 0€ garanti (cap à 429 si dépassement,
+ *    jamais facturable)
+ *  - Qualité Gemini 2.0 Flash suffisante pour du structured-JSON
  *
- * Best practices Anthropic SDK :
- *  - Modèle : claude-opus-4-7 (recommandé par défaut)
- *  - Structured outputs via Zod schema + messages.parse() (sortie validée)
- *  - Prompt caching sur le system prompt (catalog stable)
- *  - Pas de thinking (tâche simple JSON, pas besoin)
+ * Best practices :
  *  - Auth + double rate-limit (user + IP)
+ *  - Structured output via responseSchema
+ *  - System instruction séparée du user prompt (convention Gemini)
+ *  - Re-validation Zod côté serveur (le LLM peut déborder du schéma)
  */
 
 const inputSchema = z.object({
@@ -42,57 +43,98 @@ const inputSchema = z.object({
   preferredModule: z.enum(["FI", "CO", "MM", "SD", "PP", "AI"]).optional(),
 });
 
-const moduleCodeSchema = z.enum(["FI", "CO", "MM", "SD", "PP", "AI"]);
-
-const roadmapSchema = z.object({
-  summary: z
-    .string()
-    .describe("Résumé du parcours recommandé en 1-2 phrases en français"),
-  estimatedTotalWeeks: z
-    .number()
-    .int()
-    .min(1)
-    .describe("Estimation totale du parcours en semaines"),
+// Validation côté serveur de ce que Gemini renvoie.
+const roadmapResponseSchema = z.object({
+  summary: z.string().min(1),
+  estimatedTotalWeeks: z.number().int().min(1).max(104),
   modules: z
     .array(
       z.object({
-        code: moduleCodeSchema,
-        order: z.number().int().min(1).describe("Ordre dans le parcours (1, 2, 3...)"),
-        weeks: z.number().int().min(1).describe("Nombre de semaines pour ce module"),
-        why: z
-          .string()
-          .describe(
-            "Explication concrète pourquoi ce module à cette position. 1-2 phrases.",
-          ),
+        code: z.enum(["FI", "CO", "MM", "SD", "PP", "AI"]),
+        order: z.number().int().min(1),
+        weeks: z.number().int().min(1),
+        why: z.string().min(1),
       }),
     )
     .min(1)
-    .describe("Modules SAP ordonnés selon le parcours optimal pour ce profil"),
+    .max(6),
   milestones: z
     .array(
       z.object({
         week: z.number().int().min(1),
-        title: z.string().describe("Titre court du milestone"),
-        description: z.string().describe("Ce qui se passe à ce milestone"),
+        title: z.string().min(1),
+        description: z.string().min(1),
       }),
     )
-    .describe("Jalons clés du parcours (3-6 milestones)"),
-  nextSteps: z
-    .array(z.string())
-    .min(3)
-    .max(6)
-    .describe(
-      "3-5 actions très concrètes que l'apprenant peut faire DÈS AUJOURD'HUI",
-    ),
+    .max(8),
+  nextSteps: z.array(z.string().min(1)).min(3).max(6),
 });
 
-const MAX_TOKENS = 4000;
+// Schéma au format Gemini (enum Type au lieu de strings JSON).
+const geminiResponseSchema = {
+  type: Type.OBJECT,
+  properties: {
+    summary: {
+      type: Type.STRING,
+      description: "Résumé du parcours en 1-2 phrases en français",
+    },
+    estimatedTotalWeeks: {
+      type: Type.INTEGER,
+      description: "Durée totale estimée du parcours en semaines",
+    },
+    modules: {
+      type: Type.ARRAY,
+      description: "Modules SAP ordonnés selon le parcours optimal",
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          code: {
+            type: Type.STRING,
+            enum: ["FI", "CO", "MM", "SD", "PP", "AI"],
+          },
+          order: { type: Type.INTEGER },
+          weeks: { type: Type.INTEGER },
+          why: {
+            type: Type.STRING,
+            description: "Pourquoi ce module à cette position, 1-2 phrases",
+          },
+        },
+        required: ["code", "order", "weeks", "why"],
+      },
+    },
+    milestones: {
+      type: Type.ARRAY,
+      description: "3 à 6 jalons clés du parcours",
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          week: { type: Type.INTEGER },
+          title: { type: Type.STRING },
+          description: { type: Type.STRING },
+        },
+        required: ["week", "title", "description"],
+      },
+    },
+    nextSteps: {
+      type: Type.ARRAY,
+      description: "3 à 5 actions très concrètes à faire DÈS AUJOURD'HUI",
+      items: { type: Type.STRING },
+    },
+  },
+  required: [
+    "summary",
+    "estimatedTotalWeeks",
+    "modules",
+    "milestones",
+    "nextSteps",
+  ],
+};
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return err(
-      "Service IA non configuré (ANTHROPIC_API_KEY manquant côté serveur).",
+      "Service IA non configuré (GEMINI_API_KEY manquant côté serveur).",
       503,
     );
   }
@@ -100,8 +142,8 @@ export async function POST(req: NextRequest) {
   const auth = requireAuth(req);
   if ("status" in auth) return auth;
 
-  // Rate-limit aggressif : la génération Claude coûte ~$0.10–0.20 par appel.
-  // 5 par heure par user + 10 par heure par IP = on couvre les abus.
+  // Rate-limit doublé : user + IP. Couvre aussi le free tier Google
+  // (1500 req/jour, ~10 req/min).
   const ip = getClientIp(req);
   if (!(await rateLimit(`roadmap:user:${auth.user.userId}`, 5, 60 * 60 * 1000))) {
     return err(
@@ -119,11 +161,9 @@ export async function POST(req: NextRequest) {
 
   const profile = validated.data;
 
-  // System prompt : contient le catalog SAP. Cacheable (stable, ~1k tokens
-  // par session — le cache hit kick in dès qu'on a > 1024 tokens).
-  const systemPrompt = `Tu es un coach SAP expérimenté qui aide des apprenants à construire un parcours personnalisé vers un poste de consultant SAP (junior, lead, freelance, etc.).
+  const systemInstruction = `Tu es un coach SAP expérimenté qui aide des apprenants à construire un parcours personnalisé vers un poste de consultant SAP.
 
-Tu connais les modules SAP enseignés sur HanaFlow (plateforme certifiante alignée sur les certifs officielles SAP) :
+Tu connais ces modules SAP enseignés sur HanaFlow (plateforme certifiante alignée sur les certifs officielles SAP) :
 
 ${JSON.stringify(
   certCatalog.modules.map((m) => ({
@@ -138,13 +178,13 @@ ${JSON.stringify(
   2,
 )}
 
-Règles strictes pour la roadmap que tu génères :
+Règles strictes :
 
-1. **Ordre logique** : ne propose pas un module avancé avant un fondamental. FI est souvent la porte d'entrée (compta = colonne vertébrale ERP). MM précède souvent SD (input → output). CO est utile après FI. PP est plus avancé. AI est une spécialisation transverse, à placer en complément.
-2. **Réalisme** : ne propose pas 6 modules sur 8 semaines à 5h/semaine. Compte ~3-4 semaines minimum par module à 5h/semaine, ~2 semaines à 10h/semaine.
-3. **Concret** : dans \`why\`, dis pourquoi CE module pour CE profil. Pas de phrases passe-partout.
-4. **Pas de bullshit AI** : pas de "Vous allez exceller", "incroyable opportunité", "transformer votre carrière". Phrasing direct, factuel.
-5. **nextSteps actionnables** : pas "se former" ou "rester motivé". Quelque chose comme : "Commence par lire le chapitre 1 du module FI sur HanaFlow", "Passe le simulateur FI dès que tu finis les 3 premiers chapitres".
+1. ORDRE LOGIQUE : ne propose pas un module avancé avant un fondamental. FI = porte d'entrée classique (compta = colonne vertébrale ERP). MM précède souvent SD. CO suit FI. PP est plus avancé. AI = spécialisation transverse à placer en complément.
+2. RÉALISME : ne propose pas 6 modules en 8 semaines à 5h/sem. Compte minimum 3-4 semaines par module à 5h/sem, ~2 semaines à 10h/sem.
+3. CONCRET : dans \`why\`, dis pourquoi CE module pour CE profil précis. Pas de phrases passe-partout.
+4. ANTI-BULLSHIT : pas de "Vous allez exceller", "incroyable opportunité", "transformer votre carrière". Phrasing direct, factuel.
+5. nextSteps ACTIONNABLES : pas "se former" ou "rester motivé". Plutôt : "Commence par lire le chapitre 1 du module FI sur HanaFlow", "Passe le simulateur FI dès que tu finis les 3 premiers chapitres".
 
 Réponds en français. Tutoie l'apprenant.`;
 
@@ -174,57 +214,63 @@ ${profile.preferredModule ? `- **Module préféré (souhait initial)** : ${profi
 
 Génère la roadmap personnalisée pour ce profil.`;
 
-  const client = new Anthropic({ apiKey });
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
-    const response = await client.messages.parse({
-      model: "claude-opus-4-7",
-      max_tokens: MAX_TOKENS,
-      system: [
-        {
-          type: "text",
-          text: systemPrompt,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      messages: [{ role: "user", content: userPrompt }],
-      output_config: {
-        format: zodOutputFormat(roadmapSchema),
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: geminiResponseSchema,
+        temperature: 0.7,
       },
     });
 
-    if (response.stop_reason === "refusal") {
-      return err("L'assistant IA a refusé de répondre à cette requête.", 422);
+    const text = response.text;
+    if (!text) {
+      return err("Réponse IA vide.", 500);
     }
-    if (response.stop_reason === "max_tokens") {
-      return err(
-        "La roadmap a été tronquée. Réessaie en simplifiant ton profil.",
-        500,
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      console.error("[roadmap/generate] JSON parse failed:", text.slice(0, 200));
+      return err("Réponse IA mal formée.", 500);
+    }
+
+    const result = roadmapResponseSchema.safeParse(parsed);
+    if (!result.success) {
+      console.error(
+        "[roadmap/generate] Zod validation failed:",
+        result.error.issues,
       );
-    }
-    if (!response.parsed_output) {
-      return err("Réponse IA invalide (parsing impossible).", 500);
+      return err("Réponse IA invalide (structure inattendue).", 500);
     }
 
     return ok({
-      roadmap: response.parsed_output,
+      roadmap: result.data,
       usage: {
-        input_tokens: response.usage.input_tokens,
-        cache_read: response.usage.cache_read_input_tokens ?? 0,
-        cache_creation: response.usage.cache_creation_input_tokens ?? 0,
-        output_tokens: response.usage.output_tokens,
+        promptTokens: response.usageMetadata?.promptTokenCount ?? 0,
+        outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
+        totalTokens: response.usageMetadata?.totalTokenCount ?? 0,
       },
     });
   } catch (e) {
-    if (e instanceof Anthropic.RateLimitError) {
-      console.error("[roadmap/generate] anthropic rate limit");
-      return err("Service IA temporairement saturé, réessaie dans 1 minute.", 429);
+    console.error("[roadmap/generate] gemini error:", e);
+    const msg = e instanceof Error ? e.message : String(e);
+
+    if (/quota|rate.?limit/i.test(msg)) {
+      return err(
+        "Service IA temporairement saturé (limite gratuite atteinte). Réessaie dans quelques minutes.",
+        429,
+      );
     }
-    if (e instanceof Anthropic.APIError) {
-      console.error("[roadmap/generate] anthropic api error", e.status, e.message);
-      return err("Erreur côté Anthropic. Réessaie dans quelques minutes.", 502);
+    if (/api.?key|unauthorized|forbidden/i.test(msg)) {
+      return err("Erreur d'authentification côté Google. Vérifie la clé.", 500);
     }
-    console.error("[roadmap/generate]", e);
     return err("Erreur lors de la génération de la roadmap.", 500);
   }
 }
