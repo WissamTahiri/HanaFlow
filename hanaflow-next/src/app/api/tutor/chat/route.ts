@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { GoogleGenAI, type Content } from "@google/genai";
+import { type Content } from "@google/genai";
 import { z } from "zod";
 import "server-only";
 import {
@@ -11,7 +11,7 @@ import {
   validateBody,
 } from "@/lib/apiHelpers";
 import { isValidModule, type ModuleId } from "@/lib/certAccess";
-import { GEMINI_MODEL } from "@/lib/gemini";
+import { generateText, isAiError } from "@/lib/ai";
 
 /**
  * POST /api/tutor/chat
@@ -92,11 +92,6 @@ async function loadModuleContext(
 const MAX_OUTPUT_TOKENS = 1500;
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return err("Tuteur IA non configuré côté serveur.", 503);
-  }
-
   const auth = requireAuth(req);
   if ("status" in auth) return auth;
 
@@ -160,43 +155,25 @@ Tu réponds toujours en français.`;
     },
   ];
 
-  const ai = new GoogleGenAI({ apiKey });
-
   try {
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
+    const result = await generateText({
+      caller: "tutor/chat",
+      systemInstruction,
       contents,
-      config: {
-        systemInstruction,
-        temperature: 0.5, // un peu moins créatif qu'un coach roadmap : on veut factuel
-        maxOutputTokens: MAX_OUTPUT_TOKENS,
-      },
+      temperature: 0.5,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
     });
-
-    const reply = response.text;
-    if (!reply) {
-      return err("Le tuteur n'a pas pu répondre, réessaie.", 500);
-    }
-
-    return ok({
-      reply,
-      usage: {
-        promptTokens: response.usageMetadata?.promptTokenCount ?? 0,
-        outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
-        totalTokens: response.usageMetadata?.totalTokenCount ?? 0,
-      },
-    });
+    return ok({ reply: result.text, provider: result.provider, usage: result.usage });
   } catch (e) {
-    console.error("[tutor/chat] gemini error:", e);
-    const msg = e instanceof Error ? e.message : String(e);
-
-    if (/quota|rate.?limit|RESOURCE_EXHAUSTED/i.test(msg)) {
-      const retryMatch = msg.match(/retry in ([\d.]+)s/i);
-      const retryHint = retryMatch
-        ? ` Réessaie dans ~${Math.ceil(parseFloat(retryMatch[1]))}s.`
-        : " Réessaie dans quelques minutes.";
-      return err(`Le tuteur est temporairement saturé.${retryHint}`, 429);
+    if (isAiError(e)) {
+      if (e.kind === "rate_limit") {
+        const hint = e.retryAfterSeconds ? ` Réessaie dans ~${e.retryAfterSeconds}s.` : " Réessaie plus tard.";
+        return err(`Le tuteur est temporairement saturé.${hint}`, 429);
+      }
+      if (e.kind === "no_provider" || e.kind === "auth") return err(e.message, 503);
+      if (e.kind === "invalid_response") return err("Le tuteur n'a pas pu répondre, réessaie.", 500);
     }
+    console.error("[tutor/chat] failed:", e);
     return err("Erreur côté tuteur.", 500);
   }
 }
