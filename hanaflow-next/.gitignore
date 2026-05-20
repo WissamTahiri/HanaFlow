@@ -47,13 +47,15 @@ yarn-error.log*
 /prisma/migrations/dev.db
 /prisma/migrations/dev.db-journal
 
-# PWA generated
+# PWA generated (serwist / workbox)
 /public/sw.js
 /public/sw.js.map
 /public/workbox-*.js
 /public/workbox-*.js.map
 /public/worker-*.js
 /public/worker-*.js.map
+/public/swe-worker-*.js
+/public/swe-worker-*.js.map
 /public/fallback-*.js
 
 # Test
