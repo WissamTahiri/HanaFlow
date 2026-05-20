@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ProGate from "@/components/ProGate";
 import type { CvData } from "@/types/cv";
 
 /**
@@ -790,7 +791,19 @@ function SkillRow({ label, items }: { label: string; items: string[] }) {
 export default function CvBuilderPage() {
   return (
     <ProtectedRoute>
-      <CvBuilderContent />
+      <ProGate
+        featureName="CV Builder ATS SAP"
+        featureDescription="L'IA réécrit ton CV avec action verbs, T-codes officiels et structure JD-friendly pour passer les filtres ATS (Taleo, Workday, iCIMS) des ESN et clients finaux."
+        perks={[
+          "Wizard 5 étapes : identité, expériences, formation, skills, langues",
+          "Optimisation IA : action verbs, quantification, vocabulaire SAP officiel",
+          "Skills auto-catégorisés (SAP / technique / méthodologies / soft)",
+          "Score ATS /100 + conseils précis pour passer à 90+",
+          "PDF text-based téléchargeable (lisible par tous les ATS)",
+        ]}
+      >
+        <CvBuilderContent />
+      </ProGate>
     </ProtectedRoute>
   );
 }

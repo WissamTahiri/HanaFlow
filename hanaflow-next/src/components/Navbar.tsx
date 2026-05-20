@@ -190,18 +190,25 @@ export default function Navbar() {
                                 shadow-[0_8px_40px_rgba(0,0,0,0.10)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.35)]
                                 p-2 z-50">
                   {[
-                    { href: "/entretien", label: "Mock Interview IA", desc: "Entretien IA avec scoring détaillé" },
-                    { href: "/cv-builder", label: "CV Builder ATS", desc: "Génère un CV SAP optimisé ATS" },
-                    { href: "/flashcards", label: "Flashcards SAP", desc: "Révision active spaced repetition" },
-                    { href: "/roadmap", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil" },
-                    { href: "/certifications/comparer", label: "Comparateur certifs", desc: "Compare les certifs SAP" },
-                  ].map(({ href, label, desc }) => (
+                    { href: "/entretien", label: "Mock Interview IA", desc: "Entretien IA avec scoring détaillé", pro: true },
+                    { href: "/cv-builder", label: "CV Builder ATS", desc: "Génère un CV SAP optimisé ATS", pro: true },
+                    { href: "/flashcards", label: "Flashcards SAP", desc: "Révision active spaced repetition", pro: true },
+                    { href: "/roadmap", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil", pro: false },
+                    { href: "/certifications/comparer", label: "Comparateur certifs", desc: "Compare les certifs SAP", pro: false },
+                  ].map(({ href, label, desc, pro }) => (
                     <Link
                       key={href}
                       href={href}
                       className="block px-3 py-2.5 rounded-xl hover:bg-gray-50/80 dark:hover:bg-slate-800/80 transition-colors"
                     >
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
+                        {pro && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase tracking-wider">
+                            Pro
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
                     </Link>
                   ))}
@@ -258,6 +265,7 @@ export default function Navbar() {
                     <hr className="border-gray-100 dark:border-slate-800 mx-2 mb-1" />
                     {[
                       { href: "/dashboard",    label: "Dashboard" },
+                      { href: "/certificats",  label: "Mes certificats" },
                       { href: "/profil",       label: "Mon profil" },
                       { href: "/achievements", label: "Achievements" },
                     ].map(({ href, label }) => (

@@ -109,11 +109,16 @@ export default function FlashcardsPage() {
                     <span className={`h-10 w-10 rounded-xl bg-linear-to-br ${deck.color} flex items-center justify-center text-white font-extrabold text-xs`}>
                       {deck.code.toUpperCase()}
                     </span>
-                    {s.due > 0 && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sap-blue text-white">
-                        {s.due} à réviser
+                    <div className="flex items-center gap-1">
+                      {s.due > 0 && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sap-blue text-white">
+                          {s.due} à réviser
+                        </span>
+                      )}
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase tracking-wider">
+                        Pro
                       </span>
-                    )}
+                    </div>
                   </div>
                   <h3 className="font-bold text-slate-900 dark:text-white mb-1">{deck.label}</h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">{deck.description}</p>

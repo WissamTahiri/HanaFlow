@@ -130,6 +130,35 @@ export function requireAdmin(
 }
 
 /**
+ * Gate pour les features Pro (mock interview, CV builder, flashcards).
+ *
+ * isPro n'est pas dans le JWT (la donnée bouge — refund, upgrade, downgrade
+ * doivent prendre effet immédiatement, pas à la prochaine rotation 1h plus
+ * tard). On query donc la DB à chaque appel — coût négligeable (~5ms) et
+ * c'est la seule manière de garantir la fraîcheur de l'état d'abonnement.
+ *
+ * Les admins bypassent automatiquement le gate (besoin de QA en prod).
+ */
+export async function requireProUser(
+  req: NextRequest
+): Promise<{ user: JwtPayload } | NextResponse> {
+  const user = getAuthUser(req);
+  if (!user) return err("Non authentifié", 401);
+  if (user.role === "admin") return { user };
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.userId },
+    select: { isPro: true, isSuspended: true },
+  });
+  if (!dbUser) return err("Utilisateur introuvable", 401);
+  if (dbUser.isSuspended) return err("Compte suspendu", 403);
+  if (!dbUser.isPro) {
+    return err("Cette fonctionnalité est réservée aux membres Pro.", 402);
+  }
+  return { user };
+}
+
+/**
  * Vérifie le mot de passe de l'admin courant — utilisé comme « step-up auth »
  * pour les opérations destructives (delete, impersonate, reset password, bulk delete).
  * Le mot de passe est passé dans le header `X-Confirm-Password` (jamais dans le body

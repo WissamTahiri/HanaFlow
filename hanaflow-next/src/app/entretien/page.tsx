@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ProGate from "@/components/ProGate";
 
 /**
  * Page /entretien — Mock interview SAP par IA.
@@ -555,7 +556,19 @@ function EntretienContent() {
 export default function EntretienPage() {
   return (
     <ProtectedRoute>
-      <EntretienContent />
+      <ProGate
+        featureName="Mock Interview SAP IA"
+        featureDescription="Un recruteur IA te pose 6 questions adaptées à ton module et ta séniorité, puis te score sur 100 avec feedback détaillé par question."
+        perks={[
+          "Questions générées par IA selon module + séniorité (junior / confirmé / senior)",
+          "3 styles d'entretien : technique pur, cas client, ou mixte",
+          "Score global /100 + grade A-F + verdict hire/borderline/no-hire",
+          "Feedback question par question avec réponse modèle pour réviser",
+          "3 entretiens par heure (free tier IA)",
+        ]}
+      >
+        <EntretienContent />
+      </ProGate>
     </ProtectedRoute>
   );
 }

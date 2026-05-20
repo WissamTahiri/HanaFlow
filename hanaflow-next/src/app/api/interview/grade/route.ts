@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { Type } from "@google/genai";
 import { z } from "zod";
 import {
-  requireAuth,
+  requireProUser,
   rateLimit,
   getClientIp,
   err,
@@ -123,7 +123,7 @@ const geminiResponseSchema = {
 };
 
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireProUser(req);
   if ("status" in auth) return auth;
 
   const ip = getClientIp(req);

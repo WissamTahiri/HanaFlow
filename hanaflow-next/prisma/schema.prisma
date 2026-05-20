@@ -39,8 +39,40 @@ model User {
   progress      UserProgress[]
   passwordResetTokens PasswordResetToken[]
   emailVerifications  EmailVerificationToken[]
+  certificates  CompletionCertificate[]
 
   @@map("users")
+}
+
+model CompletionCertificate {
+  // ID public (cuid) : utilisé dans l'URL de vérification.
+  // Pas d'autoincrement → on ne révèle pas le volume de certifs émis.
+  id            String   @id @default(cuid())
+  userId        Int      @map("user_id")
+  moduleCode    String   @map("module_code") @db.VarChar(10)
+  /** Module label snapshot (au cas où le catalogue change après émission). */
+  moduleLabel   String   @map("module_label") @db.VarChar(120)
+  /** Code certif officiel SAP snapshot (ex: C_TS4FI_2601). */
+  certCode      String?  @map("cert_code") @db.VarChar(40)
+  /** Nom complet du candidat au moment de l'émission. */
+  candidateName String   @map("candidate_name") @db.VarChar(120)
+  /** Score obtenu sur 100. */
+  examScore     Int      @map("exam_score")
+  /** Nombre de questions du simulateur passé. */
+  examQuestions Int      @map("exam_questions")
+  issuedAt      DateTime @default(now()) @map("issued_at") @db.Timestamptz
+  /** Révoqué par admin (fraude, plainte) — n'affiche plus comme valide. */
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz
+  revokedReason String?   @map("revoked_reason") @db.VarChar(255)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 1 certificat par user × module : repasser le simulateur ne réémet pas
+  // un nouveau cert mais update celui existant (meilleur score conservé).
+  @@unique([userId, moduleCode])
+  @@index([userId])
+  @@index([issuedAt])
+  @@map("completion_certificates")
 }
 
 model PasswordResetToken {
