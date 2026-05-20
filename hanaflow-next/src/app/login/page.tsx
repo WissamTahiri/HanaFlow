@@ -164,12 +164,20 @@ export default function LoginPage() {
             )}
           </form>
 
-          <p className="mt-5 text-sm text-center text-slate-500 dark:text-slate-400">
-            Pas encore de compte ?{" "}
-            <Link href="/register" className="font-semibold text-sap-blue dark:text-sap-accent hover:underline">
-              Créer un compte gratuit
+          <div className="mt-5 text-sm text-center space-y-2">
+            <Link
+              href="/forgot-password"
+              className="block text-slate-500 dark:text-slate-400 hover:text-sap-blue dark:hover:text-sap-accent hover:underline"
+            >
+              Mot de passe oublié ?
             </Link>
-          </p>
+            <p className="text-slate-500 dark:text-slate-400">
+              Pas encore de compte ?{" "}
+              <Link href="/register" className="font-semibold text-sap-blue dark:text-sap-accent hover:underline">
+                Créer un compte gratuit
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

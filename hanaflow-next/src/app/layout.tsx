@@ -15,10 +15,13 @@ import Footer from "@/components/Footer";
 import BadgeToast from "@/components/BadgeToast";
 import ImpersonationBanner from "@/components/ImpersonationBanner";
 import SiteBanner from "@/components/SiteBanner";
-import MaintenanceGate from "@/components/MaintenanceGate";
-import { getPublicSettings } from "@/lib/settings";
+import EmailVerificationBanner from "@/components/EmailVerificationBanner";
+import MaintenancePage from "@/components/MaintenancePage";
+import { getPublicSettings, getCriticalSettings } from "@/lib/settings";
+import { getServerUser } from "@/lib/serverAuth";
 import { JsonLd } from "@/components/JsonLd";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { headers } from "next/headers";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://hanaflow.vercel.app";
 
@@ -59,12 +62,25 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getPublicSettings();
+  const [settings, critical, user, hdrs] = await Promise.all([
+    getPublicSettings(),
+    getCriticalSettings(),
+    getServerUser(),
+    headers(),
+  ]);
+
+  // Nonce CSP posé par proxy.ts — passé aux <script> inline pour qu'ils
+  // satisfassent la politique sans 'unsafe-inline'.
+  const nonce = hdrs.get("x-nonce") ?? undefined;
+
+  // Mode maintenance évalué côté serveur (pas de cache, et pas de bypass via JS off).
+  // Les admins passent toujours.
+  const maintenanceActive = critical.maintenanceEnabled && user?.role !== "admin";
   return (
     <html lang="fr" suppressHydrationWarning className={plusJakartaSans.variable}>
       <head>
-        <ThemeScript />
-        <JsonLd data={{
+        <ThemeScript nonce={nonce} />
+        <JsonLd nonce={nonce} data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
           "name": "HanaFlow",
@@ -76,7 +92,7 @@ export default async function RootLayout({
             "query-input": "required name=search_term_string"
           }
         }} />
-        <JsonLd data={{
+        <JsonLd nonce={nonce} data={{
           "@context": "https://schema.org",
           "@type": "EducationalOrganization",
           "name": "HanaFlow",
@@ -90,12 +106,15 @@ export default async function RootLayout({
         <Providers>
           <ImpersonationBanner />
           <SiteBanner enabled={settings.bannerEnabled} message={settings.bannerMessage} link={settings.bannerLink} />
+          <EmailVerificationBanner />
           <Navbar />
           <main className="flex-1 pt-[4.5rem]">
             <ErrorBoundary>
-              <MaintenanceGate enabled={settings.maintenanceEnabled} message={settings.maintenanceMessage}>
-                {children}
-              </MaintenanceGate>
+              {maintenanceActive ? (
+                <MaintenancePage message={critical.maintenanceMessage} />
+              ) : (
+                children
+              )}
             </ErrorBoundary>
           </main>
           <Footer />

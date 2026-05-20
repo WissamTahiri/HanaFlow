@@ -39,7 +39,25 @@ export function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
+/**
+ * Parse une durée style "7d", "12h", "45m", "30s" en millisecondes.
+ * Sans unité → traite comme jours (pour compat avec l'ancien comportement).
+ */
+export function parseDurationMs(value: string): number {
+  const m = value.trim().match(/^(\d+)\s*(ms|s|m|h|d)?$/i);
+  if (!m) return 7 * 24 * 60 * 60 * 1000;
+  const n = parseInt(m[1], 10);
+  const unit = (m[2] ?? "d").toLowerCase();
+  const mult: Record<string, number> = {
+    ms: 1,
+    s: 1000,
+    m: 60 * 1000,
+    h: 60 * 60 * 1000,
+    d: 24 * 60 * 60 * 1000,
+  };
+  return n * (mult[unit] ?? mult.d);
+}
+
 export function getRefreshTokenExpiry(): Date {
-  const days = parseInt(JWT_REFRESH_EXPIRES_IN) || 7;
-  return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  return new Date(Date.now() + parseDurationMs(JWT_REFRESH_EXPIRES_IN));
 }

@@ -1,9 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 const DISMISSED_KEY = "hf_banner_dismissed";
+
+// Lecture du localStorage côté client uniquement, en isomorphic-safe.
+function subscribe(cb: () => void): () => void {
+  const handler = (e: StorageEvent) => { if (e.key === DISMISSED_KEY) cb(); };
+  window.addEventListener("storage", handler);
+  return () => window.removeEventListener("storage", handler);
+}
+
+function useDismissedMessage(): string | null {
+  return useSyncExternalStore(
+    subscribe,
+    () => localStorage.getItem(DISMISSED_KEY),
+    () => null,
+  );
+}
 
 export default function SiteBanner({
   enabled,
@@ -14,19 +29,16 @@ export default function SiteBanner({
   message: string;
   link: string;
 }) {
-  const [dismissed, setDismissed] = useState(true);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = localStorage.getItem(DISMISSED_KEY);
-    setDismissed(stored === message); // dismiss only matches if message hasn't changed
-  }, [message]);
+  const dismissedMessage = useDismissedMessage();
+  // Override local pour fermer immédiatement après click (sans attendre l'event storage)
+  const [localDismissed, setLocalDismissed] = useState(false);
+  const dismissed = localDismissed || dismissedMessage === message;
 
   if (!enabled || !message || dismissed) return null;
 
   const close = () => {
     localStorage.setItem(DISMISSED_KEY, message);
-    setDismissed(true);
+    setLocalDismissed(true);
   };
 
   const Inner = (

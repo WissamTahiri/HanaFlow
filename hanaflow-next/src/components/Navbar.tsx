@@ -62,12 +62,17 @@ export default function Navbar() {
     ? user.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()
     : "?";
 
-  // Fermer les menus au changement de route
-  useEffect(() => {
-    setMobileOpen(false);
-    setOpenModules(false);
-    setOpenUser(false);
-  }, [pathname]);
+  // Fermer les menus au changement de route. Pattern React 19 « derived state » :
+  // on garde le dernier pathname rendu en state ; quand il change, on met à jour
+  // ce state et on ferme les menus pendant le même render (pas d'effect).
+  // Voir https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [lastPath, setLastPath] = useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    if (mobileOpen) setMobileOpen(false);
+    if (openModules) setOpenModules(false);
+    if (openUser) setOpenUser(false);
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);

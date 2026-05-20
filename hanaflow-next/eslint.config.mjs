@@ -13,6 +13,15 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // L'app est en français → l'UI contient des dizaines d'apostrophes
+      // typographiques légitimes. La règle visait à éviter d'oublier d'échapper
+      // une entité HTML, ce qui est sans risque ici (React les rend en texte).
+      // On la désactive plutôt que de polluer le code avec des `&apos;`.
+      "react/no-unescaped-entities": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

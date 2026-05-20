@@ -103,7 +103,9 @@ const GamificationContext = createContext<GamificationContextValue | null>(null)
 export function GamificationProvider({ children }: { children: React.ReactNode }) {
   const [xp, setXP] = useState(() => load("hf_xp", 0));
   const [earnedBadges, setEarnedBadges] = useState<string[]>(() => load("hf_badges", []));
-  const [quizPassCount, setQuizPassCount] = useState(() => load("hf_quiz_pass", 0));
+  // Compteur de quiz réussis : la valeur n'est jamais lue (juste persistée
+  // localement et utilisée comme seuil dans le setter), d'où le préfixe `_`.
+  const [, setQuizPassCount] = useState(() => load("hf_quiz_pass", 0));
   const [streak, setStreak] = useState(() => load("hf_streak", 0));
   const [notification, setNotification] = useState<{ badge: Badge; ts: number } | null>(null);
 

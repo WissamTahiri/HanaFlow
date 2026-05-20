@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore, useCallback } from "react";
 
 const SunIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -20,42 +20,57 @@ const MoonIcon = () => (
 
 const STORAGE_KEY = "hanaflow-theme";
 
+// useSyncExternalStore : bridge propre vers le store externe (localStorage +
+// matchMedia). Évite le pattern setState-in-effect que React 19 décourage.
+
+function subscribe(callback: () => void): () => void {
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY) callback();
+  };
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  window.addEventListener("storage", onStorage);
+  media.addEventListener("change", callback);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    media.removeEventListener("change", callback);
+  };
+}
+
+function getClientSnapshot(): "dark" | "light" {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === "dark" || stored === "light") return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function getServerSnapshot(): "dark" | "light" {
+  // Server-side : pas d'info ; on défaut sur "light" (le ThemeScript dans <head>
+  // applique la bonne classe avant le premier paint, donc pas de flash).
+  return "light";
+}
+
 export default function DarkModeToggle() {
-  const [dark, setDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const theme = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const dark = theme === "dark";
 
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setDark(stored === "dark");
-    } else {
-      setDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    const root = document.documentElement;
-    if (dark) {
-      root.classList.add("dark");
-      localStorage.setItem(STORAGE_KEY, "dark");
-    } else {
-      root.classList.remove("dark");
-      localStorage.setItem(STORAGE_KEY, "light");
-    }
-  }, [dark, mounted]);
+  const toggle = useCallback(() => {
+    const next = dark ? "light" : "dark";
+    if (next === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+    localStorage.setItem(STORAGE_KEY, next);
+    // Re-déclenche subscribe() en simulant un storage event (même onglet)
+    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY, newValue: next }));
+  }, [dark]);
 
   return (
     <button
-      onClick={() => setDark((d) => !d)}
+      onClick={toggle}
       aria-label={dark ? "Passer en mode clair" : "Passer en mode sombre"}
       className="h-9 w-9 flex items-center justify-center rounded-xl border border-gray-200
                  dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600
                  dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700
                  hover:text-sap-blue dark:hover:text-sap-accent transition-all duration-150"
     >
-      {mounted ? (dark ? <SunIcon /> : <MoonIcon />) : <MoonIcon />}
+      {dark ? <SunIcon /> : <MoonIcon />}
     </button>
   );
 }

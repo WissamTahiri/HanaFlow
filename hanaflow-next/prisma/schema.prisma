@@ -17,14 +17,61 @@ model User {
   isPro           Boolean   @default(false) @map("is_pro")
   isSuspended     Boolean   @default(false) @map("is_suspended")
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  totpSecret      String?   @map("totp_secret") @db.VarChar(255)
+  // Secret TOTP : stocké chiffré au format AES-GCM (nonce:cipher:tag, hex) si
+  // TOTP_ENCRYPTION_KEY est défini. Les secrets historiques en clair restent
+  // lisibles (auto-upgrade au prochain accès). Voir src/lib/totpCrypto.ts.
+  totpSecret      String?   @map("totp_secret") @db.VarChar(512)
   totpEnabled     Boolean   @default(false) @map("totp_enabled")
   totpEnabledAt   DateTime? @map("totp_enabled_at") @db.Timestamptz
+  // Anti-replay : dernier "step" TOTP (epoch / 30s) consommé. Refuse la
+  // réutilisation du même code dans la fenêtre de tolérance.
+  totpLastStep    Int?      @map("totp_last_step")
+  // Hashes SHA-256 des codes de récupération à usage unique (JSON array).
+  totpBackupCodes Json?     @map("totp_backup_codes")
+  // Date du dernier changement de mot de passe — sert à invalider les access
+  // tokens encore vivants émis avant ce changement (cf serverAuth/apiHelpers).
+  pwdChangedAt    DateTime? @map("pwd_changed_at") @db.Timestamptz
+  // Vérification d'email à l'inscription. Si null, l'utilisateur n'a pas
+  // confirmé son email (accès partiel ou bloqué selon la politique).
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
 
   refreshTokens RefreshToken[]
   progress      UserProgress[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerifications  EmailVerificationToken[]
 
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  // SHA-256 du token : le clair n'est jamais persisté
+  tokenHash String   @unique @map("token_hash") @db.VarChar(128)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  ipAddress String?  @map("ip_address") @db.VarChar(64)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  tokenHash String   @unique @map("token_hash") @db.VarChar(128)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_verification_tokens")
 }
 
 model PromoCode {

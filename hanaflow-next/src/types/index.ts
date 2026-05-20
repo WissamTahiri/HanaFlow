@@ -7,6 +7,7 @@ export interface User {
   isSuspended: boolean;
   createdAt: string;
   totpEnabled?: boolean;
+  emailVerifiedAt?: string | null;
 }
 
 export interface AuthResponse {

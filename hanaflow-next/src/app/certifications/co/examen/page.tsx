@@ -1,24 +1,20 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { coMockExamQuestions, coCertification } from "@/data/certifications/co.js";
+import ProPaywall from "@/components/ProPaywall";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
 
-function COExamContent() {
+export default async function COExamPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/co/examen");
+  if (!user.isPro) return <ProPaywall certPath="/certifications/co" />;
+
   return (
     <ExamSimulatorTemplate
-      questions={coMockExamQuestions}
-      certInfo={{ code: coCertification.code, shortName: coCertification.shortName }}
+      questions={getExamQuestions("co")}
+      certInfo={getCertMeta("co")}
       moduleId="co"
       certPath="/certifications/co"
     />
-  );
-}
-
-export default function COExamPage() {
-  return (
-    <ProtectedRoute>
-      <COExamContent />
-    </ProtectedRoute>
   );
 }

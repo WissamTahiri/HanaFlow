@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, ok, err } from "@/lib/apiHelpers";
+import { requireAdmin, ok, err, verifyAdminPassword } from "@/lib/apiHelpers";
 import { signImpersonationToken } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 
@@ -18,6 +18,10 @@ export async function POST(
   if (auth.user.userId === userId) {
     return err("Inutile : vous êtes déjà connecté en tant que vous-même", 400);
   }
+
+  // Step-up auth obligatoire avant impersonation
+  const stepUpOk = await verifyAdminPassword(req, auth.user.userId);
+  if (!stepUpOk) return err("Re-saisie du mot de passe administrateur requise", 401);
 
   try {
     const target = await prisma.user.findUnique({

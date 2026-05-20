@@ -49,20 +49,20 @@ describe("rateLimit", () => {
     // Use unique keys to avoid cross-test pollution
   });
 
-  it("allows the first request and increments counter", () => {
+  it("allows the first request and increments counter", async () => {
     const key = `test:rl:${Date.now()}:1`;
-    expect(rateLimit(key, 3, 1000)).toBe(true);
-    expect(rateLimit(key, 3, 1000)).toBe(true);
-    expect(rateLimit(key, 3, 1000)).toBe(true);
-    expect(rateLimit(key, 3, 1000)).toBe(false);
+    expect(await rateLimit(key, 3, 1000)).toBe(true);
+    expect(await rateLimit(key, 3, 1000)).toBe(true);
+    expect(await rateLimit(key, 3, 1000)).toBe(true);
+    expect(await rateLimit(key, 3, 1000)).toBe(false);
   });
 
-  it("treats different keys independently", () => {
+  it("treats different keys independently", async () => {
     const a = `test:rl:${Date.now()}:a`;
     const b = `test:rl:${Date.now()}:b`;
-    rateLimit(a, 1, 1000);
-    expect(rateLimit(a, 1, 1000)).toBe(false);
-    expect(rateLimit(b, 1, 1000)).toBe(true);
+    await rateLimit(a, 1, 1000);
+    expect(await rateLimit(a, 1, 1000)).toBe(false);
+    expect(await rateLimit(b, 1, 1000)).toBe(true);
   });
 });
 

@@ -1,24 +1,20 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { mmMockExamQuestions, mmCertification } from "@/data/certifications/mm.js";
+import ProPaywall from "@/components/ProPaywall";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
 
-function MMExamContent() {
+export default async function MMExamPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/mm/examen");
+  if (!user.isPro) return <ProPaywall certPath="/certifications/mm" />;
+
   return (
     <ExamSimulatorTemplate
-      questions={mmMockExamQuestions}
-      certInfo={{ code: mmCertification.code, shortName: mmCertification.shortName }}
+      questions={getExamQuestions("mm")}
+      certInfo={getCertMeta("mm")}
       moduleId="mm"
       certPath="/certifications/mm"
     />
-  );
-}
-
-export default function MMExamPage() {
-  return (
-    <ProtectedRoute>
-      <MMExamContent />
-    </ProtectedRoute>
   );
 }

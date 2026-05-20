@@ -1,53 +1,125 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance pour Claude Code travaillant sur ce repo.
+
+## Où vit le code
+
+**Le projet actif est dans [`hanaflow-next/`](./hanaflow-next/).** Tout nouveau travail s'y fait. La racine ne contient que de la doc.
+
+`_archive/` contient l'ancienne implémentation React/Vite + Express (à ne pas modifier — référence uniquement, pour récupérer un composant ou retrouver une décision passée).
+
+## Avertissement Next.js 16
+
+`hanaflow-next/AGENTS.md` dit explicitement : *« This is NOT the Next.js you know. APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. »*
+
+Avant d'écrire du code Next.js non-trivial (API routes, middleware, layouts, server components, caching, Suspense, prisma config…), lire d'abord les docs locales :
+
+```bash
+ls hanaflow-next/node_modules/next/dist/docs/
+```
 
 ## Project Overview
 
-HanaFlow is an SAP educational platform built with a separate frontend/backend architecture. It teaches SAP modules (FI, CO, MM, SD, HCM, PP) and S/4HANA concepts to users.
+HanaFlow est une plateforme éducative SAP (modules FI, CO, MM, SD, HCM, PP + S/4HANA), avec simulateurs d'examens de certification, gamification, plan Pro, panel admin complet.
 
-## Development Commands
+## Stack
 
-### Backend (`Back-End/`)
+- Next.js 16 App Router + React 19 + TypeScript
+- Tailwind CSS v4
+- Prisma + PostgreSQL Neon
+- Argon2id + JWT (access + refresh httpOnly cookie) + TOTP 2FA
+- Vitest pour les tests
+- Resend pour l'email (fallback console si pas de clé) + next-pwa
+
+## Commandes (dans `hanaflow-next/`)
+
 ```bash
-npm run dev    # Start with nodemon (auto-reload)
-npm start      # Start without auto-reload
+npm run dev        # dev server (webpack mode, port 3000)
+npm run build      # prisma generate && next build
+npm start          # production server
+npm test           # vitest run
+npm run test:watch # vitest watch
+npm run lint       # eslint
+npm run db:push    # prisma db push
+npm run db:studio  # prisma studio
 ```
-Server runs on port 5000 (configured via `.env`).
 
-### Frontend (`Front-End/`)
+## Architecture (`hanaflow-next/src/`)
+
+```
+src/
+├── app/                  # App Router pages
+│   ├── api/              # Route handlers
+│   │   ├── auth/         # login, register, refresh, logout, me, profile, 2fa
+│   │   ├── admin/        # users (+ bulk/export/[id]/impersonate/revoke-sessions),
+│   │   │                 # promo-codes, audit-log, settings, stats, analytics
+│   │   ├── progress/
+│   │   └── promo/redeem/
+│   ├── admin/            # Panel admin (users, promo-codes, audit-log, settings)
+│   ├── modules-sap/      # FI, CO, MM, SD, HCM, PP
+│   ├── certifications/   # Pages d'intro + /examen pour chaque module
+│   ├── dashboard/, profil/, achievements/, pricing/
+│   ├── s4hana/, ai-joule/, processus-metier/, roadmap/, a-propos/, contact/
+│   ├── cgu/, confidentialite/, mentions-legales/
+│   ├── layout.tsx        # root layout (Providers, Navbar, Footer, banners)
+│   ├── providers.tsx     # AuthProvider + SubscriptionProvider + GamificationProvider
+│   ├── sitemap.ts, robots.ts, not-found.tsx, error.tsx
+│   └── _home.tsx         # contenu de la home (rendu par page.tsx)
+├── components/           # Navbar, Footer, ModuleLayout, PageLayout,
+│                         # ExamSimulatorTemplate, CertificateDocument, BadgeToast,
+│                         # ImpersonationBanner, MaintenanceGate, SiteBanner,
+│                         # TwoFactorSection, ProtectedRoute, etc.
+├── context/              # AuthContext, SubscriptionContext, GamificationContext
+├── data/certifications/  # Banques de questions par module (1000–1600 lignes)
+├── hooks/useProgress.ts
+├── lib/                  # prisma, auth (JWT, hashToken), audit, settings,
+│                         # email (Resend), totp, apiHelpers
+├── types/index.ts
+├── middleware.ts         # auth middleware Next.js
+└── instrumentation.ts    # hook vide (réservé pour instrumentation future)
+```
+
+## Schéma Prisma
+
+6 modèles dans `prisma/schema.prisma` :
+- `User` (id, name, email, passwordHash, role, isPro, isSuspended, totp*)
+- `RefreshToken` (hashé SHA-256, expire, indexé)
+- `UserProgress` (user × module, unique)
+- `PromoCode` (code, usageLimit, expiresAt)
+- `AdminAuditLog` (actor, action, target, metadata, ip)
+- `SiteSetting` (key/value pour maintenance mode, bannière, etc.)
+
+## Auth flow
+
+- Access token JWT (HS256, 1h par défaut) → header `Authorization: Bearer`
+- Refresh token JWT séparé (7j) → cookie httpOnly, rotaté à chaque `/api/auth/refresh`, hashé en base
+- Impersonation : access token spécial 15 min émis par `/api/admin/users/[id]/impersonate`, contient `impersonatedBy` dans le payload → `ImpersonationBanner` rendu globalement quand actif
+
+## Sécurité
+
+- Headers via `next.config.ts` (X-Frame-Options SAMEORIGIN, nosniff, Referrer-Policy, Permissions-Policy)
+- Hash passwords : Argon2id
+- Validation : Zod côté serveur
+- Audit log sur toutes les actions admin
+
+## Conventions
+
+- UI en **français** (chaînes utilisateur)
+- Path alias : `@/` → `src/`
+- Couleurs Tailwind custom : `sap-blue`, `sap-blue-dark`, `sap-accent`, `sap-dark`, `sap-100`, etc.
+- Test files colocated : `lib/auth.ts` + `lib/auth.test.ts`
+- Composants : un fichier par composant, PascalCase
+
+## Déploiement
+
+Vercel, auto-deploy sur `master`. `vercel.json` : framework `nextjs`, région `cdg1`.
+
+Variables d'env requises en prod (voir `hanaflow-next/README.md`) :
+`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `NEXT_PUBLIC_APP_URL`, et optionnellement `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `JWT_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`. Voir `hanaflow-next/.env.example`.
+
+## Promouvoir un admin
+
 ```bash
-npm run dev      # Vite dev server on port 5173
-npm run build    # Production build
-npm run preview  # Preview production build
-node scripts/generate-sitemap.cjs  # Generate sitemap
+echo "UPDATE users SET role = 'admin' WHERE email = 'ton@email.com';" | \
+  npx prisma db execute --schema=prisma/schema.prisma --stdin
 ```
-
-There are no configured test runners or linters in either package.
-
-## Architecture
-
-### Backend (`Back-End/server.js`)
-- Express.js 5 API with JWT authentication (bcryptjs + jsonwebtoken)
-- **In-memory user store** — no database; data resets on server restart
-- CORS configured for `localhost:5173` only
-- Key routes: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`
-
-### Frontend (`Front-End/src/`)
-- React 18 + Vite 6, styled with Tailwind CSS (custom SAP brand colors: `sapBlue`, `sapBlueDark`, `sapGrayLight`)
-- React Router v6 for client-side routing
-- `AuthContext` (`context/AuthContext.jsx`) manages authentication state globally — wraps the entire app in `main.jsx`
-- `ProtectedRoute` component guards authenticated routes
-- API base URL configured in `config/api.js`
-- Path aliases: `@components`, `@pages`, `@layouts`, `@routes` (defined in `jsconfig.json`, resolved by Vite)
-
-### Key Frontend Directories
-- `pages/` — Route-level components including SAP module pages (`FI.jsx`, `CO.jsx`, `MM.jsx`, `SD.jsx`, `HCM.jsx`, `PP.jsx`, `AIJoule.jsx`) which are large static content files (~23–28KB each)
-- `components/` — Reusable UI: `Navbar.jsx`, `Footer.jsx`, `DarkModeToggle.jsx`, `SEO.jsx`, `HeroHome.jsx`, `ProtectedRoute.jsx`
-- `layouts/` — Layout wrappers
-- `routes/` — Route definitions
-
-### Current Limitations
-- Authentication is partially mocked — `AuthContext` handles fake tokens; the backend has real JWT logic but the frontend may not fully integrate it
-- No persistent storage (in-memory only on backend)
-- No tests configured

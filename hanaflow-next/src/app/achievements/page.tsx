@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useGamification, BADGES, LEVELS, getLevelInfo } from "@/context/GamificationContext";
+import { useGamification, BADGES, LEVELS } from "@/context/GamificationContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const CATEGORIES = ["Démarrage", "Certifications", "Quiz", "Examens", "Régularité", "Abonnement"];

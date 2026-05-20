@@ -1,24 +1,18 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import CertificationTemplate from "@/components/CertificationTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { coCertification } from "@/data/certifications/co.js";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertForPlan } from "@/lib/certAccess";
 
-function COCertificationContent() {
+export default async function CertificationCOPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/co");
+
   return (
     <CertificationTemplate
-      certification={coCertification}
+      certification={getCertForPlan("co", user.isPro)}
       moduleId="co"
       examPath="/certifications/co/examen"
       heroGradient="from-indigo-900 via-indigo-700 to-indigo-500"
     />
-  );
-}
-
-export default function CertificationCOPage() {
-  return (
-    <ProtectedRoute>
-      <COCertificationContent />
-    </ProtectedRoute>
   );
 }

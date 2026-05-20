@@ -22,17 +22,17 @@ export async function POST(req: NextRequest) {
   if ("status" in auth) return auth;
 
   const body = await req.json().catch(() => null);
-  const module = (body?.module as string)?.toLowerCase();
+  const moduleId = (body?.module as string)?.toLowerCase();
 
-  if (!module || !VALID_MODULES.includes(module)) {
+  if (!moduleId || !VALID_MODULES.includes(moduleId)) {
     return err("Module invalide", 400);
   }
 
   await prisma.userProgress.upsert({
-    where: { userId_module: { userId: auth.user.userId, module } },
-    create: { userId: auth.user.userId, module },
+    where: { userId_module: { userId: auth.user.userId, module: moduleId } },
+    create: { userId: auth.user.userId, module: moduleId },
     update: { visitedAt: new Date() },
   });
 
-  return ok({ message: "Progression enregistrée", module });
+  return ok({ message: "Progression enregistrée", module: moduleId });
 }

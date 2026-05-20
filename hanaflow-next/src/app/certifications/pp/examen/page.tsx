@@ -1,24 +1,20 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { ppMockExamQuestions, ppCertification } from "@/data/certifications/pp.js";
+import ProPaywall from "@/components/ProPaywall";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
 
-function PPExamContent() {
+export default async function PPExamPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/pp/examen");
+  if (!user.isPro) return <ProPaywall certPath="/certifications/pp" />;
+
   return (
     <ExamSimulatorTemplate
-      questions={ppMockExamQuestions}
-      certInfo={{ code: ppCertification.code, shortName: ppCertification.shortName }}
+      questions={getExamQuestions("pp")}
+      certInfo={getCertMeta("pp")}
       moduleId="pp"
       certPath="/certifications/pp"
     />
-  );
-}
-
-export default function PPExamPage() {
-  return (
-    <ProtectedRoute>
-      <PPExamContent />
-    </ProtectedRoute>
   );
 }

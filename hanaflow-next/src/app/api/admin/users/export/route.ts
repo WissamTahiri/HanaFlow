@@ -5,7 +5,12 @@ import { logAudit } from "@/lib/audit";
 
 const escapeCsv = (value: unknown): string => {
   if (value === null || value === undefined) return "";
-  const str = String(value);
+  let str = String(value);
+  // Prévention de l'injection de formule Excel/Sheets (OWASP) :
+  // préfixer d'une apostrophe toute valeur commençant par =, +, -, @, tab ou CR.
+  if (/^[=+\-@\t\r]/.test(str)) {
+    str = "'" + str;
+  }
   if (/[",\n\r;]/.test(str)) {
     return `"${str.replace(/"/g, '""')}"`;
   }

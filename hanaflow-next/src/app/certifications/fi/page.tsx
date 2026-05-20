@@ -1,24 +1,18 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import CertificationTemplate from "@/components/CertificationTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { fiCertification } from "@/data/certifications/fi.js";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertForPlan } from "@/lib/certAccess";
 
-function FICertificationContent() {
+export default async function CertificationFIPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/fi");
+
   return (
     <CertificationTemplate
-      certification={fiCertification}
+      certification={getCertForPlan("fi", user.isPro)}
       moduleId="fi"
       examPath="/certifications/fi/examen"
       heroGradient="from-blue-900 via-blue-700 to-blue-500"
     />
-  );
-}
-
-export default function CertificationFIPage() {
-  return (
-    <ProtectedRoute>
-      <FICertificationContent />
-    </ProtectedRoute>
   );
 }

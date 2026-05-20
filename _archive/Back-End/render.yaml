@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: hanaflow-api
+    runtime: node
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Les variables suivantes doivent être saisies MANUELLEMENT
+      # dans le dashboard Render > Environment > Add Environment Variable
+      # NE PAS les ajouter ici (risque d'exposition dans git)
+      #
+      # - PORT          → Render l'injecte automatiquement (ne pas définir)
+      # - DATABASE_URL  → URL Neon PostgreSQL (dashboard Neon > Connection string)
+      # - JWT_SECRET    → Secret aléatoire 64+ chars
+      # - JWT_REFRESH_SECRET → Secret aléatoire 64+ chars (différent de JWT_SECRET)
+      # - JWT_EXPIRES_IN     → ex: 1h
+      # - JWT_REFRESH_EXPIRES_IN → ex: 7d
+      # - ALLOWED_ORIGINS    → https://ton-app.vercel.app (URL Vercel de production)

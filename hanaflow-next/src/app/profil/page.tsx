@@ -61,6 +61,9 @@ function ProfileContent() {
   const [name, setName]                       = useState(user?.name || "");
   const [password, setPassword]               = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [totpCode, setTotpCode]               = useState("");
+  const [needs2fa, setNeeds2fa]               = useState(false);
   const [showPwd, setShowPwd]                 = useState(false);
   const [success, setSuccess]                 = useState("");
   const [error, setError]                     = useState("");
@@ -131,12 +134,18 @@ function ProfileContent() {
       return setError("Les mots de passe ne correspondent pas.");
     if (password && password.length < 8)
       return setError("Le mot de passe doit contenir au moins 8 caractères.");
+    if (password && !currentPassword)
+      return setError("Saisissez votre mot de passe actuel pour confirmer.");
     if (!name.trim())
       return setError("Le nom ne peut pas être vide.");
 
-    const updates: { name?: string; password?: string } = {};
+    const updates: { name?: string; password?: string; currentPassword?: string; totpCode?: string } = {};
     if (name !== user?.name) updates.name = name.trim();
-    if (password)            updates.password = password;
+    if (password) {
+      updates.password = password;
+      updates.currentPassword = currentPassword;
+      if (needs2fa) updates.totpCode = totpCode;
+    }
 
     if (Object.keys(updates).length === 0)
       return setError("Aucune modification détectée.");
@@ -144,11 +153,20 @@ function ProfileContent() {
     setLoading(true);
     try {
       await updateProfile(updates);
-      setSuccess("Profil mis à jour avec succès !");
+      setSuccess("Profil mis à jour avec succès ! Toutes vos autres sessions ont été déconnectées.");
       setPassword("");
       setConfirmPassword("");
+      setCurrentPassword("");
+      setTotpCode("");
+      setNeeds2fa(false);
     } catch (err) {
-      setError((err as Error).message || "Erreur lors de la mise à jour.");
+      const e = err as Error & { requires2fa?: boolean };
+      if (e.requires2fa) {
+        setNeeds2fa(true);
+        setError("Saisissez votre code 2FA pour confirmer le changement.");
+      } else {
+        setError(e.message || "Erreur lors de la mise à jour.");
+      }
     } finally {
       setLoading(false);
     }
@@ -306,19 +324,61 @@ function ProfileContent() {
             </div>
 
             {password && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-                  Confirmer le mot de passe
-                </label>
-                <input
-                  type={showPwd ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600
-                             bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm
-                             focus:outline-none focus:ring-2 focus:ring-sap-blue/50"
-                />
-              </div>
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+                    Confirmer le nouveau mot de passe
+                  </label>
+                  <input
+                    type={showPwd ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600
+                               bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm
+                               focus:outline-none focus:ring-2 focus:ring-sap-blue/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+                    Mot de passe actuel <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    autoComplete="current-password"
+                    placeholder="Pour confirmer le changement"
+                    required
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600
+                               bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm
+                               focus:outline-none focus:ring-2 focus:ring-sap-blue/50"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">
+                    Toutes vos autres sessions seront déconnectées après confirmation.
+                  </p>
+                </div>
+
+                {needs2fa && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+                      Code 2FA <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      value={totpCode}
+                      onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="••••••"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600
+                                 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm font-mono tracking-widest text-center
+                                 focus:outline-none focus:ring-2 focus:ring-sap-blue/50"
+                    />
+                  </div>
+                )}
+              </>
             )}
 
             {error   && <p className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{error}</p>}

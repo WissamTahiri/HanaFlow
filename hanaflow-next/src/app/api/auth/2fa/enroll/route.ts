@@ -2,10 +2,11 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err } from "@/lib/apiHelpers";
 import { generateTotpSecret, buildOtpAuthQrDataUrl } from "@/lib/totp";
+import { encryptTotpSecret } from "@/lib/totpCrypto";
 
 /**
  * Initie l'enrôlement 2FA : génère un secret TOTP éphémère, le stocke en BDD
- * (mais totpEnabled reste false jusqu'à la vérification du premier code).
+ * (chiffré) mais totpEnabled reste false jusqu'à la vérification du premier code.
  */
 export async function POST(req: NextRequest) {
   const auth = requireAuth(req);
@@ -24,7 +25,13 @@ export async function POST(req: NextRequest) {
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { totpSecret: secret, totpEnabled: false, totpEnabledAt: null },
+      data: {
+        totpSecret: encryptTotpSecret(secret),
+        totpEnabled: false,
+        totpEnabledAt: null,
+        totpLastStep: null,
+        totpBackupCodes: undefined,
+      },
     });
 
     return ok({
