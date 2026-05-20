@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import ReactMarkdown from "react-markdown";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 /**
@@ -89,6 +91,7 @@ const SUGGESTED_QUESTIONS: Record<string, string[]> = {
 
 export default function TutorChat({ moduleCode, chapterId, moduleName }: Props) {
   const { getToken, isAuthenticated } = useAuth();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<ChatMessage[]>([]);
@@ -169,9 +172,8 @@ export default function TutorChat({ moduleCode, chapterId, moduleName }: Props) 
     setError("");
   };
 
-  if (!isAuthenticated) return null;
-
   const suggestions = SUGGESTED_QUESTIONS[moduleCode] ?? [];
+  const loginHref = `/login?next=${encodeURIComponent(pathname ?? "/")}`;
 
   return (
     <>
@@ -253,9 +255,10 @@ export default function TutorChat({ moduleCode, chapterId, moduleName }: Props) 
                         {suggestions.map((q) => (
                           <button
                             key={q}
-                            onClick={() => send(q)}
-                            disabled={pending}
-                            className="block w-full text-left text-xs px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sap-blue/5 dark:hover:bg-sap-blue/15 hover:text-sap-blue dark:hover:text-sap-accent transition-colors disabled:opacity-50"
+                            onClick={() => (isAuthenticated ? send(q) : undefined)}
+                            disabled={pending || !isAuthenticated}
+                            title={isAuthenticated ? undefined : "Connecte-toi pour discuter avec le tuteur"}
+                            className="block w-full text-left text-xs px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sap-blue/5 dark:hover:bg-sap-blue/15 hover:text-sap-blue dark:hover:text-sap-accent transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                           >
                             {q}
                           </button>
@@ -293,32 +296,54 @@ export default function TutorChat({ moduleCode, chapterId, moduleName }: Props) 
               )}
             </div>
 
-            {/* Input */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                send(input);
-              }}
-              className="border-t border-gray-100 dark:border-slate-800 p-3 flex gap-2"
-            >
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={`Ta question sur ${moduleCode.toUpperCase()}...`}
-                disabled={pending}
-                maxLength={4000}
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
-              />
-              <button
-                type="submit"
-                disabled={pending || !input.trim()}
-                className="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-sap-blue text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sap-blue-dark transition-colors"
-                aria-label="Envoyer"
+            {/* Input ou CTA login */}
+            {isAuthenticated ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  send(input);
+                }}
+                className="border-t border-gray-100 dark:border-slate-800 p-3 flex gap-2"
               >
-                <SendIcon />
-              </button>
-            </form>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={`Ta question sur ${moduleCode.toUpperCase()}...`}
+                  disabled={pending}
+                  maxLength={4000}
+                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
+                />
+                <button
+                  type="submit"
+                  disabled={pending || !input.trim()}
+                  className="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-sap-blue text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sap-blue-dark transition-colors"
+                  aria-label="Envoyer"
+                >
+                  <SendIcon />
+                </button>
+              </form>
+            ) : (
+              <div className="border-t border-gray-100 dark:border-slate-800 p-3 bg-gradient-to-r from-sap-blue/5 to-sap-blue/10 dark:from-sap-blue/10 dark:to-sap-blue/15">
+                <p className="text-xs text-slate-600 dark:text-slate-300 mb-2 text-center">
+                  Crée ton compte gratuit pour discuter avec le tuteur IA
+                </p>
+                <div className="flex gap-2">
+                  <Link
+                    href={loginHref}
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-sap-blue/40 text-sap-blue dark:text-sap-accent hover:bg-sap-blue/10 transition-colors"
+                  >
+                    Se connecter
+                  </Link>
+                  <Link
+                    href={`/register?next=${encodeURIComponent(pathname ?? "/")}`}
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg bg-sap-blue text-white hover:bg-sap-blue-dark transition-colors"
+                  >
+                    S&apos;inscrire (gratuit)
+                  </Link>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
