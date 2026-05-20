@@ -2,6 +2,10 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
+import TutorChat from "@/components/TutorChat";
+
+type TutorModuleCode = "fi" | "co" | "mm" | "sd" | "pp" | "ai";
+const TUTOR_MODULES: readonly TutorModuleCode[] = ["fi", "co", "mm", "sd", "pp", "ai"];
 
 interface ModuleLayoutProps {
   code: string;
@@ -19,7 +23,9 @@ const ModuleLayout = ({
   gradient,
   badge,
   children,
-}: ModuleLayoutProps) => (
+}: ModuleLayoutProps) => {
+  const tutorCode = TUTOR_MODULES.find((c) => c === code.toLowerCase());
+  return (
   <div className="min-h-[calc(100vh-4rem)]">
     {/* Hero */}
     <div className={`bg-linear-to-br ${gradient} text-white`}>
@@ -63,7 +69,11 @@ const ModuleLayout = ({
         {children}
       </div>
     </div>
+
+    {/* Tuteur IA — réservé aux utilisateurs connectés (le widget se masque seul sinon) */}
+    {tutorCode && <TutorChat moduleCode={tutorCode} moduleName={title} />}
   </div>
-);
+  );
+};
 
 export default ModuleLayout;
