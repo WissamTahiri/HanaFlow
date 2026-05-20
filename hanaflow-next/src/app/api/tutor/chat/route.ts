@@ -11,6 +11,7 @@ import {
   validateBody,
 } from "@/lib/apiHelpers";
 import { isValidModule, type ModuleId } from "@/lib/certAccess";
+import { GEMINI_MODEL } from "@/lib/gemini";
 
 /**
  * POST /api/tutor/chat
@@ -88,7 +89,6 @@ async function loadModuleContext(
   );
 }
 
-const MODEL = "gemini-2.0-flash";
 const MAX_OUTPUT_TOKENS = 1500;
 
 export async function POST(req: NextRequest) {
@@ -164,7 +164,7 @@ Tu réponds toujours en français.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: MODEL,
+      model: GEMINI_MODEL,
       contents,
       config: {
         systemInstruction,
@@ -190,11 +190,12 @@ Tu réponds toujours en français.`;
     console.error("[tutor/chat] gemini error:", e);
     const msg = e instanceof Error ? e.message : String(e);
 
-    if (/quota|rate.?limit/i.test(msg)) {
-      return err(
-        "Le tuteur est temporairement saturé (free tier atteint). Réessaie dans quelques minutes.",
-        429,
-      );
+    if (/quota|rate.?limit|RESOURCE_EXHAUSTED/i.test(msg)) {
+      const retryMatch = msg.match(/retry in ([\d.]+)s/i);
+      const retryHint = retryMatch
+        ? ` Réessaie dans ~${Math.ceil(parseFloat(retryMatch[1]))}s.`
+        : " Réessaie dans quelques minutes.";
+      return err(`Le tuteur est temporairement saturé.${retryHint}`, 429);
     }
     return err("Erreur côté tuteur.", 500);
   }

@@ -237,7 +237,7 @@ export default function CompararePage() {
               (consultant junior, indep, lead architect…) en 30 secondes.
             </p>
             <Link
-              href="/roadmap-personnalisee"
+              href="/roadmap"
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-white text-sap-blue font-bold hover:bg-slate-100 transition-all active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.15)]"
             >
               Générer ma roadmap →
