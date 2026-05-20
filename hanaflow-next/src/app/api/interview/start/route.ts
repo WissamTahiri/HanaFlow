@@ -10,6 +10,7 @@ import {
   validateBody,
 } from "@/lib/apiHelpers";
 import certCatalog from "@/data/cert-catalog.json";
+import { GEMINI_MODEL } from "@/lib/gemini";
 
 /**
  * POST /api/interview/start
@@ -138,7 +139,7 @@ Tutoie le candidat. Français professionnel sans jargon RH.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
       config: {
         systemInstruction,
@@ -179,8 +180,12 @@ Tutoie le candidat. Français professionnel sans jargon RH.`;
   } catch (e) {
     console.error("[interview/start] gemini error:", e);
     const msg = e instanceof Error ? e.message : String(e);
-    if (/quota|rate.?limit/i.test(msg)) {
-      return err("Service IA temporairement saturé. Réessaie dans quelques minutes.", 429);
+    if (/quota|rate.?limit|RESOURCE_EXHAUSTED/i.test(msg)) {
+      const retryMatch = msg.match(/retry in ([\d.]+)s/i);
+      const retryHint = retryMatch
+        ? ` Réessaie dans ~${Math.ceil(parseFloat(retryMatch[1]))}s.`
+        : " Réessaie dans quelques minutes.";
+      return err(`Service IA temporairement saturé.${retryHint}`, 429);
     }
     if (/api.?key|unauthorized|forbidden/i.test(msg)) {
       return err("Erreur d'authentification côté Google.", 500);

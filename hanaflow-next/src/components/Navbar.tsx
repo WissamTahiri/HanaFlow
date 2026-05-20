@@ -190,10 +190,9 @@ export default function Navbar() {
                                 shadow-[0_8px_40px_rgba(0,0,0,0.10)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.35)]
                                 p-2 z-50">
                   {[
-                    { href: "/entretien", label: "Mock Interview IA", desc: "Entretien IA avec scoring" },
-                    { href: "/roadmap-personnalisee", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil" },
+                    { href: "/entretien", label: "Mock Interview IA", desc: "Entretien IA avec scoring détaillé" },
+                    { href: "/roadmap", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil" },
                     { href: "/certifications/comparer", label: "Comparateur certifs", desc: "Compare les certifs SAP" },
-                    { href: "/roadmap", label: "Roadmap consultant", desc: "Guide complet (statique)" },
                   ].map(({ href, label, desc }) => (
                     <Link
                       key={href}
@@ -352,8 +351,7 @@ export default function Navbar() {
             { href: "/s4hana",           label: "S/4HANA" },
             { href: "/ai-joule",         label: "IA & Joule" },
             { href: "/processus-metier", label: "Processus métier" },
-            { href: "/roadmap",          label: "Roadmap consultant" },
-            { href: "/roadmap-personnalisee", label: "Roadmap IA perso" },
+            { href: "/roadmap",          label: "Roadmap IA" },
             { href: "/entretien",        label: "Mock Interview IA" },
             { href: "/a-propos",         label: "À propos" },
             { href: "/certifications",   label: "Certifications" },

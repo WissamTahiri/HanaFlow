@@ -10,6 +10,7 @@ import {
   validateBody,
 } from "@/lib/apiHelpers";
 import certCatalog from "@/data/cert-catalog.json";
+import { GEMINI_MODEL } from "@/lib/gemini";
 
 /**
  * POST /api/roadmap/generate
@@ -218,7 +219,7 @@ Génère la roadmap personnalisée pour ce profil.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
       config: {
         systemInstruction,
@@ -262,11 +263,13 @@ Génère la roadmap personnalisée pour ce profil.`;
     console.error("[roadmap/generate] gemini error:", e);
     const msg = e instanceof Error ? e.message : String(e);
 
-    if (/quota|rate.?limit/i.test(msg)) {
-      return err(
-        "Service IA temporairement saturé (limite gratuite atteinte). Réessaie dans quelques minutes.",
-        429,
-      );
+    if (/quota|rate.?limit|RESOURCE_EXHAUSTED/i.test(msg)) {
+      // Extrait le `retryDelay` si Gemini l'a fourni (format "Please retry in Xs")
+      const retryMatch = msg.match(/retry in ([\d.]+)s/i);
+      const retryHint = retryMatch
+        ? ` Réessaie dans ~${Math.ceil(parseFloat(retryMatch[1]))}s.`
+        : " Réessaie dans quelques minutes.";
+      return err(`Service IA temporairement saturé.${retryHint}`, 429);
     }
     if (/api.?key|unauthorized|forbidden/i.test(msg)) {
       return err("Erreur d'authentification côté Google. Vérifie la clé.", 500);
