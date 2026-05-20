@@ -62,6 +62,18 @@
       "chapters": 7,
       "questions": 40,
       "color": "from-emerald-500 to-emerald-700"
+    },
+    {
+      "code": "AI",
+      "name": "Generative AI Developer",
+      "href": "/ai-joule",
+      "desc": "LLMs, RAG, prompt engineering, intégration Joule et IA générative dans S/4HANA.",
+      "cert": "C_AIG",
+      "certName": "SAP Certified Associate – SAP Generative AI Developer",
+      "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-generative-ai-developer",
+      "chapters": 7,
+      "questions": 40,
+      "color": "from-violet-500 to-purple-700"
     }
   ],
   "retired": [
