@@ -46,29 +46,36 @@ function formatDate(date: Date) {
   return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(date);
 }
 
-function generateCertId(userName: string, moduleCode: string, date: Date) {
-  const str = `${userName}-${moduleCode}-${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  const abs = Math.abs(hash).toString(16).toUpperCase().padStart(8, "0");
-  return `HF-${abs.slice(0, 4)}-${abs.slice(4)}`;
-}
-
 interface CertificateDocumentProps {
   userName: string;
   moduleCode: string;
   moduleName: string;
   score: number;
   totalQuestions: number;
-  passed?: boolean;
+  /** ID persisté DB (cuid). Si absent, fallback ID local (preview seulement). */
+  certId?: string;
+  /** Date d'émission DB. Si absent, now(). */
+  issuedAt?: Date | string;
+  /** Code certif SAP officiel snapshot (ex: C_TS4FI_2601). */
+  certCode?: string;
+  /** URL absolue de vérification publique. Imprimée en bas du certificat. */
+  verifyUrl?: string;
 }
 
-export default function CertificateDocument({ userName, moduleCode, moduleName, score, totalQuestions }: CertificateDocumentProps) {
-  const date = new Date();
-  const certId = generateCertId(userName, moduleCode, date);
+export default function CertificateDocument({
+  userName,
+  moduleCode,
+  moduleName,
+  score,
+  totalQuestions,
+  certId,
+  issuedAt,
+  certCode,
+  verifyUrl,
+}: CertificateDocumentProps) {
+  const date = issuedAt ? (typeof issuedAt === "string" ? new Date(issuedAt) : issuedAt) : new Date();
+  // certId = vrai cuid persisté en DB ; fallback "non émis" si on est en preview.
+  const displayId = certId ? `HF-${certId.slice(0, 8).toUpperCase()}-${certId.slice(-4).toUpperCase()}` : "PREVIEW";
   const pct = Math.round((score / totalQuestions) * 100);
 
   return (
@@ -95,12 +102,18 @@ export default function CertificateDocument({ userName, moduleCode, moduleName, 
           <Text style={styles.presentedTo}>décerné à</Text>
           <Text style={styles.recipientName}>{userName || "Apprenant HanaFlow"}</Text>
           <Text style={styles.description}>
-            {`A complété avec succès la formation de préparation à la certification\n${moduleCode} — ${moduleName}\nsur la plateforme HanaFlow`}
+            {`A complété avec succès la formation de préparation à la certification${certCode ? ` ${certCode}` : ""}\n${moduleCode} — ${moduleName}\nsur la plateforme HanaFlow`}
           </Text>
           <View style={styles.moduleBadge}>
             <Text style={styles.moduleBadgeCode}>{moduleCode}</Text>
             <Text style={{ fontSize: 9, color: "#64748B" }}>·</Text>
             <Text style={styles.moduleBadgeName}>{moduleName}</Text>
+            {certCode && (
+              <>
+                <Text style={{ fontSize: 9, color: "#64748B" }}>·</Text>
+                <Text style={{ fontSize: 10, color: "#1D4ED8", fontFamily: "Helvetica-Bold" }}>{certCode}</Text>
+              </>
+            )}
           </View>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
@@ -134,7 +147,12 @@ export default function CertificateDocument({ userName, moduleCode, moduleName, 
           </View>
           <View style={styles.footerRight}>
             <Text style={styles.footerLabel}>N° CERTIFICAT</Text>
-            <Text style={styles.footerValue}>{certId}</Text>
+            <Text style={styles.footerValue}>{displayId}</Text>
+            {verifyUrl && (
+              <Text style={{ fontSize: 7, color: "#94A3B8", marginTop: 2 }}>
+                Vérifier : {verifyUrl}
+              </Text>
+            )}
           </View>
         </View>
       </Page>

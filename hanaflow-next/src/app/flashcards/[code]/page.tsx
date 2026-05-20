@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { getDeck, type FlashCard } from "@/data/flashcards";
 import { newCardProgress, review, sortByPriority, type CardProgress, type Quality } from "@/lib/sm2";
 import { notFound } from "next/navigation";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import ProGate from "@/components/ProGate";
 
 /**
  * /flashcards/[code] — session de révision pour un module SAP.
@@ -48,7 +50,27 @@ const RATINGS: { label: string; quality: Quality; color: string; key: string }[]
   { label: "Facile", quality: 5, color: "bg-sap-blue hover:bg-sap-blue-dark", key: "4" },
 ];
 
-export default function FlashcardSession({ params }: { params: Promise<{ code: string }> }) {
+export default function FlashcardSessionPage({ params }: { params: Promise<{ code: string }> }) {
+  return (
+    <ProtectedRoute>
+      <ProGate
+        featureName="Flashcards SAP Pro"
+        featureDescription="Mémorise les T-codes, tables et processus SAP avec un système de spaced repetition (SM-2) qui s'adapte à ce que tu retiens vraiment."
+        perks={[
+          "6 decks curated : FI, CO, MM, SD, PP, IA générative",
+          "Algorithme SM-2 (SuperMemo) — les cartes ratées reviennent, les maîtrisées s'espacent",
+          "Sessions de 5 min : T-codes, tables, processus métier, concepts S/4HANA",
+          "Progression locale sécurisée (rien n'est envoyé au serveur)",
+          "Raccourcis clavier pour réviser à vitesse réelle",
+        ]}
+      >
+        <FlashcardSessionContent params={params} />
+      </ProGate>
+    </ProtectedRoute>
+  );
+}
+
+function FlashcardSessionContent({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const deck = getDeck(code);
   if (!deck) notFound();
