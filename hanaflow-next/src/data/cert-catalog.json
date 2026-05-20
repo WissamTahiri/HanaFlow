@@ -13,7 +13,21 @@
       "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-for-financial-accounting",
       "chapters": 7,
       "questions": 40,
-      "color": "from-blue-500 to-blue-700"
+      "color": "from-blue-500 to-blue-700",
+      "level": "Associate",
+      "durationMin": 180,
+      "passingScore": 65,
+      "officialQuestions": 80,
+      "priceEur": 535,
+      "targetRoles": ["Consultant FI junior", "Comptable SAP", "Auditeur SI finance"],
+      "topics": [
+        "FI Organizational structure",
+        "Master data (comptes, clients, fournisseurs)",
+        "Document control",
+        "Asset Accounting (FI-AA)",
+        "Reporting (FBL3N, FAGLB03)"
+      ],
+      "format": "Multiple choice + scenario-based"
     },
     {
       "code": "CO",
@@ -25,7 +39,21 @@
       "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-for-management-accounting-associates",
       "chapters": 7,
       "questions": 40,
-      "color": "from-indigo-500 to-indigo-700"
+      "color": "from-indigo-500 to-indigo-700",
+      "level": "Associate",
+      "durationMin": 180,
+      "passingScore": 65,
+      "officialQuestions": 80,
+      "priceEur": 535,
+      "targetRoles": ["Consultant CO junior", "Contrôleur de gestion SAP"],
+      "topics": [
+        "Cost element / center accounting",
+        "Internal orders",
+        "Product cost controlling",
+        "Profitability analysis (CO-PA)",
+        "Profit center accounting"
+      ],
+      "format": "Multiple choice + scenario-based"
     },
     {
       "code": "MM",
@@ -37,7 +65,21 @@
       "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-sourcing-and-procurement",
       "chapters": 7,
       "questions": 40,
-      "color": "from-sky-500 to-sky-700"
+      "color": "from-sky-500 to-sky-700",
+      "level": "Associate",
+      "durationMin": 180,
+      "passingScore": 76,
+      "officialQuestions": 80,
+      "priceEur": 535,
+      "targetRoles": ["Consultant MM junior", "Acheteur SAP", "Supply chain analyst"],
+      "topics": [
+        "Master data (matériaux, fournisseurs, info records)",
+        "Procurement processes (P2P)",
+        "Inventory management",
+        "Valuation et imputation",
+        "Logistic Invoice Verification"
+      ],
+      "format": "Multiple choice + scenario-based"
     },
     {
       "code": "SD",
@@ -49,7 +91,21 @@
       "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-sales",
       "chapters": 7,
       "questions": 40,
-      "color": "from-cyan-500 to-cyan-700"
+      "color": "from-cyan-500 to-cyan-700",
+      "level": "Associate",
+      "durationMin": 180,
+      "passingScore": 65,
+      "officialQuestions": 80,
+      "priceEur": 535,
+      "targetRoles": ["Consultant SD junior", "Customer service ops SAP"],
+      "topics": [
+        "Master data (clients, articles, conditions)",
+        "Sales order processing (OTC)",
+        "Pricing & condition technique",
+        "Delivery & shipping",
+        "Billing & accounting integration"
+      ],
+      "format": "Multiple choice + scenario-based"
     },
     {
       "code": "PP",
@@ -61,7 +117,21 @@
       "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-production-planning-and-manufacturing",
       "chapters": 7,
       "questions": 40,
-      "color": "from-emerald-500 to-emerald-700"
+      "color": "from-emerald-500 to-emerald-700",
+      "level": "Associate",
+      "durationMin": 180,
+      "passingScore": 64,
+      "officialQuestions": 80,
+      "priceEur": 535,
+      "targetRoles": ["Consultant PP junior", "Production scheduler SAP"],
+      "topics": [
+        "Demand management & forecasting",
+        "Material Requirements Planning (MRP)",
+        "Production order processing",
+        "Capacity planning",
+        "Manufacturing analytics"
+      ],
+      "format": "Multiple choice + scenario-based"
     },
     {
       "code": "AI",
@@ -73,7 +143,21 @@
       "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-generative-ai-developer",
       "chapters": 7,
       "questions": 40,
-      "color": "from-violet-500 to-purple-700"
+      "color": "from-violet-500 to-purple-700",
+      "level": "Associate",
+      "durationMin": 120,
+      "passingScore": 65,
+      "officialQuestions": 60,
+      "priceEur": 535,
+      "targetRoles": ["Dev IA SAP", "Solution architect Joule", "Consultant IA générative SAP"],
+      "topics": [
+        "Fondamentaux LLMs",
+        "SAP AI Core & SAP AI Launchpad",
+        "Joule architecture",
+        "RAG (Retrieval Augmented Generation)",
+        "Prompt engineering & responsible AI"
+      ],
+      "format": "Practical / system-based (nov 2025+)"
     }
   ],
   "retired": [
