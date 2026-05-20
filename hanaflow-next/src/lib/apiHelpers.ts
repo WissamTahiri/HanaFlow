@@ -151,13 +151,17 @@ export async function verifyAdminPassword(req: NextRequest, userId: number): Pro
 }
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
-// Backend : Upstash Redis (REST) si UPSTASH_REDIS_REST_URL + _TOKEN sont définis,
-// sinon fallback en mémoire (utile en dev, mais ineffectif sur Vercel serverless
-// car chaque fonction a sa propre mémoire).
+// Backend : Upstash Redis (REST) si configuré (via l'intégration Vercel
+// Marketplace qui pose KV_REST_API_* ou via les vars Upstash legacy), sinon
+// fallback en mémoire (utile en dev mais ineffectif sur Vercel serverless car
+// chaque Lambda a sa propre Map).
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
-const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+// Vercel Marketplace → KV_REST_API_*  ; install manuel Upstash → UPSTASH_REDIS_REST_*
+const UPSTASH_URL =
+  process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_TOKEN =
+  process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
 const USE_REDIS = Boolean(UPSTASH_URL && UPSTASH_TOKEN);
 
 async function redisRateLimit(key: string, maxRequests: number, windowMs: number): Promise<boolean> {
