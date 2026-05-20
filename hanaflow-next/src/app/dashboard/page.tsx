@@ -52,6 +52,7 @@ const FI_TOTAL_LESSONS = 14;
 
 const quickLinks = [
   { href: "/entretien",                label: "Mock Interview IA",   color: "bg-sap-blue/10 text-sap-blue dark:bg-sap-blue/20 dark:text-sap-accent" },
+  { href: "/cv-builder",               label: "CV Builder ATS",       color: "bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400" },
   { href: "/roadmap",                  label: "Roadmap IA",           color: "bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400" },
   { href: "/certifications/comparer",  label: "Comparer certifs",     color: "bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-400" },
   { href: "/s4hana",                   label: "S/4HANA",              color: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" },
