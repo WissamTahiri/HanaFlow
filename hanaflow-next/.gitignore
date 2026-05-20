@@ -58,3 +58,7 @@ yarn-error.log*
 
 # Test
 /coverage
+
+
+# Migré vers proxy.ts (Next.js 16) — fichier non supprimable localement (perms)
+src/middleware.ts
