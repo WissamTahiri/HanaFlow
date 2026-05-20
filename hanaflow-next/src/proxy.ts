@@ -8,6 +8,10 @@ const PROTECTED_PREFIXES = [
   "/certifications",
 ];
 
+// Pages publiques qui matchent un PROTECTED_PREFIXES mais doivent rester
+// accessibles sans login (SEO, funnel d'acquisition).
+const PUBLIC_EXCEPTIONS = ["/certifications/comparer"];
+
 const ADMIN_PREFIX = "/admin";
 
 const IS_DEV = process.env.NODE_ENV !== "production";
@@ -56,9 +60,14 @@ export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
   // ── 1) Garde d'authentification sur les routes protégées ────────────
-  const needsAuth = PROTECTED_PREFIXES.some(
+  const isPublicException = PUBLIC_EXCEPTIONS.some(
     (p) => pathname === p || pathname.startsWith(`${p}/`),
   );
+  const needsAuth =
+    !isPublicException &&
+    PROTECTED_PREFIXES.some(
+      (p) => pathname === p || pathname.startsWith(`${p}/`),
+    );
 
   if (needsAuth) {
     const hasSession = Boolean(req.cookies.get("refreshToken")?.value);
