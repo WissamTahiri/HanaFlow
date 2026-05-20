@@ -65,8 +65,26 @@ export async function POST(req: NextRequest) {
   }
 
   const passwordHash = await argon2.hash(data.password, { type: argon2.argon2id });
+
+  // ── Auto-admin allowlist ──────────────────────────────────────────────
+  // Liste d'emails (séparés par virgule) promus admin automatiquement à la
+  // création du compte. Permet de récréer un compte super-admin sans accès
+  // au shell DB. Aussi, on bypass la vérif email pour ces comptes.
+  const adminAllowlist = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const isAutoAdmin = adminAllowlist.includes(data.email);
+
   const user = await prisma.user.create({
-    data: { name: data.name, email: data.email, passwordHash },
+    data: {
+      name: data.name,
+      email: data.email,
+      passwordHash,
+      ...(isAutoAdmin
+        ? { role: "admin", emailVerifiedAt: new Date() }
+        : {}),
+    },
     select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true, createdAt: true },
   });
 
@@ -82,7 +100,10 @@ export async function POST(req: NextRequest) {
   });
 
   // Vérification d'email + notifications — best effort, ne bloque pas l'inscription
-  void issueEmailVerification({ id: user.id, name: user.name, email: user.email });
+  // (skip pour les comptes auto-admin : déjà marqués comme vérifiés ci-dessus)
+  if (!isAutoAdmin) {
+    void issueEmailVerification({ id: user.id, name: user.name, email: user.email });
+  }
   const welcomeTpl = templates.welcome(user.name);
   void sendEmail({ to: user.email, ...welcomeTpl });
   const adminEmail = getAdminEmail();

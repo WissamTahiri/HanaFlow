@@ -228,6 +228,20 @@ export default function Navbar() {
                         {label}
                       </Link>
                     ))}
+                    {user?.role === "admin" && (
+                      <>
+                        <hr className="my-1 border-gray-100 dark:border-slate-800 mx-2" />
+                        <Link
+                          href="/admin"
+                          className="flex items-center justify-between gap-2 w-full px-3 py-2.5 rounded-xl text-sm
+                                     font-semibold text-sap-blue dark:text-sap-accent
+                                     hover:bg-sap-blue/10 dark:hover:bg-sap-blue/20 transition-colors"
+                        >
+                          <span>Panel admin</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-sap-blue text-white">ADMIN</span>
+                        </Link>
+                      </>
+                    )}
                     <hr className="my-1 border-gray-100 dark:border-slate-800 mx-2" />
                     <button
                       onClick={handleLogout}
@@ -345,6 +359,15 @@ export default function Navbar() {
                 <Link href="/dashboard" className="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-semibold bg-sap-blue text-white hover:bg-sap-blue-dark transition-colors">
                   Dashboard
                 </Link>
+                {user?.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center justify-center gap-2 w-full text-center px-4 py-2.5 rounded-xl text-sm font-semibold border border-sap-blue/40 text-sap-blue dark:text-sap-accent hover:bg-sap-blue/10 transition-colors"
+                  >
+                    Panel admin
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-sap-blue text-white">ADMIN</span>
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="block w-full px-4 py-2.5 rounded-xl text-sm font-medium text-red-500
