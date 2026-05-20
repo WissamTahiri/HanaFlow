@@ -51,11 +51,13 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const [openModules, setOpenModules] = useState(false);
+  const [openTools, setOpenTools]     = useState(false);
   const [openUser, setOpenUser]       = useState(false);
   const [mobileOpen, setMobileOpen]   = useState(false);
   const [scrolled, setScrolled]       = useState(false);
 
   const modulesRef = useRef<HTMLDivElement>(null);
+  const toolsRef   = useRef<HTMLDivElement>(null);
   const userRef    = useRef<HTMLDivElement>(null);
 
   const initials = user?.name
@@ -71,6 +73,7 @@ export default function Navbar() {
     setLastPath(pathname);
     if (mobileOpen) setMobileOpen(false);
     if (openModules) setOpenModules(false);
+    if (openTools) setOpenTools(false);
     if (openUser) setOpenUser(false);
   }
 
@@ -83,6 +86,7 @@ export default function Navbar() {
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (modulesRef.current && !modulesRef.current.contains(e.target as Node)) setOpenModules(false);
+      if (toolsRef.current && !toolsRef.current.contains(e.target as Node)) setOpenTools(false);
       if (userRef.current && !userRef.current.contains(e.target as Node)) setOpenUser(false);
     };
     document.addEventListener("mousedown", handleClick);
@@ -164,7 +168,45 @@ export default function Navbar() {
             <NavItem href="/s4hana" label="S/4HANA" />
             <NavItem href="/ai-joule" label="IA & Joule" />
             <NavItem href="/processus-metier" label="Processus" />
-            <NavItem href="/roadmap" label="Roadmap" />
+
+            {/* Dropdown Outils IA */}
+            <div className="relative" ref={toolsRef}>
+              <button
+                type="button"
+                onClick={() => setOpenTools((o) => !o)}
+                className={`${navLinkBase} ${navLinkInactive} flex items-center gap-1.5`}
+                aria-expanded={openTools}
+                aria-haspopup="true"
+              >
+                Outils IA
+                <span className="text-[9px] px-1 py-0.5 rounded bg-sap-blue text-white font-bold">NEW</span>
+                <span className={`transition-transform duration-200 ${openTools ? "rotate-180" : ""}`}>
+                  <ChevronDown />
+                </span>
+              </button>
+              {openTools && (
+                <div className="absolute left-0 top-full mt-2.5 w-72 bg-white dark:bg-slate-900
+                                border border-gray-100 dark:border-slate-700 rounded-2xl
+                                shadow-[0_8px_40px_rgba(0,0,0,0.10)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.35)]
+                                p-2 z-50">
+                  {[
+                    { href: "/entretien", label: "Mock Interview IA", desc: "Entretien IA avec scoring" },
+                    { href: "/roadmap-personnalisee", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil" },
+                    { href: "/certifications/comparer", label: "Comparateur certifs", desc: "Compare les certifs SAP" },
+                    { href: "/roadmap", label: "Roadmap consultant", desc: "Guide complet (statique)" },
+                  ].map(({ href, label, desc }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="block px-3 py-2.5 rounded-xl hover:bg-gray-50/80 dark:hover:bg-slate-800/80 transition-colors"
+                    >
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <span className="mx-2 h-5 w-px bg-gray-200 dark:bg-slate-700 flex-shrink-0" aria-hidden="true" />
 
@@ -311,8 +353,11 @@ export default function Navbar() {
             { href: "/ai-joule",         label: "IA & Joule" },
             { href: "/processus-metier", label: "Processus métier" },
             { href: "/roadmap",          label: "Roadmap consultant" },
+            { href: "/roadmap-personnalisee", label: "Roadmap IA perso" },
+            { href: "/entretien",        label: "Mock Interview IA" },
             { href: "/a-propos",         label: "À propos" },
             { href: "/certifications",   label: "Certifications" },
+            { href: "/certifications/comparer", label: "Comparer certifs" },
             { href: "/pricing",          label: "Tarifs" },
           ].map(({ href, label, exact }) => {
             const isActive = exact ? pathname === href : pathname.startsWith(href);

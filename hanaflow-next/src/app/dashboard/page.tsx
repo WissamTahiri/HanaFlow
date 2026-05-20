@@ -51,10 +51,12 @@ const RECOMMENDED_ORDER = ["fi", "mm", "sd", "co", "hcm", "pp"];
 const FI_TOTAL_LESSONS = 14;
 
 const quickLinks = [
-  { href: "/s4hana",           label: "S/4HANA",         color: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" },
-  { href: "/ai-joule",         label: "SAP AI Joule",     color: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" },
-  { href: "/processus-metier", label: "Processus",        color: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400" },
-  { href: "/roadmap",          label: "Ma Roadmap",       color: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400" },
+  { href: "/entretien",                label: "Mock Interview IA",   color: "bg-sap-blue/10 text-sap-blue dark:bg-sap-blue/20 dark:text-sap-accent" },
+  { href: "/roadmap-personnalisee",    label: "Roadmap IA perso",     color: "bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400" },
+  { href: "/certifications/comparer",  label: "Comparer certifs",     color: "bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-400" },
+  { href: "/s4hana",                   label: "S/4HANA",              color: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" },
+  { href: "/ai-joule",                 label: "SAP AI Joule",          color: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" },
+  { href: "/processus-metier",         label: "Processus",             color: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400" },
 ];
 
 function DashboardContent() {
@@ -402,7 +404,7 @@ function DashboardContent() {
           className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6"
         >
           <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Explorer</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {quickLinks.map(({ href, label, color }) => (
               <Link
                 key={href}
