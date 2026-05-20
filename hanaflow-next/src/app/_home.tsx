@@ -2,35 +2,76 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
+import certCatalog from "@/data/cert-catalog.json";
+
+/**
+ * Home v6 — design d'origine HanaFlow polish + inspirations plateformes
+ * de formation classiques.
+ *
+ * Restauré depuis la version d'origine :
+ *  - Plus Jakarta Sans, palette sap-blue, cards rounded-xl, gradient hero
+ *  - btn-primary / card / hero-gradient comme dans globals.css legacy
+ *
+ * Ajouts inspirés Udemy / SAP Learning / OpenClassrooms :
+ *  - Section "Comment ça marche" 4 étapes avec icônes (style OpenClassrooms)
+ *  - Section "Certifications préparées" avec les codes officiels SAP visibles
+ *    (style SAP Learning Hub : trust signal pro fort)
+ *  - Cards modules avec badge certification visible + meta (chapters / questions)
+ *    style Udemy card
+ *  - Trust line sous le hero (style OpenClassrooms "diplôme reconnu")
+ */
 
 const GraduationIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
   </svg>
 );
 const AwardIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
   </svg>
 );
 const ZapIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
   </svg>
 );
 const MapIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polygon points="3 11 22 2 13 21 11 13 3 11"/>
   </svg>
 );
+const UserIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+const BookIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+  </svg>
+);
+const TargetIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+  </svg>
+);
+const CertificateIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
 
-const modules = [
-  { code: "FI", name: "Finance", href: "/modules-sap/fi", color: "from-blue-500 to-blue-700", desc: "Comptabilité générale, fournisseurs, clients et immobilisations." },
-  { code: "CO", name: "Controlling", href: "/modules-sap/co", color: "from-indigo-500 to-indigo-700", desc: "Centres de coûts, ordres internes et contrôle de gestion." },
-  { code: "MM", name: "Materials Mgmt", href: "/modules-sap/mm", color: "from-sky-500 to-sky-700", desc: "Achats, gestion des stocks et valorisation des articles." },
-  { code: "SD", name: "Sales & Distrib.", href: "/modules-sap/sd", color: "from-cyan-500 to-cyan-700", desc: "Commandes clients, livraisons, facturation et tarification." },
-  { code: "HCM", name: "Human Capital", href: "/modules-sap/hcm", color: "from-teal-500 to-teal-700", desc: "Gestion RH, paie, temps et recrutement." },
-  { code: "PP", name: "Production Plan.", href: "/modules-sap/pp", color: "from-emerald-500 to-emerald-700", desc: "Planification de la production, ordres de fabrication et MRP." },
+// Catalogue de modules + codes certifs : source de vérité dans
+// src/data/cert-catalog.json (mis à jour automatiquement par le workflow
+// scripts/sap-cert-watch.mjs déclenché chaque semaine via GitHub Actions).
+const modules = certCatalog.modules;
+
+const steps = [
+  { num: "01", icon: <UserIcon />, title: "Crée ton compte", desc: "Inscription gratuite en 30 secondes, sans carte bancaire." },
+  { num: "02", icon: <BookIcon />, title: "Étudie les modules", desc: "Sept chapitres progressifs par module, avec quiz à chaque étape." },
+  { num: "03", icon: <TargetIcon />, title: "Passe le simulateur", desc: "40 questions en conditions réelles, corrections détaillées." },
+  { num: "04", icon: <CertificateIcon />, title: "Obtiens ton certificat", desc: "Certificat PDF délivré dès 65 % de réussite au simulateur." },
 ];
 
 const features = [
@@ -43,85 +84,174 @@ const features = [
 export default function Home() {
   return (
     <div className="flex flex-col">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-linear-to-br from-sap-blue-dark via-sap-blue to-sap-400 py-24 sm:py-32">
+
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-linear-to-br from-sap-blue-dark via-sap-blue to-sap-400 py-20 sm:py-28">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
           >
             <span className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-white/15 text-white text-sm font-medium backdrop-blur-sm border border-white/20">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-              Plateforme SAP éducative gratuite
+              <span className="w-2 h-2 rounded-full bg-emerald-300" />
+              Plateforme SAP éducative · 100 % gratuit
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6">
-              Maîtrise SAP S/4HANA<br className="hidden sm:block" /> de zéro à consultant
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.05] tracking-tight mb-6 text-balance">
+              Apprends SAP comme en école,<br className="hidden sm:block" /> obtiens un certificat reconnu.
             </h1>
             <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Apprends les modules SAP FI, CO, MM, SD, HCM et PP avec des cours interactifs,
-              des simulateurs d&apos;examens et une roadmap consultant complète.
+              Modules FI, CO, MM, SD, HCM, PP et S/4HANA. Cours structurés,
+              simulateurs d&apos;examen alignés sur les certifications officielles SAP.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register" className="btn-primary px-8 py-3 text-base bg-white text-sap-blue hover:bg-slate-100">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+              <Link href="/register" className="btn-primary px-8 py-3.5 text-base bg-white text-sap-blue hover:bg-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.15)]">
                 Commencer gratuitement →
               </Link>
-              <Link href="/modules-sap" className="btn px-8 py-3 text-base border-2 border-white/40 text-white hover:bg-white/10">
+              <Link href="/modules-sap" className="btn px-8 py-3.5 text-base border-2 border-white/40 text-white hover:bg-white/10">
                 Explorer les modules
               </Link>
+            </div>
+
+            {/* Trust line — style OpenClassrooms */}
+            <div className="pt-8 mt-6 border-t border-white/10">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60 mb-3">
+                Aligné sur les certifications officielles SAP
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/70 font-mono">
+                {modules.map((m) => (
+                  <span key={m.cert} className="px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-sm border border-white/10">
+                    {m.cert}
+                  </span>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Stats bar */}
+      {/* ── STATS BAR ────────────────────────────────────────────────── */}
       <section className="bg-sap-blue border-b border-sap-blue-dark">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex flex-wrap justify-center gap-8 text-white text-sm font-medium">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-white text-center sm:text-left">
             {[
-              { value: "6", label: "Modules SAP" },
-              { value: "50+", label: "Concepts clés" },
-              { value: "6", label: "Simulateurs d'examen" },
-              { value: "100%", label: "Gratuit" },
+              { value: "5", label: "Modules SAP" },
+              { value: "35", label: "Chapitres" },
+              { value: "200+", label: "Questions d'examen" },
+              { value: "100 %", label: "Gratuit" },
             ].map((s) => (
-              <div key={s.label} className="flex items-center gap-2">
-                <span className="text-xl font-extrabold">{s.value}</span>
-                <span className="text-white/70">{s.label}</span>
+              <div key={s.label} className="flex items-baseline sm:items-center gap-2 justify-center sm:justify-start">
+                <span className="text-2xl sm:text-3xl font-extrabold">{s.value}</span>
+                <span className="text-sm text-white/80">{s.label}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Modules grid */}
-      <section className="py-20 bg-sap-gray-light dark:bg-sap-dark">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3">
-              Les modules SAP
+      {/* ── COMMENT ÇA MARCHE ── style OpenClassrooms / Coursera ─────── */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-sap-blue mb-3">
+              Le parcours
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-3 text-balance">
+              De zéro à consultant junior, en 4 étapes
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-              Plonge dans chaque domaine fonctionnel avec des cours progressifs et des exercices pratiques.
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+              Un chemin clair, balisé, sans deviner ce que les recruteurs attendent.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-4">
+            {steps.map((s, i) => (
+              <motion.div
+                key={s.num}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="relative card p-7 hover:shadow-medium transition-all duration-200"
+              >
+                {/* Ligne de connexion entre les étapes (desktop) */}
+                {i < steps.length - 1 && (
+                  <div className="hidden lg:block absolute top-12 -right-3 w-6 h-0.5 bg-linear-to-r from-sap-blue/30 to-transparent" aria-hidden />
+                )}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="h-12 w-12 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue flex items-center justify-center">
+                    {s.icon}
+                  </div>
+                  <span className="text-xs font-bold text-sap-blue/40 tracking-widest">{s.num}</span>
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{s.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── MODULES SAP ── cards style Udemy ─────────────────────────── */}
+      <section className="py-20 bg-sap-gray-light dark:bg-sap-dark">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-sap-blue mb-3">
+              Les modules
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-3 text-balance">
+              Six domaines fonctionnels SAP
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+              Chaque module prépare une certification officielle SAP. Cours, quiz et simulateur inclus.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {modules.map((mod, i) => (
               <motion.div
                 key={mod.code}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
+                transition={{ delay: i * 0.05 }}
               >
-                <Link href={mod.href} className="card group flex flex-col p-6 hover:shadow-medium transition-all duration-200 hover:-translate-y-0.5">
-                  <div className={`h-12 w-12 rounded-xl bg-linear-to-br ${mod.color} flex items-center justify-center text-white font-bold text-sm mb-4`}>
-                    {mod.code}
+                <Link href={mod.href} className="card-interactive group flex flex-col h-full p-6">
+                  {/* En-tête : icône module + badge certif */}
+                  <div className="flex items-start justify-between mb-5">
+                    <div className={`h-14 w-14 rounded-2xl bg-linear-to-br ${mod.color} flex items-center justify-center text-white font-extrabold text-base shadow-soft`}>
+                      {mod.code}
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-md bg-sap-blue/10 text-sap-blue dark:bg-sap-blue/20 dark:text-sap-accent">
+                      {mod.cert}
+                    </span>
                   </div>
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-1.5">{mod.name}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed flex-1">{mod.desc}</p>
-                  <span className="mt-4 text-sm font-semibold text-sap-blue dark:text-sap-300 group-hover:underline">
-                    Voir le module →
+
+                  <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{mod.name}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5 flex-1">
+                    {mod.desc}
+                  </p>
+
+                  {/* Meta-data : chapters + questions */}
+                  <div className="flex items-center gap-4 mb-4 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                      </svg>
+                      {mod.chapters} chapitres
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                      </svg>
+                      {mod.questions} questions
+                    </span>
+                  </div>
+
+                  <span className="inline-flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-700 text-sm font-bold text-sap-blue dark:text-sap-300">
+                    Découvrir le module
+                    <span className="transition-transform group-hover:translate-x-1" aria-hidden>→</span>
                   </span>
                 </Link>
               </motion.div>
@@ -130,18 +260,63 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 bg-white dark:bg-slate-900">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3">
-              Pourquoi HanaFlow ?
+      {/* ── CERTIFICATIONS PRÉPARÉES ── style SAP Learning Hub ───────── */}
+      <section className="py-20 bg-white dark:bg-slate-900 border-y border-gray-100 dark:border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-5">
+              <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-sap-blue mb-3">
+                Certifications préparées
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 text-balance">
+                Aligné sur les certifications officielles SAP
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                Chaque module suit fidèlement le syllabus de la certification SAP
+                correspondante. Le simulateur d&apos;examen reproduit les conditions
+                réelles : 40 questions, scoring équivalent, corrections détaillées.
+              </p>
+              <Link href="/certifications" className="btn-primary">
+                Voir les certifications →
+              </Link>
+            </div>
+
+            <div className="lg:col-span-7">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {modules.map((m) => (
+                  <div
+                    key={m.cert}
+                    className="card p-4 hover:border-sap-blue/30 hover:shadow-soft transition-all duration-200"
+                  >
+                    <div className={`inline-flex h-10 w-10 rounded-lg bg-linear-to-br ${m.color} text-white text-sm font-bold items-center justify-center mb-3`}>
+                      {m.code}
+                    </div>
+                    <p className="font-mono text-xs text-slate-900 dark:text-white font-semibold mb-0.5">{m.cert}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{m.name}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── POURQUOI HANAFLOW ── features avec icônes ────────────────── */}
+      <section className="py-20 bg-sap-gray-light dark:bg-sap-dark">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-sap-blue mb-3">
+              Pourquoi HanaFlow
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-3 text-balance">
+              Tout ce dont tu as besoin, dans un seul endroit
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
               Une plateforme pensée pour aller vite et apprendre efficacement.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {features.map((f, i) => (
               <motion.div
                 key={f.title}
@@ -149,9 +324,11 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="card p-6 text-center"
+                className="card p-6 hover:shadow-soft transition-all duration-200"
               >
-                <div className="h-12 w-12 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue dark:text-blue-300 flex items-center justify-center mb-4">{f.icon}</div>
+                <div className="h-12 w-12 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue dark:text-sap-accent flex items-center justify-center mb-4">
+                  {f.icon}
+                </div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-2">{f.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
               </motion.div>
@@ -160,19 +337,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-sap-gray-light dark:bg-sap-dark">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="card p-10 text-center bg-linear-to-br from-sap-blue-dark to-sap-blue border-0">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-              Prêt à démarrer ta carrière SAP ?
-            </h2>
-            <p className="text-white/80 mb-8">
-              Rejoins la plateforme gratuitement et commence dès aujourd&apos;hui.
-            </p>
-            <Link href="/register" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-white text-sap-blue font-bold hover:bg-slate-100 transition-all duration-150 active:scale-[0.98]">
-              Créer mon compte →
-            </Link>
+      {/* ── CTA FINAL ── card gradient bleu propre ─────────────────── */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-3xl p-10 sm:p-14 text-center bg-linear-to-br from-sap-blue-dark via-sap-blue to-sap-400 shadow-large">
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" aria-hidden />
+            <div className="relative">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 text-balance">
+                Prêt à démarrer ta carrière SAP ?
+              </h2>
+              <p className="text-white/85 max-w-xl mx-auto mb-8 leading-relaxed">
+                Inscription gratuite en 30 secondes. Aucune carte bancaire,
+                aucune confirmation par étape.
+              </p>
+              <Link href="/register" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-sap-blue font-bold text-base hover:bg-slate-100 transition-all duration-150 active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.15)]">
+                Créer mon compte gratuit
+                <span aria-hidden>→</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

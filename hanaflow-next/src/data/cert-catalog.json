@@ -1,0 +1,75 @@
+{
+  "$schema": "./cert-catalog.schema.json",
+  "lastVerified": "2026-05-20",
+  "verifiedBy": "manual + scripts/sap-cert-watch.mjs",
+  "modules": [
+    {
+      "code": "FI",
+      "name": "Financial Accounting",
+      "href": "/modules-sap/fi",
+      "desc": "Comptabilité générale, fournisseurs, clients, immobilisations.",
+      "cert": "C_TS4FI_2601",
+      "certName": "SAP Certified Associate – SAP S/4HANA Cloud Private Edition, Financial Accounting",
+      "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-for-financial-accounting",
+      "chapters": 7,
+      "questions": 40,
+      "color": "from-blue-500 to-blue-700"
+    },
+    {
+      "code": "CO",
+      "name": "Controlling",
+      "href": "/modules-sap/co",
+      "desc": "Centres de coûts, ordres internes, contrôle de gestion.",
+      "cert": "C_TS4CO_2601",
+      "certName": "SAP Certified Associate – SAP S/4HANA Cloud Private Edition, Management Accounting",
+      "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-for-management-accounting-associates",
+      "chapters": 7,
+      "questions": 40,
+      "color": "from-indigo-500 to-indigo-700"
+    },
+    {
+      "code": "MM",
+      "name": "Sourcing & Procurement",
+      "href": "/modules-sap/mm",
+      "desc": "Achats, gestion des stocks, valorisation des articles.",
+      "cert": "C_TS452_2601",
+      "certName": "SAP Certified Associate – SAP S/4HANA Cloud Private Edition, Sourcing and Procurement",
+      "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-sourcing-and-procurement",
+      "chapters": 7,
+      "questions": 40,
+      "color": "from-sky-500 to-sky-700"
+    },
+    {
+      "code": "SD",
+      "name": "Sales & Distribution",
+      "href": "/modules-sap/sd",
+      "desc": "Commandes clients, livraisons, facturation, tarification.",
+      "cert": "C_TS460_2023",
+      "certName": "SAP Certified Associate – Implementation Consultant for SAP S/4HANA Cloud Private Edition, Sales",
+      "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-sales",
+      "chapters": 7,
+      "questions": 40,
+      "color": "from-cyan-500 to-cyan-700"
+    },
+    {
+      "code": "PP",
+      "name": "Production Planning",
+      "href": "/modules-sap/pp",
+      "desc": "Planification production, MRP, ordres de fabrication.",
+      "cert": "C_TS422_2601",
+      "certName": "SAP Certified Associate – SAP S/4HANA Cloud Private Edition, Production Planning and Manufacturing",
+      "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-production-planning-and-manufacturing",
+      "chapters": 7,
+      "questions": 40,
+      "color": "from-emerald-500 to-emerald-700"
+    }
+  ],
+  "retired": [
+    {
+      "code": "HCM",
+      "cert": "C_THR12",
+      "retiredAt": "2025-03-31",
+      "replacement": "Éclaté en certifications SuccessFactors C_THR8x (Employee Central, Compensation, Recruiting, etc.)"
+    }
+  ]
+}

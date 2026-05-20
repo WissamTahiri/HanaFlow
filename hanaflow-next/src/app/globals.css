@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Dark mode basé sur la classe .dark (ajoutée par DarkModeToggle) */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
@@ -46,7 +45,6 @@
   --background-image-card-gradient: linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%);
 }
 
-/* Anti-flash dark mode */
 :root {
   color-scheme: light dark;
   scroll-behavior: smooth;
@@ -72,7 +70,7 @@ a, button, input, select, textarea, [role="button"] {
   transition-duration: 150ms;
 }
 
-/* ── Components ── */
+/* ── Components ─────────────────────────────────────────────────────── */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl
@@ -150,9 +148,10 @@ a, button, input, select, textarea, [role="button"] {
   }
 }
 
-/* ── Utilities ── */
+/* ── Utilities ──────────────────────────────────────────────────────── */
 @layer utilities {
   .text-balance { text-wrap: balance; }
+  .text-pretty  { text-wrap: pretty; }
 
   .gradient-text {
     background: linear-gradient(135deg, #1D4ED8, #60A5FA);
@@ -176,7 +175,7 @@ a, button, input, select, textarea, [role="button"] {
   }
 }
 
-/* ── Legal pages typography ── */
+/* ── Legal pages typography ────────────────────────────────────────── */
 .legal-content {
   @apply text-slate-700 dark:text-slate-300 leading-relaxed;
 }
@@ -218,7 +217,7 @@ a, button, input, select, textarea, [role="button"] {
   @apply px-3 py-2 border border-gray-200 dark:border-slate-700 align-top;
 }
 
-/* ── Keyframes ── */
+/* ── Keyframes ─────────────────────────────────────────────────────── */
 @keyframes pulseRing {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
@@ -229,7 +228,6 @@ a, button, input, select, textarea, [role="button"] {
   100% { background-position: -200% 0; }
 }
 
-/* ── Accessibility: prefers-reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
