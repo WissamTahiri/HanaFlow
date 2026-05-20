@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
 import { z } from "zod";
 import {
   requireAuth,
@@ -10,7 +10,7 @@ import {
   validateBody,
 } from "@/lib/apiHelpers";
 import certCatalog from "@/data/cert-catalog.json";
-import { GEMINI_MODEL } from "@/lib/gemini";
+import { generateJSON, isAiError } from "@/lib/ai";
 
 /**
  * POST /api/interview/grade
@@ -123,9 +123,6 @@ const geminiResponseSchema = {
 };
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return err("Service IA non configuré (GEMINI_API_KEY manquant).", 503);
-
   const auth = requireAuth(req);
   if ("status" in auth) return auth;
 
@@ -194,61 +191,33 @@ RÉPONSE DU CANDIDAT : ${it.answer.trim() || "[VIDE]"}
 
 Note chaque question selon le barème, puis donne ton verdict global.`;
 
-  const ai = new GoogleGenAI({ apiKey });
-
   try {
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      config: {
-        systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema: geminiResponseSchema,
-        temperature: 0.3,
-      },
+    const result = await generateJSON({
+      caller: "interview/grade",
+      systemInstruction,
+      userPrompt,
+      geminiSchema: geminiResponseSchema,
+      zodSchema: responseZod,
+      temperature: 0.3,
     });
-
-    const text = response.text;
-    if (!text) return err("Réponse IA vide.", 500);
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      console.error("[interview/grade] JSON parse failed:", text.slice(0, 200));
-      return err("Réponse IA mal formée.", 500);
-    }
-
-    const result = responseZod.safeParse(parsed);
-    if (!result.success) {
-      console.error("[interview/grade] Zod validation failed:", result.error.issues);
-      return err("Réponse IA invalide.", 500);
-    }
-
     return ok({
       perQuestion: result.data.perQuestion,
       overall: result.data.overall,
       // On renvoie aussi les idealAnswers pour que le front les affiche en révision
       idealAnswers: items.map((it) => ({ id: it.id, idealAnswer: it.idealAnswer })),
-      usage: {
-        promptTokens: response.usageMetadata?.promptTokenCount ?? 0,
-        outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
-        totalTokens: response.usageMetadata?.totalTokenCount ?? 0,
-      },
+      provider: result.provider,
+      usage: result.usage,
     });
   } catch (e) {
-    console.error("[interview/grade] gemini error:", e);
-    const msg = e instanceof Error ? e.message : String(e);
-    if (/quota|rate.?limit|RESOURCE_EXHAUSTED/i.test(msg)) {
-      const retryMatch = msg.match(/retry in ([\d.]+)s/i);
-      const retryHint = retryMatch
-        ? ` Réessaie dans ~${Math.ceil(parseFloat(retryMatch[1]))}s.`
-        : " Réessaie dans quelques minutes.";
-      return err(`Service IA temporairement saturé.${retryHint}`, 429);
+    if (isAiError(e)) {
+      if (e.kind === "rate_limit") {
+        const hint = e.retryAfterSeconds ? ` Réessaie dans ~${e.retryAfterSeconds}s.` : " Réessaie plus tard.";
+        return err(`Service IA temporairement saturé.${hint}`, 429);
+      }
+      if (e.kind === "no_provider" || e.kind === "auth") return err(e.message, 503);
+      if (e.kind === "invalid_response") return err("Réponse IA invalide.", 500);
     }
-    if (/api.?key|unauthorized|forbidden/i.test(msg)) {
-      return err("Erreur d'authentification côté Google.", 500);
-    }
+    console.error("[interview/grade] failed:", e);
     return err("Erreur lors de la notation.", 500);
   }
 }
