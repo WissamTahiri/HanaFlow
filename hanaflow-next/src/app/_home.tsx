@@ -85,45 +85,88 @@ export default function Home() {
   return (
     <div className="flex flex-col">
 
-      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      {/* ── HERO ── CTA refondu, dark-mode safe ─────────────────────── */}
       <section className="relative overflow-hidden bg-linear-to-br from-sap-blue-dark via-sap-blue to-sap-400 py-20 sm:py-28">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        {/* Texture grid + bloom radial */}
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.08]" aria-hidden />
+        <div className="absolute top-0 right-0 w-[40vw] h-[40vw] rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.5), transparent 70%)" }} aria-hidden />
+        <div className="absolute bottom-0 left-0 w-[30vw] h-[30vw] rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, rgba(147,197,253,0.5), transparent 70%)" }} aria-hidden />
+
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
           >
+            {/* Eyebrow avec dot pulsant */}
             <span className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-white/15 text-white text-sm font-medium backdrop-blur-sm border border-white/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-300" />
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
               Plateforme SAP éducative · 100 % gratuit
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.05] tracking-tight mb-6 text-balance">
-              Apprends SAP comme en école,<br className="hidden sm:block" /> obtiens un certificat reconnu.
+
+            {/* Headline : 1ère ligne en blanc, 2ème en italique + accent doux pour respiration */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.02] tracking-[-0.02em] mb-6 text-balance">
+              Apprends SAP comme en école,
+              <br className="hidden sm:block" />{" "}
+              <span className="bg-linear-to-r from-white via-sky-100 to-blue-100 bg-clip-text text-transparent">
+                obtiens un certificat reconnu.
+              </span>
             </h1>
-            <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Modules FI, CO, MM, SD, HCM, PP et S/4HANA. Cours structurés,
+
+            <p className="text-lg sm:text-xl text-white/85 max-w-2xl mx-auto mb-10 leading-relaxed">
+              Modules FI, CO, MM, SD, PP, et désormais une certif IA générative. Cours structurés,
               simulateurs d&apos;examen alignés sur les certifications officielles SAP.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-              <Link href="/register" className="btn-primary px-8 py-3.5 text-base bg-white text-sap-blue hover:bg-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.15)]">
-                Commencer gratuitement →
+
+            {/* CTA — primary button-in-button + secondary link discret */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-10">
+              <Link
+                href="/register"
+                className="group inline-flex items-center gap-2 pl-7 pr-2 py-2 bg-white text-sap-blue-dark text-base font-bold rounded-full
+                           shadow-[0_8px_24px_rgba(15,23,42,0.20)] hover:shadow-[0_12px_36px_rgba(15,23,42,0.30)]
+                           transition-all duration-200 active:scale-[0.98]"
+              >
+                Commencer gratuitement
+                <span className="ml-1 inline-flex items-center justify-center w-9 h-9 rounded-full bg-sap-blue text-white transition-transform duration-200 group-hover:translate-x-0.5 group-hover:scale-105">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
               </Link>
-              <Link href="/modules-sap" className="btn px-8 py-3.5 text-base border-2 border-white/40 text-white hover:bg-white/10">
+
+              <Link
+                href="/modules-sap"
+                className="inline-flex items-center gap-1.5 px-6 py-3 text-base text-white font-semibold rounded-full hover:bg-white/10 transition-colors"
+              >
                 Explorer les modules
+                <span aria-hidden className="transition-transform duration-200 hover:translate-x-0.5">→</span>
               </Link>
             </div>
 
-            {/* Trust line — style OpenClassrooms */}
+            {/* Micro proof line — sous les CTA, rassurant et concret */}
+            <p className="text-sm text-white/60 mb-10">
+              Compte créé en 30 secondes · sans carte bancaire · contenu certifiant officiel SAP
+            </p>
+
+            {/* Trust strip — codes officiels comme badges cliquables */}
             <div className="pt-8 mt-6 border-t border-white/10">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60 mb-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60 mb-4">
                 Aligné sur les certifications officielles SAP
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/70 font-mono">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 {modules.map((m) => (
-                  <span key={m.cert} className="px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-sm border border-white/10">
-                    {m.cert}
-                  </span>
+                  <Link
+                    key={m.cert}
+                    href={m.href}
+                    className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.15] backdrop-blur-sm border border-white/15 hover:border-white/30 transition-all"
+                    title={m.certName}
+                  >
+                    <span className="text-[10px] font-bold text-white/80 group-hover:text-white">{m.code}</span>
+                    <span className="text-[10px] text-white/40 group-hover:text-white/70 font-mono">{m.cert}</span>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -136,9 +179,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-white text-center sm:text-left">
             {[
-              { value: "5", label: "Modules SAP" },
-              { value: "35", label: "Chapitres" },
-              { value: "200+", label: "Questions d'examen" },
+              { value: "6", label: "Modules SAP" },
+              { value: "42", label: "Chapitres" },
+              { value: "240+", label: "Questions d'examen" },
               { value: "100 %", label: "Gratuit" },
             ].map((s) => (
               <div key={s.label} className="flex items-baseline sm:items-center gap-2 justify-center sm:justify-start">
