@@ -1,24 +1,18 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import CertificationTemplate from "@/components/CertificationTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { ppCertification } from "@/data/certifications/pp.js";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertForPlan } from "@/lib/certAccess";
 
-function PPCertificationContent() {
+export default async function CertificationPPPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/pp");
+
   return (
     <CertificationTemplate
-      certification={ppCertification}
+      certification={getCertForPlan("pp", user.isPro)}
       moduleId="pp"
       examPath="/certifications/pp/examen"
       heroGradient="from-rose-900 via-rose-700 to-pink-500"
     />
-  );
-}
-
-export default function CertificationPPPage() {
-  return (
-    <ProtectedRoute>
-      <PPCertificationContent />
-    </ProtectedRoute>
   );
 }

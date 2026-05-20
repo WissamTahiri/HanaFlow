@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
-type Phase = "idle" | "enrolling" | "verifying" | "disabling";
+type Phase = "idle" | "enrolling" | "verifying" | "disabling" | "showing-codes" | "regenerating";
 
 export default function TwoFactorSection() {
   const { user, token } = useAuth();
@@ -15,6 +15,22 @@ export default function TwoFactorSection() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [remainingCodes, setRemainingCodes] = useState<number | null>(null);
+  const [acknowledged, setAcknowledged] = useState(false);
+
+  useEffect(() => {
+    if (!user?.totpEnabled || !token) return;
+    fetch("/api/auth/2fa/backup-codes", {
+      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) setRemainingCodes(d.remaining);
+      })
+      .catch(() => {});
+  }, [user?.totpEnabled, token]);
 
   if (!user) return null;
   const isEnabled = user.totpEnabled === true;
@@ -27,12 +43,12 @@ export default function TwoFactorSection() {
     setPassword("");
     setError("");
     setInfo("");
+    setBackupCodes([]);
+    setAcknowledged(false);
   };
 
   const startEnroll = async () => {
-    setBusy(true);
-    setError("");
-    setInfo("");
+    setBusy(true); setError(""); setInfo("");
     try {
       const r = await fetch("/api/auth/2fa/enroll", {
         method: "POST",
@@ -53,8 +69,7 @@ export default function TwoFactorSection() {
 
   const verifyEnroll = async () => {
     if (code.length < 6) return;
-    setBusy(true);
-    setError("");
+    setBusy(true); setError("");
     try {
       const r = await fetch("/api/auth/2fa/verify-enroll", {
         method: "POST",
@@ -64,13 +79,12 @@ export default function TwoFactorSection() {
       });
       const d = await r.json();
       if (!r.ok) { setError(d.message ?? "Erreur"); return; }
-      setInfo("2FA activée. À votre prochaine connexion, un code vous sera demandé.");
-      setPhase("idle");
+      // Affiche les codes de récupération AVANT de finir
+      setBackupCodes(d.backupCodes ?? []);
+      setPhase("showing-codes");
+      setCode("");
       setSecret("");
       setQrDataUrl("");
-      setCode("");
-      // Refresh user
-      window.location.reload();
     } catch {
       setError("Erreur réseau");
     } finally {
@@ -80,8 +94,7 @@ export default function TwoFactorSection() {
 
   const disable = async () => {
     if (code.length < 6 || password.length === 0) return;
-    setBusy(true);
-    setError("");
+    setBusy(true); setError("");
     try {
       const r = await fetch("/api/auth/2fa/disable", {
         method: "POST",
@@ -94,6 +107,30 @@ export default function TwoFactorSection() {
       setInfo("2FA désactivée");
       reset();
       window.location.reload();
+    } catch {
+      setError("Erreur réseau");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const regenerate = async () => {
+    if (code.length < 6 || password.length === 0) return;
+    setBusy(true); setError("");
+    try {
+      const r = await fetch("/api/auth/2fa/backup-codes", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ code, password }),
+      });
+      const d = await r.json();
+      if (!r.ok) { setError(d.message ?? "Erreur"); return; }
+      setBackupCodes(d.backupCodes ?? []);
+      setRemainingCodes((d.backupCodes ?? []).length);
+      setPhase("showing-codes");
+      setCode("");
+      setPassword("");
     } catch {
       setError("Erreur réseau");
     } finally {
@@ -122,9 +159,8 @@ export default function TwoFactorSection() {
       {error && <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">{error}</div>}
       {info && <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm">{info}</div>}
 
-      {/* Idle state */}
       {phase === "idle" && (
-        <div>
+        <div className="space-y-3">
           {!isEnabled ? (
             <button
               onClick={startEnroll}
@@ -134,17 +170,36 @@ export default function TwoFactorSection() {
               Activer la 2FA
             </button>
           ) : (
-            <button
-              onClick={() => setPhase("disabling")}
-              className="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 text-sm font-semibold transition-colors"
-            >
-              Désactiver la 2FA
-            </button>
+            <>
+              {remainingCodes !== null && (
+                <div className={`p-3 rounded-lg text-sm ${
+                  remainingCodes <= 2
+                    ? "bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300"
+                    : "bg-slate-50 dark:bg-slate-900/40 text-slate-600 dark:text-slate-300"
+                }`}>
+                  <strong>{remainingCodes}</strong> code{remainingCodes > 1 ? "s" : ""} de récupération restant{remainingCodes > 1 ? "s" : ""}.
+                  {remainingCodes <= 2 && " Régénère-en pour ne pas te retrouver bloqué."}
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setPhase("regenerating")}
+                  className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                >
+                  Régénérer codes de récupération
+                </button>
+                <button
+                  onClick={() => setPhase("disabling")}
+                  className="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 text-sm font-semibold transition-colors"
+                >
+                  Désactiver la 2FA
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}
 
-      {/* Enrolling — afficher QR code */}
       {phase === "enrolling" && (
         <div className="space-y-4">
           <ol className="text-sm text-slate-700 dark:text-slate-300 space-y-2 list-decimal pl-5">
@@ -155,6 +210,7 @@ export default function TwoFactorSection() {
 
           <div className="flex flex-col sm:flex-row gap-5 items-start">
             {qrDataUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={qrDataUrl} alt="QR code 2FA" className="w-48 h-48 rounded-lg border-2 border-gray-200 dark:border-slate-700 bg-white p-2 flex-shrink-0" />
             )}
             <div className="flex-1 min-w-0">
@@ -204,11 +260,73 @@ export default function TwoFactorSection() {
         </div>
       )}
 
-      {/* Disabling — demander password + code */}
-      {phase === "disabling" && (
+      {phase === "showing-codes" && (
+        <div className="space-y-4">
+          <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">
+              ⚠️ Sauvegarde ces codes maintenant
+            </p>
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              Chaque code n&apos;est utilisable qu&apos;une seule fois. Ils te permettent de te connecter
+              si tu perds ton téléphone. Ils ne seront plus jamais affichés.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-sm">
+            {backupCodes.map((c) => (
+              <div key={c} className="text-slate-900 dark:text-slate-100 select-all">{c}</div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => navigator.clipboard?.writeText(backupCodes.join("\n"))}
+              className="px-3 py-2 rounded-lg text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+            >
+              Copier tous
+            </button>
+            <button
+              onClick={() => {
+                const blob = new Blob([`Codes de récupération HanaFlow — ${new Date().toLocaleDateString("fr-FR")}\n\n${backupCodes.join("\n")}\n`], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `hanaflow-backup-codes-${new Date().toISOString().slice(0, 10)}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="px-3 py-2 rounded-lg text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+            >
+              Télécharger (.txt)
+            </button>
+          </div>
+
+          <label className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={(e) => setAcknowledged(e.target.checked)}
+              className="mt-0.5"
+            />
+            J&apos;ai sauvegardé mes codes de récupération dans un endroit sûr.
+          </label>
+
+          <button
+            onClick={() => { reset(); window.location.reload(); }}
+            disabled={!acknowledged}
+            className="px-4 py-2 rounded-lg bg-sap-blue text-white text-sm font-semibold hover:bg-sap-blue-dark transition-colors disabled:opacity-40"
+          >
+            Terminé
+          </button>
+        </div>
+      )}
+
+      {(phase === "disabling" || phase === "regenerating") && (
         <div className="space-y-3 max-w-sm">
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            Pour désactiver la 2FA, confirme avec ton mot de passe et un code valide.
+            {phase === "disabling"
+              ? "Pour désactiver la 2FA, confirme avec ton mot de passe et un code valide."
+              : "Pour régénérer les codes, confirme avec ton mot de passe et un code TOTP valide."}
           </p>
           <div>
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Mot de passe</label>
@@ -221,25 +339,29 @@ export default function TwoFactorSection() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Code 2FA (6 chiffres)</label>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+              {phase === "disabling" ? "Code 2FA ou code de récupération" : "Code 2FA (6 chiffres)"}
+            </label>
             <input
               type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={6}
+              inputMode={phase === "regenerating" ? "numeric" : "text"}
+              pattern={phase === "regenerating" ? "[0-9]*" : undefined}
+              maxLength={phase === "disabling" ? 12 : 6}
               value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full px-3 py-2 text-center tracking-[0.3em] font-mono rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
-              placeholder="••••••"
+              onChange={(e) => setCode(phase === "regenerating" ? e.target.value.replace(/\D/g, "").slice(0, 6) : e.target.value.slice(0, 12))}
+              className="w-full px-3 py-2 text-center tracking-[0.2em] font-mono rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
+              placeholder={phase === "disabling" ? "123456 ou abcde-fghij" : "••••••"}
             />
           </div>
           <div className="flex gap-2">
             <button
-              onClick={disable}
+              onClick={phase === "disabling" ? disable : regenerate}
               disabled={busy || code.length < 6 || password.length === 0}
-              className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-40"
+              className={`px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors disabled:opacity-40 ${
+                phase === "disabling" ? "bg-red-600 hover:bg-red-700" : "bg-sap-blue hover:bg-sap-blue-dark"
+              }`}
             >
-              {busy ? "…" : "Désactiver la 2FA"}
+              {busy ? "…" : phase === "disabling" ? "Désactiver la 2FA" : "Régénérer"}
             </button>
             <button
               onClick={reset}

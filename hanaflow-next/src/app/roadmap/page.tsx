@@ -552,7 +552,8 @@ function Step2({ form, setForm }: { form: FormData; setForm: React.Dispatch<Reac
 function Step3({ form, setForm }: { form: FormData; setForm: React.Dispatch<React.SetStateAction<FormData>> }) {
   const toggle = (key: string) => {
     const set = new Set(form.modulesConnus);
-    set.has(key) ? set.delete(key) : set.add(key);
+    if (set.has(key)) set.delete(key);
+    else set.add(key);
     setForm(f => ({ ...f, modulesConnus: [...set] }));
   };
 

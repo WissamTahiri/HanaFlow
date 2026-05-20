@@ -38,6 +38,27 @@ export async function sendEmail({ to, subject, html, text }: EmailParams): Promi
   }
 }
 
+/** Escape HTML pour interpolation sûre dans les templates email. */
+const esc = (s: string): string =>
+  s.replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case "&": return "&amp;";
+      case "<": return "&lt;";
+      case ">": return "&gt;";
+      case '"': return "&quot;";
+      case "'": return "&#39;";
+      default:  return c;
+    }
+  });
+
+/**
+ * Sanitise une chaîne destinée à un header email (Subject, etc.) :
+ * supprime tous les caractères de contrôle (CR/LF/NUL/…) qui permettraient
+ * d'injecter des headers MIME supplémentaires, et tronque à 200 chars.
+ */
+const sanitizeHeader = (s: string): string =>
+  s.replace(/[\x00-\x1f\x7f]/g, " ").trim().slice(0, 200);
+
 /* ─── Templates HTML simples ────────────────────────────────────────── */
 
 const wrap = (innerHtml: string) => `<!doctype html>
@@ -56,7 +77,7 @@ export const templates = {
   welcome: (name: string) => ({
     subject: "Bienvenue sur HanaFlow",
     html: wrap(`
-      <h1 style="font-size:22px;margin:0 0 16px 0;">Bienvenue ${name} 👋</h1>
+      <h1 style="font-size:22px;margin:0 0 16px 0;">Bienvenue ${esc(name)} 👋</h1>
       <p style="line-height:1.6;color:#334155;">
         Ton compte HanaFlow est créé. Tu peux maintenant accéder à l'ensemble des modules SAP
         (FI, CO, MM, SD, HCM, PP) et suivre ta progression.
@@ -67,7 +88,7 @@ export const templates = {
         </a>
       </p>
     `),
-    text: `Bienvenue ${name} sur HanaFlow ! Connecte-toi sur https://hanaflow.vercel.app/dashboard`,
+    text: `Bienvenue ${sanitizeHeader(name)} sur HanaFlow ! Connecte-toi sur https://hanaflow.vercel.app/dashboard`,
   }),
 
   passwordReset: (name: string) => ({
@@ -75,7 +96,7 @@ export const templates = {
     html: wrap(`
       <h1 style="font-size:22px;margin:0 0 16px 0;">Mot de passe réinitialisé</h1>
       <p style="line-height:1.6;color:#334155;">
-        Bonjour ${name}, ton mot de passe HanaFlow vient d'être réinitialisé par un administrateur.
+        Bonjour ${esc(name)}, ton mot de passe HanaFlow vient d'être réinitialisé par un administrateur.
       </p>
       <p style="line-height:1.6;color:#334155;">
         Toutes tes sessions actives ont été déconnectées. Connecte-toi avec ton nouveau mot de passe pour récupérer l'accès.
@@ -96,7 +117,7 @@ export const templates = {
     html: wrap(`
       <h1 style="font-size:22px;margin:0 0 16px 0;">Compte temporairement suspendu</h1>
       <p style="line-height:1.6;color:#334155;">
-        Bonjour ${name}, ton compte HanaFlow a été suspendu par un administrateur.
+        Bonjour ${esc(name)}, ton compte HanaFlow a été suspendu par un administrateur.
         Tu n'as plus accès à la plateforme jusqu'à réactivation.
       </p>
       <p style="line-height:1.6;color:#334155;">
@@ -110,7 +131,7 @@ export const templates = {
     html: wrap(`
       <h1 style="font-size:22px;margin:0 0 16px 0;">Bienvenue dans Pro 🎉</h1>
       <p style="line-height:1.6;color:#334155;">
-        Bonjour ${name}, ton plan Pro est maintenant actif. Tu as accès à l'ensemble des chapitres
+        Bonjour ${esc(name)}, ton plan Pro est maintenant actif. Tu as accès à l'ensemble des chapitres
         de certifications, aux simulateurs d'examen et aux contenus premium.
       </p>
       <p style="margin-top:24px;">
@@ -121,11 +142,51 @@ export const templates = {
     `),
   }),
 
+  passwordResetRequest: (name: string, resetUrl: string) => ({
+    subject: "Réinitialisation de ton mot de passe",
+    html: wrap(`
+      <h1 style="font-size:22px;margin:0 0 16px 0;">Réinitialisation du mot de passe</h1>
+      <p style="line-height:1.6;color:#334155;">
+        Bonjour ${esc(name)}, tu as demandé à réinitialiser ton mot de passe HanaFlow.
+        Ce lien est valable <strong>1 heure</strong> et ne peut servir qu'une seule fois.
+      </p>
+      <p style="margin-top:24px;">
+        <a href="${esc(resetUrl)}" style="display:inline-block;padding:12px 20px;background:#2563EB;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;">
+          Choisir un nouveau mot de passe →
+        </a>
+      </p>
+      <p style="font-size:13px;color:#64748B;margin-top:24px;">
+        Si tu n'as pas demandé cela, ignore simplement cet email — ton mot de passe ne change pas.
+      </p>
+    `),
+    text: `Lien de réinitialisation HanaFlow (valide 1h, usage unique) : ${resetUrl}`,
+  }),
+
+  emailVerification: (name: string, verifyUrl: string) => ({
+    subject: "Confirme ton email HanaFlow",
+    html: wrap(`
+      <h1 style="font-size:22px;margin:0 0 16px 0;">Bienvenue ${esc(name)} 👋</h1>
+      <p style="line-height:1.6;color:#334155;">
+        Confirme ton adresse email pour activer ton compte et accéder à toutes les fonctionnalités.
+        Ce lien est valable <strong>48 heures</strong>.
+      </p>
+      <p style="margin-top:24px;">
+        <a href="${esc(verifyUrl)}" style="display:inline-block;padding:12px 20px;background:#2563EB;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;">
+          Confirmer mon email →
+        </a>
+      </p>
+      <p style="font-size:13px;color:#64748B;margin-top:24px;">
+        Si tu n'as pas créé de compte sur HanaFlow, ignore cet email.
+      </p>
+    `),
+    text: `Confirme ton email HanaFlow (48h) : ${verifyUrl}`,
+  }),
+
   adminNewSignup: (newUser: { name: string; email: string }) => ({
-    subject: `Nouveau compte : ${newUser.name}`,
+    subject: sanitizeHeader(`Nouveau compte : ${newUser.name}`),
     html: wrap(`
       <h1 style="font-size:18px;margin:0 0 16px 0;">Nouvel utilisateur inscrit</h1>
-      <p style="line-height:1.6;color:#334155;"><strong>${newUser.name}</strong> (${newUser.email})</p>
+      <p style="line-height:1.6;color:#334155;"><strong>${esc(newUser.name)}</strong> (${esc(newUser.email)})</p>
       <p style="margin-top:24px;">
         <a href="https://hanaflow.vercel.app/admin/users" style="display:inline-block;padding:10px 16px;background:#2563EB;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">
           Voir dans l'admin →

@@ -1,24 +1,18 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import CertificationTemplate from "@/components/CertificationTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { sdCertification } from "@/data/certifications/sd.js";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertForPlan } from "@/lib/certAccess";
 
-function SDCertificationContent() {
+export default async function CertificationSDPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/sd");
+
   return (
     <CertificationTemplate
-      certification={sdCertification}
+      certification={getCertForPlan("sd", user.isPro)}
       moduleId="sd"
       examPath="/certifications/sd/examen"
       heroGradient="from-purple-900 via-purple-700 to-purple-500"
     />
-  );
-}
-
-export default function CertificationSDPage() {
-  return (
-    <ProtectedRoute>
-      <SDCertificationContent />
-    </ProtectedRoute>
   );
 }

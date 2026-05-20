@@ -1,159 +1,61 @@
 # HanaFlow
 
-Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, HCM et PP ainsi que S/4HANA.
+Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, HCM, PP et S/4HANA, de zéro à consultant certifié.
 
-## Stack technique
+> Le code actif vit dans [`hanaflow-next/`](./hanaflow-next/). Une ancienne implémentation React/Vite + Express est conservée dans `_archive/` pour référence (voir « Historique » plus bas).
 
-| Couche | Technologies |
-|--------|-------------|
-| Frontend | React 18, Vite 6, Tailwind CSS, React Router v6 |
-| Backend | Express.js 5, Node.js |
-| Base de données | PostgreSQL (Neon cloud) |
-| Authentification | JWT (HS256) + refresh tokens httpOnly |
-| Hachage | Argon2id |
-| Validation | Zod |
-| Monitoring | Sentry |
-| Déploiement | Vercel (frontend) + Render (backend) |
+## Stack
 
-## Architecture
+- **Framework** : Next.js 16 (App Router, TypeScript)
+- **UI** : React 19, Tailwind CSS v4, motion/react
+- **Base de données** : Neon PostgreSQL + Prisma ORM
+- **Auth** : JWT (access + refresh httpOnly), Argon2id, TOTP 2FA optionnel
+- **Email** : Resend (fallback console si non configuré)
+- **PWA** : `next-pwa` (installable mobile)
+- **Déploiement** : Vercel (région `cdg1`)
 
-```
-HanaFlow/
-├── Front-End/          # Application React (Vite)
-│   ├── src/
-│   │   ├── pages/      # Pages de l'app (FI, CO, MM, SD, HCM, PP…)
-│   │   ├── components/ # Composants réutilisables (Navbar, SEO, ProtectedRoute…)
-│   │   ├── context/    # AuthContext — état auth global
-│   │   ├── hooks/      # useProgress — suivi de progression
-│   │   └── config/     # api.js — URL backend
-│   ├── vercel.json     # Config déploiement Vercel
-│   └── vite.config.js  # Build + alias de chemins + Vitest
-│
-├── Back-End/           # API Express
-│   ├── routes/         # auth.js, progress.js
-│   ├── middleware/     # auth.js, errorHandler.js
-│   ├── db/             # pool.js, migrate.js, migrations/
-│   ├── tests/          # Tests Jest + Supertest
-│   ├── server.js       # Point d'entrée
-│   └── render.yaml     # Config déploiement Render
-│
-├── SECURITY.md         # Documentation sécurité
-├── DEPLOIEMENT.md      # Guide déploiement pas-à-pas
-└── PROGRESS.md         # Suivi d'implémentation
-```
+## Fonctionnalités
 
-## Développement local
+- 6 modules SAP avec cours structurés (FI, CO, MM, SD, HCM, PP)
+- Pages S/4HANA, SAP AI Joule, processus métier, roadmap consultant
+- 6 simulateurs d'examens de certification avec corrections détaillées
+- Certificats PDF téléchargeables (`@react-pdf/renderer`)
+- Gamification : XP, badges, niveaux 1–10
+- Dashboard personnalisé avec progression
+- Plan Pro activable par codes promo
+- Panel admin : utilisateurs (bulk, export, impersonation, revoke sessions), codes promo, audit log, paramètres site, analytics
+- Mode maintenance & bannière site pilotables depuis l'admin
+- 2FA TOTP optionnel pour les comptes
+- Dark mode avec persistance + anti-flash
 
-### Prérequis
-
-- Node.js 18+
-- Un compte [Neon](https://neon.tech) (PostgreSQL cloud gratuit)
-
-### 1. Cloner le projet
+## Démarrage local
 
 ```bash
-git clone git@github.com:WissamTahiri/HanaFlow.git
-cd HanaFlow
-```
-
-### 2. Configurer le backend
-
-```bash
-cd Back-End
-cp .env.example .env
-# Remplir .env avec tes vraies valeurs (voir section Variables d'environnement)
+cd hanaflow-next
 npm install
-npm run migrate   # Créer les tables en base
-npm run dev       # Démarre sur http://localhost:5000
+cp .env.example .env   # éditer .env avec tes vraies valeurs Neon + JWT
+npx prisma db push
+npx prisma generate
+npm run dev
 ```
 
-### 3. Configurer le frontend
-
-```bash
-cd Front-End
-cp .env.example .env
-# .env : VITE_API_URL=http://localhost:5000
-npm install
-npm run dev       # Démarre sur http://localhost:5173
-```
-
-## Variables d'environnement
-
-### Backend (`Back-End/.env`)
-
-| Variable | Obligatoire | Description |
-|----------|-------------|-------------|
-| `NODE_ENV` | Oui | `development` ou `production` |
-| `PORT` | Non | Port du serveur (défaut : 5000) |
-| `DATABASE_URL` | Oui | URL PostgreSQL Neon avec `sslmode=verify-full` |
-| `JWT_SECRET` | Oui | Secret aléatoire 64+ caractères |
-| `JWT_REFRESH_SECRET` | Oui | Secret différent de JWT_SECRET |
-| `JWT_EXPIRES_IN` | Non | Durée access token (défaut : `1h`) |
-| `JWT_REFRESH_EXPIRES_IN` | Non | Durée refresh token (défaut : `7d`) |
-| `ALLOWED_ORIGINS` | Oui (prod) | Origines CORS autorisées (séparées par virgule) |
-| `SENTRY_DSN` | Non | DSN Sentry pour le monitoring en production |
-
-Générer des secrets JWT :
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-### Frontend (`Front-End/.env`)
-
-| Variable | Description |
-|----------|-------------|
-| `VITE_API_URL` | URL de l'API backend (ex: `http://localhost:5000`) |
-| `VITE_SENTRY_DSN` | DSN Sentry frontend (optionnel) |
+App disponible sur `http://localhost:3000`.
 
 ## Tests
 
-### Backend (Jest + Supertest)
-
 ```bash
-cd Back-End
-npm test          # Lance les 12 tests
-npm run test:watch  # Mode watch
+cd hanaflow-next
+npm test          # Vitest run
+npm run test:watch
 ```
 
-### Frontend (Vitest + Testing Library)
+Couverture actuelle : `auth.ts`, `apiHelpers.ts`, `totp.ts`.
 
-```bash
-cd Front-End
-npm test          # Lance les tests
-npm run test:watch  # Mode watch
-```
+## Documentation détaillée
 
-## Déploiement
+- [`hanaflow-next/README.md`](./hanaflow-next/README.md) — README technique de l'app
+- [`hanaflow-next/AGENTS.md`](./hanaflow-next/AGENTS.md) — avertissement sur Next.js 16 (breaking changes vs versions antérieures)
 
-Voir [DEPLOIEMENT.md](./DEPLOIEMENT.md) pour le guide complet pas-à-pas.
+## Historique
 
-- **Frontend** → [Vercel](https://vercel.com) (détecte Vite automatiquement)
-- **Backend** → [Render](https://render.com) (configuré via `render.yaml`)
-- **Base de données** → [Neon](https://neon.tech) (PostgreSQL serverless)
-
-## Routes API
-
-| Méthode | Route | Auth | Description |
-|---------|-------|------|-------------|
-| `GET` | `/health` | — | Health check (Render) |
-| `POST` | `/auth/register` | — | Inscription |
-| `POST` | `/auth/login` | — | Connexion |
-| `POST` | `/auth/refresh` | Cookie | Renouveler l'access token |
-| `POST` | `/auth/logout` | Cookie | Déconnexion |
-| `GET` | `/auth/me` | JWT | Profil de l'utilisateur connecté |
-| `PATCH` | `/auth/profile` | JWT | Modifier nom ou mot de passe |
-| `GET` | `/progress` | JWT | Modules visités par l'utilisateur |
-| `POST` | `/progress/:module` | JWT | Marquer un module comme visité |
-
-Modules SAP valides : `fi`, `co`, `mm`, `sd`, `hcm`, `pp`
-
-## Sécurité
-
-Voir [SECURITY.md](./SECURITY.md) pour la documentation complète.
-
-Points clés :
-- Mots de passe hashés avec **Argon2id**
-- Refresh tokens stockés en **httpOnly cookie** (inaccessible depuis JavaScript)
-- **CSP** (Content Security Policy) stricte via Helmet
-- Rate limiting : 15 tentatives / 15 min sur les routes auth
-- 0 vulnérabilité (`npm audit` à jour sur les deux projets)
+Avant la migration Next.js, HanaFlow était une SPA React/Vite + API Express. Ce code est archivé dans `_archive/Front-End` et `_archive/Back-End` (avec ses propres `PROGRESS.md`, `SECURITY.md`, `DEPLOIEMENT.md`, etc. qui n'ont **pas** été mis à jour pour la nouvelle stack). À consulter uniquement pour récupérer un composant ou comprendre une décision passée.

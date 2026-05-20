@@ -1,24 +1,20 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { sdMockExamQuestions, sdCertification } from "@/data/certifications/sd.js";
+import ProPaywall from "@/components/ProPaywall";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
 
-function SDExamContent() {
+export default async function SDExamPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/sd/examen");
+  if (!user.isPro) return <ProPaywall certPath="/certifications/sd" />;
+
   return (
     <ExamSimulatorTemplate
-      questions={sdMockExamQuestions}
-      certInfo={{ code: sdCertification.code, shortName: sdCertification.shortName }}
+      questions={getExamQuestions("sd")}
+      certInfo={getCertMeta("sd")}
       moduleId="sd"
       certPath="/certifications/sd"
     />
-  );
-}
-
-export default function SDExamPage() {
-  return (
-    <ProtectedRoute>
-      <SDExamContent />
-    </ProtectedRoute>
   );
 }

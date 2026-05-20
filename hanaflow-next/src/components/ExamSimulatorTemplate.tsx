@@ -70,13 +70,12 @@ function StartScreen({ onStart, questions, certInfo, certPath }: { onStart: () =
   );
 }
 
-function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, moduleId }: {
+function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath }: {
   answers: (number | null)[];
   questions: ExamQuestion[];
   timeUsed: number;
   certInfo: CertInfo;
   certPath: string;
-  moduleId: string;
 }) {
   const { user } = useAuth();
   const score = answers.filter((a, i) => a === questions[i].correctIndex).length;
@@ -96,7 +95,6 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
   if (reviewMode) {
     const q = questions[reviewIndex];
     const userAnswer = answers[reviewIndex];
-    const isCorrect = userAnswer === q.correctIndex;
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto">
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
@@ -220,23 +218,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
   const [flagged, setFlagged] = useState<Set<number>>(new Set());
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  if (!canAccess(true)) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sap-dark flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-8 text-center max-w-md">
-          <div className="h-14 w-14 bg-sap-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-sap-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Simulateur d'examen — Accès Pro</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">Le simulateur d'examen est réservé aux membres Pro. Activez le plan Pro gratuitement.</p>
-          <Link href={certPath} className="block w-full py-2.5 bg-sap-blue text-white rounded-xl font-semibold text-sm hover:bg-sap-blue-dark transition-colors">Retour — Activer Pro</Link>
-        </div>
-      </div>
-    );
-  }
-
+  // Hooks DOIVENT être appelés inconditionnellement avant tout early-return.
   const startTimer = useCallback(() => {
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {
@@ -260,6 +242,23 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
+  if (!canAccess(true)) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sap-dark flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-8 text-center max-w-md">
+          <div className="h-14 w-14 bg-sap-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-sap-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Simulateur d&apos;examen — Accès Pro</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">Le simulateur d&apos;examen est réservé aux membres Pro. Activez le plan Pro gratuitement.</p>
+          <Link href={certPath} className="block w-full py-2.5 bg-sap-blue text-white rounded-xl font-semibold text-sm hover:bg-sap-blue-dark transition-colors">Retour — Activer Pro</Link>
+        </div>
+      </div>
+    );
+  }
+
   const handleStart = () => { setPhase("exam"); startTimer(); };
 
   const handleAnswer = (idx: number) => {
@@ -275,7 +274,12 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
   };
 
   const toggleFlag = () => {
-    setFlagged((prev) => { const next = new Set(prev); next.has(currentQ) ? next.delete(currentQ) : next.add(currentQ); return next; });
+    setFlagged((prev) => {
+      const next = new Set(prev);
+      if (next.has(currentQ)) next.delete(currentQ);
+      else next.add(currentQ);
+      return next;
+    });
   };
 
   const answeredCount = answers.filter((a) => a !== null).length;
@@ -365,7 +369,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
         )}
 
         {phase === "results" && (
-          <ResultsScreen answers={answers} questions={questions} timeUsed={timeUsed} certInfo={certInfo} certPath={certPath} moduleId={moduleId} />
+          <ResultsScreen answers={answers} questions={questions} timeUsed={timeUsed} certInfo={certInfo} certPath={certPath} />
         )}
       </div>
     </div>

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import argon2 from "argon2";
 import { verifyAccessToken, type JwtPayload } from "./auth";
+import { prisma } from "./prisma";
 import { z } from "zod";
 
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -7,10 +9,70 @@ const IS_PROD = process.env.NODE_ENV === "production";
 export const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: IS_PROD,
-  sameSite: (IS_PROD ? "none" : "lax") as "none" | "lax",
+  sameSite: "lax" as const,
   maxAge: 7 * 24 * 60 * 60, // 7 jours en secondes
   path: "/",
 };
+
+/**
+ * CSRF token : double-submit cookie pattern.
+ *  - cookie NON httpOnly (le JS doit pouvoir le lire pour le renvoyer en header)
+ *  - SameSite=Lax (suffisant car on exige aussi le header X-CSRF-Token, qu'un
+ *    attaquant cross-origin ne peut pas forger)
+ *  - secure en prod
+ */
+export const CSRF_COOKIE_NAME = "csrfToken";
+export const CSRF_HEADER_NAME = "x-csrf-token";
+
+export const CSRF_COOKIE_OPTIONS = {
+  httpOnly: false,
+  secure: IS_PROD,
+  sameSite: "lax" as const,
+  maxAge: 7 * 24 * 60 * 60,
+  path: "/",
+};
+
+export function generateCsrfToken(): string {
+  // 32 bytes → 64 hex chars, suffisant pour résister à la devinette
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/**
+ * Vérifie qu'un endpoint cookie-only (refresh, logout) reçoit bien un header
+ * X-CSRF-Token qui matche le cookie. Bloque les CSRF cross-origin (form-POST
+ * top-level nav ne peut pas forger un header custom).
+ *
+ * Comparaison timing-safe sur des strings hex de longueur fixe.
+ */
+export function verifyCsrf(req: NextRequest): boolean {
+  const cookieVal = req.cookies.get(CSRF_COOKIE_NAME)?.value;
+  const headerVal = req.headers.get(CSRF_HEADER_NAME);
+  if (!cookieVal || !headerVal) return false;
+  if (cookieVal.length !== headerVal.length) return false;
+  let diff = 0;
+  for (let i = 0; i < cookieVal.length; i++) {
+    diff |= cookieVal.charCodeAt(i) ^ headerVal.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+/**
+ * Récupère l'IP réelle du client de manière résistante au spoofing.
+ * Sur Vercel : `x-real-ip` est posé par le proxy (non-spoofable depuis l'extérieur).
+ * Fallback : dernier segment de `x-forwarded-for` (le proxy concatène l'IP réelle à droite).
+ */
+export function getClientIp(req: NextRequest): string {
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) {
+    const parts = xff.split(",").map((p) => p.trim()).filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
+  return "unknown";
+}
 
 // ── Validation Zod ────────────────────────────────────────────────────────────
 type ValidationResult<T> =
@@ -67,24 +129,84 @@ export function requireAdmin(
   return { user };
 }
 
-// ── Rate limiting (mémoire — suffisant pour MVP) ──────────────────────────────
+/**
+ * Vérifie le mot de passe de l'admin courant — utilisé comme « step-up auth »
+ * pour les opérations destructives (delete, impersonate, reset password, bulk delete).
+ * Le mot de passe est passé dans le header `X-Confirm-Password` (jamais dans le body
+ * pour éviter qu'il apparaisse dans des logs de request body).
+ */
+export async function verifyAdminPassword(req: NextRequest, userId: number): Promise<boolean> {
+  const password = req.headers.get("x-confirm-password");
+  if (!password) return false;
+  try {
+    const user = (await prisma.user.findUnique({
+      where: { id: userId },
+      select: { passwordHash: true },
+    })) as { passwordHash: string } | null;
+    if (!user) return false;
+    return await argon2.verify(user.passwordHash, password);
+  } catch {
+    return false;
+  }
+}
+
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+// Backend : Upstash Redis (REST) si UPSTASH_REDIS_REST_URL + _TOKEN sont définis,
+// sinon fallback en mémoire (utile en dev, mais ineffectif sur Vercel serverless
+// car chaque fonction a sa propre mémoire).
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
-export function rateLimit(
-  key: string,
-  maxRequests = 15,
-  windowMs = 15 * 60 * 1000
-): boolean {
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const USE_REDIS = Boolean(UPSTASH_URL && UPSTASH_TOKEN);
+
+async function redisRateLimit(key: string, maxRequests: number, windowMs: number): Promise<boolean> {
+  const ttlSeconds = Math.ceil(windowMs / 1000);
+  const redisKey = `rl:${key}`;
+  try {
+    // Pipeline : INCR puis EXPIRE NX (set TTL uniquement si la clé n'en a pas)
+    const res = await fetch(`${UPSTASH_URL}/pipeline`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${UPSTASH_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([
+        ["INCR", redisKey],
+        ["EXPIRE", redisKey, String(ttlSeconds), "NX"],
+      ]),
+      signal: AbortSignal.timeout(1500),
+    });
+    if (!res.ok) {
+      // Si Redis ne répond pas, on laisse passer (fail-open) plutôt que de bloquer
+      // tout le service. Vercel WAF doit prendre le relais en prod.
+      return true;
+    }
+    const data = (await res.json()) as Array<{ result: number | string }>;
+    const count = typeof data[0]?.result === "number" ? data[0].result : parseInt(String(data[0]?.result), 10);
+    return Number.isFinite(count) && count <= maxRequests;
+  } catch {
+    return true; // fail-open
+  }
+}
+
+function memoryRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
   const now = Date.now();
   const entry = rateLimitMap.get(key);
-
   if (!entry || entry.resetAt < now) {
     rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
-    return true; // autorisé
+    return true;
   }
-
-  if (entry.count >= maxRequests) return false; // bloqué
-
+  if (entry.count >= maxRequests) return false;
   entry.count++;
   return true;
+}
+
+export async function rateLimit(
+  key: string,
+  maxRequests = 15,
+  windowMs = 15 * 60 * 1000,
+): Promise<boolean> {
+  if (USE_REDIS) return redisRateLimit(key, maxRequests, windowMs);
+  return memoryRateLimit(key, maxRequests, windowMs);
 }

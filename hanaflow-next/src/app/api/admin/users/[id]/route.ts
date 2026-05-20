@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import argon2 from "argon2";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, ok, err, validateBody } from "@/lib/apiHelpers";
+import { requireAdmin, ok, err, validateBody, verifyAdminPassword } from "@/lib/apiHelpers";
 import { logAudit } from "@/lib/audit";
 import { sendEmail, templates } from "@/lib/email";
 
@@ -70,9 +70,18 @@ export async function PATCH(
   if (!validated.success) return err(validated.error, 400);
 
   const { password, ...rest } = validated.data;
+
+  // Step-up auth : reset de mot de passe ou changement de rôle exigent
+  // que l'admin reconfirme son propre mot de passe (header X-Confirm-Password).
+  const requiresStepUp = Boolean(password) || rest.role !== undefined;
+  if (requiresStepUp) {
+    const ok = await verifyAdminPassword(req, auth.user.userId);
+    if (!ok) return err("Re-saisie du mot de passe administrateur requise", 401);
+  }
+
   const data: Record<string, unknown> = { ...rest };
   if (password) {
-    data.passwordHash = await argon2.hash(password);
+    data.passwordHash = await argon2.hash(password, { type: argon2.argon2id });
   }
 
   if (Object.keys(data).length === 0) {
@@ -86,9 +95,19 @@ export async function PATCH(
       select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true, createdAt: true },
     });
 
-    if (password) {
-      // Invalider toutes les sessions existantes après reset
+    // Tout changement sensible invalide les sessions actives :
+    //   - reset mot de passe (sinon l'ancien mdp reste utilisable via access token vivant)
+    //   - suspension (sinon l'access token tient jusqu'à 1h après suspension)
+    //   - changement de rôle (sinon l'access token conserve l'ancien rôle)
+    const shouldRevokeSessions =
+      Boolean(password) ||
+      rest.isSuspended === true ||
+      rest.role !== undefined;
+    if (shouldRevokeSessions) {
       await prisma.refreshToken.deleteMany({ where: { userId } });
+    }
+
+    if (password) {
       const tpl = templates.passwordReset(user.name);
       void sendEmail({ to: user.email, ...tpl });
     }
@@ -124,6 +143,10 @@ export async function DELETE(
   if (isNaN(userId)) return err("ID invalide", 400);
 
   if (auth.user.userId === userId) return err("Impossible de supprimer son propre compte", 400);
+
+  // Step-up auth obligatoire pour les suppressions
+  const stepUpOk = await verifyAdminPassword(req, auth.user.userId);
+  if (!stepUpOk) return err("Re-saisie du mot de passe administrateur requise", 401);
 
   try {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });

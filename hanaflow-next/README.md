@@ -7,9 +7,8 @@ Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, HCM, PP et S/
 - **Framework** : Next.js 16 App Router (TypeScript)
 - **Styles** : Tailwind CSS v4
 - **Base de données** : Neon PostgreSQL + Prisma ORM
-- **Auth** : JWT (argon2id) + refresh tokens httpOnly
-- **Analytics** : PostHog
-- **Error tracking** : Sentry
+- **Auth** : JWT (argon2id) + refresh tokens httpOnly + TOTP 2FA optionnel
+- **Email** : Resend (fallback console si non configuré)
 - **PWA** : next-pwa (installable sur mobile)
 - **Déploiement** : Vercel
 
@@ -63,9 +62,10 @@ Voir `.env.example` pour la liste complète.
 | `DIRECT_URL` | URL directe Neon PostgreSQL (migrations) |
 | `JWT_SECRET` | Secret pour les access tokens (min 32 chars) |
 | `JWT_REFRESH_SECRET` | Secret pour les refresh tokens (min 32 chars) |
-| `NEXT_PUBLIC_APP_URL` | URL publique du site |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Clé PostHog analytics |
-| `SENTRY_AUTH_TOKEN` | Token Sentry error tracking |
+| `NEXT_PUBLIC_APP_URL` | URL publique du site (ex: `http://localhost:3000` en dev) |
+| `RESEND_API_KEY` | Optionnel — clé Resend pour l'envoi d'emails |
+| `RESEND_FROM_EMAIL` | Optionnel — adresse expéditeur |
+| `ADMIN_NOTIFICATION_EMAIL` | Optionnel — destinataire des alertes admin |
 
 ## Déploiement
 

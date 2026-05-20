@@ -1,24 +1,22 @@
-"use client";
-
+import { redirect } from "next/navigation";
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { fiMockExamQuestions, fiCertification } from "@/data/certifications/fi.js";
+import ProPaywall from "@/components/ProPaywall";
+import { getServerUser } from "@/lib/serverAuth";
+import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
 
-function FIExamContent() {
+// Server Component : aucune question d'examen n'arrive dans le bundle client tant
+// que le serveur n'a pas vérifié que l'utilisateur est connecté ET Pro.
+export default async function FIExamPage() {
+  const user = await getServerUser();
+  if (!user) redirect("/login?next=/certifications/fi/examen");
+  if (!user.isPro) return <ProPaywall certPath="/certifications/fi" />;
+
   return (
     <ExamSimulatorTemplate
-      questions={fiMockExamQuestions}
-      certInfo={{ code: fiCertification.code, shortName: fiCertification.shortName }}
+      questions={getExamQuestions("fi")}
+      certInfo={getCertMeta("fi")}
       moduleId="fi"
       certPath="/certifications/fi"
     />
-  );
-}
-
-export default function FIExamPage() {
-  return (
-    <ProtectedRoute>
-      <FIExamContent />
-    </ProtectedRoute>
   );
 }

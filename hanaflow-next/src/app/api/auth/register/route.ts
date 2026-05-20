@@ -4,9 +4,20 @@ import crypto from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { signAccessToken, hashToken, getRefreshTokenExpiry } from "@/lib/auth";
-import { validateBody, err, rateLimit, COOKIE_OPTIONS } from "@/lib/apiHelpers";
+import {
+  validateBody,
+  err,
+  rateLimit,
+  COOKIE_OPTIONS,
+  CSRF_COOKIE_NAME,
+  CSRF_COOKIE_OPTIONS,
+  generateCsrfToken,
+  getClientIp,
+} from "@/lib/apiHelpers";
 import { getPublicSettings } from "@/lib/settings";
 import { sendEmail, templates, getAdminEmail } from "@/lib/email";
+import { checkPasswordBreached } from "@/lib/passwordBreach";
+import { issueEmailVerification } from "@/lib/emailVerification";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Nom trop long"),
@@ -30,9 +41,9 @@ export async function POST(req: NextRequest) {
     return err("Les inscriptions sont temporairement désactivées.", 403);
   }
 
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-  if (!rateLimit(`register:${ip}`)) {
-    return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
+  const ip = getClientIp(req);
+  if (!(await rateLimit(`register:${ip}`, 5, 60 * 60 * 1000))) {
+    return err("Trop de tentatives, réessaie dans 1 heure.", 429);
   }
 
   const body = await req.json().catch(() => null);
@@ -42,6 +53,16 @@ export async function POST(req: NextRequest) {
 
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
   if (existing) return err("Email déjà utilisé", 400);
+
+  // Refuser les mots de passe connus comme compromis (HIBP, k-anonymity).
+  // On ne bloque pas en cas d'erreur réseau pour ne pas casser l'inscription.
+  const breachCheck = await checkPasswordBreached(data.password);
+  if (breachCheck.breached) {
+    return err(
+      `Ce mot de passe figure dans une fuite connue (${breachCheck.count} occurrences). Choisis-en un autre.`,
+      400,
+    );
+  }
 
   const passwordHash = await argon2.hash(data.password, { type: argon2.argon2id });
   const user = await prisma.user.create({
@@ -60,7 +81,8 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Notifications email — best effort, ne bloque pas l'inscription
+  // Vérification d'email + notifications — best effort, ne bloque pas l'inscription
+  void issueEmailVerification({ id: user.id, name: user.name, email: user.email });
   const welcomeTpl = templates.welcome(user.name);
   void sendEmail({ to: user.email, ...welcomeTpl });
   const adminEmail = getAdminEmail();
@@ -69,7 +91,9 @@ export async function POST(req: NextRequest) {
     void sendEmail({ to: adminEmail, ...adminTpl });
   }
 
-  const res = NextResponse.json({ user, token: accessToken }, { status: 201 });
+  const csrfToken = generateCsrfToken();
+  const res = NextResponse.json({ user, token: accessToken, csrfToken }, { status: 201 });
   res.cookies.set("refreshToken", rawRefresh, COOKIE_OPTIONS);
+  res.cookies.set(CSRF_COOKIE_NAME, csrfToken, CSRF_COOKIE_OPTIONS);
   return res;
 }
