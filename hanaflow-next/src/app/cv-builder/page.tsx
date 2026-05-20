@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import type { CvData } from "@/components/CvDocument";
+import type { CvData } from "@/types/cv";
 
 /**
  * /cv-builder — wizard de création de CV consultant SAP optimisé ATS.

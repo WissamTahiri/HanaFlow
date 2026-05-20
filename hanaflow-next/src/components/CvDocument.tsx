@@ -1,6 +1,7 @@
 "use client";
 
 import { Document, Page, Text, View, StyleSheet, Link, Font } from "@react-pdf/renderer";
+import type { CvData } from "@/types/cv";
 
 /**
  * CV PDF text-based, ATS-friendly.
@@ -77,47 +78,6 @@ const styles = StyleSheet.create({
   // Summary
   summary: { fontSize: 10, marginBottom: 6, textAlign: "justify" },
 });
-
-export type CvData = {
-  identity: {
-    name: string;
-    title: string;
-    email: string;
-    phone?: string;
-    location?: string;
-    linkedin?: string;
-  };
-  summary: string;
-  experiences: Array<{
-    title: string;
-    company: string;
-    location?: string;
-    startDate: string;
-    endDate?: string;
-    current?: boolean;
-    bullets: string[];
-  }>;
-  education: Array<{
-    degree: string;
-    school: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string;
-  }>;
-  skills: {
-    sap?: string[];
-    technical?: string[];
-    methods?: string[];
-    soft?: string[];
-  };
-  certifications: Array<{
-    name: string;
-    code?: string;
-    year?: string;
-    issuer?: string;
-  }>;
-  languages: Array<{ name: string; level: string }>;
-};
 
 function dateRange(start: string, end?: string, current?: boolean) {
   const e = current ? "Présent" : (end ?? "");
