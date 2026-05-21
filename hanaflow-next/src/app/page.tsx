@@ -6,11 +6,11 @@ export const metadata: Metadata = {
     absolute: "HanaFlow",
   },
   description:
-    "Cours SAP FI, CO, MM, SD, HCM, PP et S/4HANA. Simulateurs d'examens, certifications et roadmap consultant. Commence gratuitement.",
+    "Cours SAP FI, CO, MM, SD, PP, IA générative (Joule, RAG) et S/4HANA. Simulateurs d'examens, certifications et roadmap consultant. Commence gratuitement.",
   openGraph: {
     title: "HanaFlow — Apprends SAP de zéro à consultant certifié",
     description:
-      "Cours SAP FI, CO, MM, SD, HCM, PP et S/4HANA. Simulateurs d'examens, certifications et roadmap consultant.",
+      "Cours SAP FI, CO, MM, SD, PP, IA générative et S/4HANA. Simulateurs d'examens, certifications et roadmap consultant.",
     url: "/",
   },
 };

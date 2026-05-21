@@ -77,16 +77,16 @@ const modules = [
     duration: "~8h",
   },
   {
-    slug: "hcm", code: "HCM", title: "Human Capital Management",
-    description: "Gestion administrative RH, temps, paie et organisation. Intégration FI/CO pour les écritures salariales.",
-    path: "/modules-sap/hcm",
-    gradient: "from-purple-500 to-purple-700",
-    tags: ["RH", "Paie", "Temps"],
-    difficulty: "Fondamental",
-    diffColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400",
+    slug: "ai", code: "AI", title: "Generative AI Developer",
+    description: "SAP AI Core, AI Launchpad, Joule, RAG et prompt engineering. La spécialité SAP la plus demandée et la mieux rémunérée en 2026.",
+    path: "/modules-sap/ai",
+    gradient: "from-violet-500 via-purple-600 to-fuchsia-600",
+    tags: ["LLM", "RAG", "Joule"],
+    difficulty: "Intermédiaire",
+    diffColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
     prereqs: [],
-    careers: ["Consultant HCM", "Gestionnaire Paie SAP"],
-    duration: "~6h",
+    careers: ["Consultant SAP IA", "Solution Architect Joule", "Prompt/RAG Engineer SAP"],
+    duration: "~8h",
   },
   {
     slug: "pp", code: "PP", title: "Production Planning",
@@ -102,7 +102,7 @@ const modules = [
   },
 ];
 
-const RECOMMENDED_ORDER = ["fi", "mm", "sd", "co", "hcm", "pp"];
+const RECOMMENDED_ORDER = ["fi", "mm", "sd", "co", "pp", "ai"];
 const DIFFICULTIES = ["Tous", "Fondamental", "Intermédiaire", "Avancé"];
 
 const stats = [

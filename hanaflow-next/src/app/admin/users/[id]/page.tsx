@@ -11,7 +11,7 @@ const MODULES = [
   { id: "co",  label: "CO — Controlling" },
   { id: "mm",  label: "MM — Materials Management" },
   { id: "sd",  label: "SD — Sales & Distribution" },
-  { id: "hcm", label: "HCM — Human Capital" },
+  { id: "ai",  label: "AI — Generative AI Developer" },
   { id: "pp",  label: "PP — Production Planning" },
 ];
 

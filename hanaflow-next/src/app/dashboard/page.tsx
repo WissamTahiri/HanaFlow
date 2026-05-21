@@ -47,7 +47,7 @@ const ZapIcon = () => (
   </svg>
 );
 
-const RECOMMENDED_ORDER = ["fi", "mm", "sd", "co", "hcm", "pp"];
+const RECOMMENDED_ORDER = ["fi", "mm", "sd", "co", "pp", "ai"];
 const FI_TOTAL_LESSONS = 14;
 
 const quickLinks = [

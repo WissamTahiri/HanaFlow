@@ -18,7 +18,7 @@ const MODULE_LABELS: Record<string, string> = {
   co:  "CO — Controlling",
   mm:  "MM — Materials",
   sd:  "SD — Sales",
-  hcm: "HCM — Human Capital",
+  ai:  "AI — Generative AI",
   pp:  "PP — Production",
 };
 
