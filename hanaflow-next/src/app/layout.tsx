@@ -103,12 +103,15 @@ export default async function RootLayout({
         }} />
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-sap-dark text-slate-900 dark:text-slate-100 antialiased">
+        <a href="#main-content" className="skip-link">
+          Aller au contenu principal
+        </a>
         <Providers>
           <ImpersonationBanner />
           <SiteBanner enabled={settings.bannerEnabled} message={settings.bannerMessage} link={settings.bannerLink} />
           <EmailVerificationBanner />
           <Navbar />
-          <main className="flex-1 pt-[4.5rem]">
+          <main id="main-content" tabIndex={-1} className="flex-1 pt-[4.5rem]">
             <ErrorBoundary>
               {maintenanceActive ? (
                 <MaintenancePage message={critical.maintenanceMessage} />

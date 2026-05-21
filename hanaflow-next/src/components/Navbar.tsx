@@ -265,6 +265,7 @@ export default function Navbar() {
                     <hr className="border-gray-100 dark:border-slate-800 mx-2 mb-1" />
                     {[
                       { href: "/dashboard",    label: "Dashboard" },
+                      { href: "/stats",        label: "Ma progression" },
                       { href: "/certificats",  label: "Mes certificats" },
                       { href: "/profil",       label: "Mon profil" },
                       { href: "/achievements", label: "Achievements" },
