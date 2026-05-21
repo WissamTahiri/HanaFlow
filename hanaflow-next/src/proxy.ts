@@ -7,6 +7,7 @@ const PROTECTED_PREFIXES = [
   "/admin",
   "/certifications",
   "/certificats",
+  "/stats",
 ];
 
 // Pages publiques qui matchent un PROTECTED_PREFIXES mais doivent rester

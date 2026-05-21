@@ -59,6 +59,39 @@ body {
   @apply outline-2 outline-offset-2 outline-sap-blue rounded-sm;
 }
 
+/* Skip-to-content link : invisible jusqu'à ce que la touche Tab le focus,
+   puis apparaît en haut à gauche pour permettre aux clavier-only/screen
+   reader users de sauter directement au contenu principal. */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: var(--color-sap-blue, #2563EB);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: top 150ms ease;
+}
+.skip-link:focus {
+  top: 0.75rem;
+}
+
+/* Smooth scroll, respecte prefers-reduced-motion (réglé plus bas). */
+html { scroll-behavior: smooth; }
+
+/* Scrollbar custom plus discrète. Standard scrollbar API moderne. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184 / 0.4) transparent;
+}
+.dark * {
+  scrollbar-color: rgb(71 85 105 / 0.5) transparent;
+}
+
 *, *::before, *::after {
   transition-property: background-color, border-color, color, fill, stroke;
   transition-duration: 200ms;
@@ -229,6 +262,7 @@ a, button, input, select, textarea, [role="button"] {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
