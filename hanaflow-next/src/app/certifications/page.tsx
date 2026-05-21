@@ -8,7 +8,7 @@ const certifications = [
   { id: "co", code: "C_TS4CO_2023", name: "Management Accounting", module: "SAP CO", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-indigo-600 to-indigo-800", path: "/certifications/co" },
   { id: "mm", code: "C_TS4MM_2023", name: "Materials Management", module: "SAP MM", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-emerald-600 to-emerald-800", path: "/certifications/mm" },
   { id: "sd", code: "C_TS4SD_2023", name: "Sales & Distribution", module: "SAP SD", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-purple-600 to-purple-800", path: "/certifications/sd" },
-  { id: "hcm", code: "C_THR81_2311", name: "Human Capital Management", module: "SAP HCM", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-violet-600 to-violet-800", path: "/certifications/hcm" },
+  { id: "ai", code: "C_AIG_2404", name: "Generative AI Developer", module: "SAP AI / Joule", level: "Associate", questions: 60, duration: 120, chapters: 5, available: true, color: "from-violet-600 to-fuchsia-700", path: "/certifications/ai" },
   { id: "pp", code: "C_TS422_2023", name: "Production Planning", module: "SAP PP", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-rose-600 to-rose-800", path: "/certifications/pp" },
 ];
 

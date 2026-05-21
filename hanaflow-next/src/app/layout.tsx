@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | HanaFlow",
   },
   description:
-    "Apprends les modules SAP FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium.",
+    "Apprends les modules SAP FI, CO, MM, SD, PP, IA générative (Joule) et S/4HANA avec une plateforme éducative premium.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "https://hanaflow.vercel.app"
   ),

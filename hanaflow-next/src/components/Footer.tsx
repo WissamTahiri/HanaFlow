@@ -23,7 +23,7 @@ const courses = [
   { href: "/modules-sap/co",  label: "CO — Controlling" },
   { href: "/modules-sap/mm",  label: "MM — Achats" },
   { href: "/modules-sap/sd",  label: "SD — Ventes" },
-  { href: "/modules-sap/hcm", label: "HCM — RH" },
+  { href: "/modules-sap/ai",  label: "AI — IA Générative" },
   { href: "/modules-sap/pp",  label: "PP — Production" },
 ];
 
