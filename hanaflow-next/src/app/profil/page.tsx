@@ -46,7 +46,7 @@ const LEARNING_GOALS = [
   { value: "co",        label: "Consultant SAP CO",    color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400" },
   { value: "mm",        label: "Consultant SAP MM",    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400" },
   { value: "sd",        label: "Consultant SAP SD",    color: "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400" },
-  { value: "hcm",       label: "Consultant SAP HCM",   color: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" },
+  { value: "ai",        label: "Consultant SAP IA / Joule", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" },
   { value: "pp",        label: "Consultant SAP PP",    color: "bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400" },
   { value: "s4hana",    label: "Architecte S/4HANA",   color: "bg-sky-100 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400" },
   { value: "developer", label: "Développeur ABAP/BTP", color: "bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400" },

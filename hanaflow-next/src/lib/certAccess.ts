@@ -3,7 +3,7 @@ import { fiCertification, fiMockExamQuestions } from "@/data/certifications/fi.j
 import { coCertification, coMockExamQuestions } from "@/data/certifications/co.js";
 import { mmCertification, mmMockExamQuestions } from "@/data/certifications/mm.js";
 import { sdCertification, sdMockExamQuestions } from "@/data/certifications/sd.js";
-import { hcmCertification, hcmMockExamQuestions } from "@/data/certifications/hcm.js";
+import { aiCertification, aiMockExamQuestions } from "@/data/certifications/ai.js";
 import { ppCertification, ppMockExamQuestions } from "@/data/certifications/pp.js";
 
 /**
@@ -16,7 +16,7 @@ const CERT_MAP = {
   co: { cert: coCertification, exam: coMockExamQuestions },
   mm: { cert: mmCertification, exam: mmMockExamQuestions },
   sd: { cert: sdCertification, exam: sdMockExamQuestions },
-  hcm: { cert: hcmCertification, exam: hcmMockExamQuestions },
+  ai: { cert: aiCertification, exam: aiMockExamQuestions },
   pp: { cert: ppCertification, exam: ppMockExamQuestions },
 } as const;
 

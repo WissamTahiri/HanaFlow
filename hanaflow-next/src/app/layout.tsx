@@ -45,14 +45,14 @@ export const metadata: Metadata = {
     siteName: "HanaFlow",
     title: "HanaFlow",
     description:
-      "Apprends les modules SAP FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium.",
+      "Apprends les modules SAP FI, CO, MM, SD, PP, IA et S/4HANA avec une plateforme éducative premium.",
     images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: "HanaFlow" }],
   },
   twitter: {
     card: "summary",
     title: "HanaFlow",
     description:
-      "Apprends les modules SAP FI, CO, MM, SD, HCM, PP et S/4HANA avec une plateforme éducative premium.",
+      "Apprends les modules SAP FI, CO, MM, SD, PP, IA et S/4HANA avec une plateforme éducative premium.",
     images: ["/icons/icon-512.png"],
   },
 };
@@ -85,7 +85,7 @@ export default async function RootLayout({
           "@type": "WebSite",
           "name": "HanaFlow",
           "url": BASE,
-          "description": "Plateforme éducative SAP : cours FI, CO, MM, SD, HCM, PP, S/4HANA, simulateurs d'examens et roadmap consultant.",
+          "description": "Plateforme éducative SAP : cours FI, CO, MM, SD, PP, IA générative (Joule, RAG), S/4HANA, simulateurs d'examens et roadmap consultant.",
           "potentialAction": {
             "@type": "SearchAction",
             "target": { "@type": "EntryPoint", "urlTemplate": `${BASE}/modules-sap` },

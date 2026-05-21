@@ -136,7 +136,7 @@
     {
       "code": "AI",
       "name": "Generative AI Developer",
-      "href": "/ai-joule",
+      "href": "/modules-sap/ai",
       "desc": "LLMs, RAG, prompt engineering, intégration Joule et IA générative dans S/4HANA.",
       "cert": "C_AIG",
       "certName": "SAP Certified Associate – SAP Generative AI Developer",
