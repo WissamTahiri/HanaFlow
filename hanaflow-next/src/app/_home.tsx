@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import certCatalog from "@/data/cert-catalog.json";
+import TestimonialsSection from "@/components/TestimonialsSection";
 
 /**
  * Home v6 — design d'origine HanaFlow polish + inspirations plateformes
@@ -379,6 +380,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Témoignages — affichés seulement s'il y en a en DB ──────── */}
+      <TestimonialsSection />
 
       {/* ── CTA FINAL ── card gradient bleu propre ─────────────────── */}
       <section className="py-20 bg-white dark:bg-slate-900">
