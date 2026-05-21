@@ -197,7 +197,7 @@ const geminiResponseSchema = {
         sap: {
           type: Type.ARRAY,
           description:
-            "Modules SAP, T-codes, technos SAP officielles : FI, CO, MM, SD, PP, HCM, S/4HANA, ACDOCA, Fiori, BTP, ABAP, BW/4HANA, Joule…",
+            "Modules SAP, T-codes, technos SAP officielles : FI, CO, MM, SD, PP, S/4HANA, ACDOCA, Fiori, BTP, ABAP, BW/4HANA, AI Core, AI Launchpad, Joule, RAG…",
           items: { type: Type.STRING },
         },
         technical: {
@@ -302,7 +302,7 @@ Tu reçois un CV brut, tu le réécris pour maximiser ses chances de passer les 
 
 3. VOCABULAIRE SAP OFFICIEL et précis :
    - T-codes : FB50, MIRO, ME21N, VA01, MM01, MIGO, F-02, FBL3N, FAGLL03, KO01, KS01 (utilise ceux pertinents au rôle)
-   - Modules : FI, CO, MM, SD, PP, HCM/SuccessFactors, EWM, TM, PM, QM
+   - Modules : FI, CO, MM, SD, PP, EWM, TM, PM, QM, SuccessFactors (RH cloud)
    - Tech : S/4HANA Cloud Public/Private, S/4HANA on-premise, ECC 6.0, ABAP, BTP, CAP, Fiori, SAC, Datasphere, BW/4HANA, AI Core, Joule
    - Méthodo : SAP Activate, Fit-to-Standard, Greenfield/Brownfield/Hybrid, RICEF
    - Si l'utilisateur écrit "Hana", remplace par "S/4HANA". Si "abap", utilise "ABAP" (majuscules).

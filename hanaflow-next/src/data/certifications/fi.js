@@ -563,7 +563,7 @@ export const fiCertification = {
         {
           id: "q4-2",
           question: "Le processus O2C (Order-to-Cash) implique l'intégration de quels modules SAP ?",
-          options: ["FI et MM", "FI et SD (Sales & Distribution)", "FI et CO", "FI et HCM"],
+          options: ["FI et MM", "FI et SD (Sales & Distribution)", "FI et CO", "FI et PP"],
           correctIndex: 1,
           explanation: "O2C intègre SD (pour la commande client, la livraison et la facturation) avec FI (pour la comptabilisation automatique de la facture et l'enregistrement du paiement). C'est l'intégration SD-FI.",
         },
@@ -1310,7 +1310,7 @@ export const fiMockExamQuestions = [
     id: "exam-21",
     chapter: "Comptabilité Clients",
     question: "Le processus O2C (Order-to-Cash) intègre quels modules SAP ?",
-    options: ["FI et MM", "FI et SD", "FI et CO", "FI et HCM"],
+    options: ["FI et MM", "FI et SD", "FI et CO", "FI et PP"],
     correctIndex: 1,
     explanation: "O2C intègre SD (commande, livraison, facturation) avec FI (comptabilisation facture, encaissement). C'est l'intégration SD-FI.",
   },

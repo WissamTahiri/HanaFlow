@@ -80,7 +80,7 @@ export const templates = {
       <h1 style="font-size:22px;margin:0 0 16px 0;">Bienvenue ${esc(name)} 👋</h1>
       <p style="line-height:1.6;color:#334155;">
         Ton compte HanaFlow est créé. Tu peux maintenant accéder à l'ensemble des modules SAP
-        (FI, CO, MM, SD, HCM, PP) et suivre ta progression.
+        (FI, CO, MM, SD, PP, IA générative) et suivre ta progression.
       </p>
       <p style="margin-top:24px;">
         <a href="https://hanaflow.vercel.app/dashboard" style="display:inline-block;padding:12px 20px;background:#2563EB;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;">

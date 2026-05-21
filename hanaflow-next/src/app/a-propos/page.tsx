@@ -53,10 +53,9 @@ const sapCoverage = [
   { code: "CO", label: "Controlling", color: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30" },
   { code: "MM", label: "Materials Management", color: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30" },
   { code: "SD", label: "Sales & Distribution", color: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30" },
-  { code: "HCM", label: "Human Capital Management", color: "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30" },
   { code: "PP", label: "Production Planning", color: "bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/30" },
+  { code: "AI", label: "Generative AI Developer (C_AIG)", color: "bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/30" },
   { code: "S/4HANA", label: "ERP nouvelle génération", color: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30" },
-  { code: "Joule / IA", label: "IA générative SAP", color: "bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/30" },
 ];
 
 const techStack = [
@@ -129,7 +128,7 @@ export default function AboutPage() {
           ))}
         </div>
         <div className="space-y-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-          <p>HanaFlow est une plateforme pédagogique conçue pour rendre SAP S/4HANA accessible à tous — étudiants, profils en reconversion, key users et consultants juniors. Chaque module (FI, CO, MM, SD, HCM, PP) est documenté avec le vocabulaire clé, les processus métier, les intégrations inter-modules et des quiz pour valider les acquis.</p>
+          <p>HanaFlow est une plateforme pédagogique conçue pour rendre SAP S/4HANA accessible à tous — étudiants, profils en reconversion, key users et consultants juniors. Chaque module (FI, CO, MM, SD, PP, IA générative) est documenté avec le vocabulaire clé, les processus métier, les intégrations inter-modules et des quiz pour valider les acquis.</p>
           <p>L&apos;objectif : permettre à chaque apprenant de monter en compétences à son rythme et, s&apos;il le souhaite, de se présenter aux certifications officielles SAP avec un contenu de préparation aligné sur le périmètre des examens.</p>
           <p>HanaFlow ne remplace pas les formations officielles SAP. Il les complète avec une approche pédagogique structurée : leçons concises, concepts clés, T-codes, scénarios métier et roadmaps personnalisées.</p>
         </div>
@@ -139,7 +138,7 @@ export default function AboutPage() {
       <Section title="Ce que couvre HanaFlow">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
           {[
-            { title: "6 modules SAP", desc: "FI, CO, MM, SD, HCM, PP — chacun avec hero, concepts clés, processus, quiz et FAQ.", icon: <BookIcon /> },
+            { title: "6 modules SAP", desc: "FI, CO, MM, SD, PP, IA générative — chacun avec hero, concepts clés, processus, quiz et FAQ.", icon: <BookIcon /> },
             { title: "S/4HANA & IA Joule", desc: "Universal Journal, Fiori, migration, agents IA, Joule Studio et cas d'usage.", icon: <CpuIcon /> },
             { title: "Processus métier", desc: "P2P, O2C, R2R expliqués étape par étape avec t-codes et diagrammes de flux.", icon: <RefreshIcon /> },
             { title: "Quizzes interactifs", desc: "Questions par chapitre avec correction instantanée et explications détaillées.", icon: <CheckCircleIcon /> },

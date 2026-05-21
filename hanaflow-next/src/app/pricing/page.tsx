@@ -30,7 +30,7 @@ const PLANS = [
     cta: "Commencer gratuitement",
     ctaStyle: "bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700",
     features: [
-      { label: "6 modules SAP complets (FI, CO, MM, SD, HCM, PP)", included: true },
+      { label: "6 modules SAP complets (FI, CO, MM, SD, PP, IA générative)", included: true },
       { label: "Chapitre 1 de chaque certification (aperçu)", included: true },
       { label: "Roadmap personnalisée (basique)", included: true },
       { label: "Suivi de progression (modules visités)", included: true },
@@ -53,7 +53,7 @@ const PLANS = [
     cta: "Activer Pro gratuitement",
     ctaStyle: "bg-sap-blue text-white hover:bg-sap-blue-dark",
     features: [
-      { label: "6 modules SAP complets (FI, CO, MM, SD, HCM, PP)", included: true },
+      { label: "6 modules SAP complets (FI, CO, MM, SD, PP, IA générative)", included: true },
       { label: "Chapitre 1 de chaque certification (aperçu)", included: true },
       { label: "Roadmap personnalisée (basique)", included: true },
       { label: "Suivi de progression (modules visités)", included: true },

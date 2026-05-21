@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err } from "@/lib/apiHelpers";
 
-const VALID_MODULES = ["fi", "co", "mm", "sd", "hcm", "pp"];
+const VALID_MODULES = ["fi", "co", "mm", "sd", "pp", "ai"];
 
 export async function GET(req: NextRequest) {
   const auth = requireAuth(req);

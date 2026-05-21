@@ -81,7 +81,7 @@ const useCases = [
     ],
   },
   {
-    domain: "RH (HCM / SuccessFactors)", icon: <UsersIcon />, color: "red",
+    domain: "RH (SuccessFactors)", icon: <UsersIcon />, color: "red",
     cases: [
       "Gestion assistée des demandes de congés et approbations",
       "Onboarding guidé pour les nouveaux collaborateurs",
@@ -127,7 +127,7 @@ const quizQuestions = [
   { q: "Quel outil permet de créer des agents Joule personnalisés ?", choices: ["Joule Factory", "ABAP Studio", "Joule Studio", "SAP Build Apps"], answer: 2, expl: "Joule Studio est l'outil low-code sur BTP pour construire des agents Joule adaptés aux processus métier." },
   { q: "Comment Joule interagit-il avec les utilisateurs SAP ?", choices: ["Via des formules Excel", "En langage naturel, directement dans les apps Fiori", "Via des transactions SAP GUI", "Via du code ABAP uniquement"], answer: 1, expl: "Joule s'utilise en langage naturel dans les apps Fiori — pas besoin de connaître les transactions ou le code SAP." },
   { q: "Quelle solution SAP unifie les données pour alimenter Joule en contexte métier ?", choices: ["SAP Datasphere", "Business Data Cloud", "SAP Analytics Cloud", "HANA Cloud"], answer: 1, expl: "Business Data Cloud unifie les données SAP (et tierces) pour que Joule ait un contexte métier pertinent et précis." },
-  { q: "Dans quel contexte Joule peut-il automatiser la validation de factures ?", choices: ["Seulement dans SD", "Seulement dans HCM", "Dans Finance/FI via les agents IA", "Dans ABAP uniquement"], answer: 2, expl: "Les agents Joule Finance automatisent des tâches FI comme la validation de factures et la détection d'anomalies." },
+  { q: "Dans quel contexte Joule peut-il automatiser la validation de factures ?", choices: ["Seulement dans SD", "Seulement dans SuccessFactors", "Dans Finance/FI via les agents IA", "Dans ABAP uniquement"], answer: 2, expl: "Les agents Joule Finance automatisent des tâches FI comme la validation de factures et la détection d'anomalies." },
   { q: "Avec quel outil Microsoft Joule est-il intégré ?", choices: ["Azure DevOps", "Microsoft Teams / Copilot M365", "Excel uniquement", "Power BI"], answer: 1, expl: "Joule est intégré à Microsoft Teams et Copilot M365, permettant de l'utiliser sans quitter l'environnement Microsoft." },
   { q: "Quelle est la différence principale entre Joule et un chatbot classique ?", choices: ["Joule est plus lent", "Joule accède aux données SAP en temps réel et exécute des actions", "Joule est uniquement textuel", "Joule nécessite une connexion VPN"], answer: 1, expl: "Contrairement à un chatbot générique, Joule accède aux données SAP en temps réel et peut exécuter des actions métier directement." },
   { q: "Qu'est-ce qu'un \"agent Joule\" ?", choices: ["Un consultant SAP humain", "Un système semi-autonome qui automatise des tâches SAP", "Un module SAP spécifique", "Un outil de test SAP"], answer: 1, expl: "Un agent Joule est un système semi-autonome basé sur un LLM, préconfiguré pour automatiser des tâches métier spécifiques (Finance, RH, Supply…)." },
