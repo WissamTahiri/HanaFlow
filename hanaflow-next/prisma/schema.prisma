@@ -40,8 +40,83 @@ model User {
   passwordResetTokens PasswordResetToken[]
   emailVerifications  EmailVerificationToken[]
   certificates  CompletionCertificate[]
+  feedback      Feedback[]
+  npsResponses  NPSResponse[]
 
   @@map("users")
+}
+
+/**
+ * Feedback libre laissé via le widget flottant.
+ * Peut être anonyme (userId null) — dans ce cas on garde l'IP pour le
+ * rate-limit anti-spam et la modération.
+ */
+model Feedback {
+  id          Int      @id @default(autoincrement())
+  userId      Int?     @map("user_id")
+  /** URL où le user était quand il a soumis (ex: /modules-sap/fi). */
+  context     String?  @db.VarChar(200)
+  /** Ce qui marche bien (peut être vide). */
+  goodWhat    String?  @map("good_what") @db.Text
+  /** Ce qui manque / à améliorer (peut être vide). */
+  improveWhat String?  @map("improve_what") @db.Text
+  /** Statut de traitement par l'admin. */
+  status      String   @default("new") @db.VarChar(20)
+  ipAddress   String?  @map("ip_address") @db.VarChar(64)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  /** Optionnel : email pour relancer le user si feedback anonyme intéressant. */
+  contactEmail String? @map("contact_email") @db.VarChar(255)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("feedback")
+}
+
+/**
+ * Réponse au NPS (Net Promoter Score). Affiché in-app après J+7 d'usage,
+ * une fois tous les 90 jours max (un user ne reçoit pas le prompt en boucle).
+ */
+model NPSResponse {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  /** Score sur 11 (0-10). */
+  score     Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([userId])
+  @@map("nps_responses")
+}
+
+/**
+ * Témoignage public (gérés par l'admin). Affichés sur la home et la
+ * pricing page comme social proof.
+ */
+model Testimonial {
+  id               Int      @id @default(autoincrement())
+  authorName       String   @map("author_name") @db.VarChar(120)
+  /** Rôle court (ex: "Consultant SAP FI junior"). */
+  authorRole       String?  @map("author_role") @db.VarChar(120)
+  authorCompany    String?  @map("author_company") @db.VarChar(120)
+  authorPhotoUrl   String?  @map("author_photo_url") @db.Text
+  authorLinkedInUrl String? @map("author_linkedin_url") @db.Text
+  quote            String   @db.Text
+  /** 1-5 étoiles, optionnel. */
+  rating           Int?
+  isPublished      Boolean  @default(true) @map("is_published")
+  /** À mettre en hero / featured (1-2 max). */
+  isFeatured       Boolean  @default(false) @map("is_featured")
+  /** Ordre d'affichage manuel (ascending). */
+  sortOrder        Int      @default(0) @map("sort_order")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([isPublished, sortOrder])
+  @@map("testimonials")
 }
 
 model CompletionCertificate {

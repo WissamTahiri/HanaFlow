@@ -14,6 +14,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BadgeToast from "@/components/BadgeToast";
 import ImpersonationBanner from "@/components/ImpersonationBanner";
+import FeedbackWidget from "@/components/FeedbackWidget";
+import NPSPrompt from "@/components/NPSPrompt";
 import SiteBanner from "@/components/SiteBanner";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import MaintenancePage from "@/components/MaintenancePage";
@@ -122,6 +124,8 @@ export default async function RootLayout({
           </main>
           <Footer />
           <BadgeToast />
+          <FeedbackWidget />
+          <NPSPrompt />
         </Providers>
       </body>
     </html>
