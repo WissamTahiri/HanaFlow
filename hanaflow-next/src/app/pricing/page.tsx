@@ -50,7 +50,10 @@ const PLANS = [
     desc: "Pour préparer sérieusement une certification SAP.",
     color: "border-sap-blue dark:border-blue-500 ring-2 ring-sap-blue/20 dark:ring-blue-500/20",
     badge: { label: "Lancement — Accès gratuit", color: "bg-sap-blue text-white" },
-    cta: "Activer Pro gratuitement",
+    // Pendant la phase de lancement : prix barré + 0€ mis en avant, pour
+    // lever l'ambiguïté "9€/mois" vs "Activer gratuitement".
+    launchFree: true,
+    cta: "Activer gratuitement — sans carte bancaire",
     ctaStyle: "bg-sap-blue text-white hover:bg-sap-blue-dark",
     features: [
       { label: "6 modules SAP complets (FI, CO, MM, SD, PP, IA générative)", included: true },
@@ -103,7 +106,7 @@ const FAQ = [
   },
   {
     q: "Les certifications SAP sont-elles incluses dans l'abonnement ?",
-    a: "Non. Les examens officiels SAP (C_TS4FI_2023, etc.) sont passés directement sur SAP Training & Certification Hub (~500€ par voucher). HanaFlow vous prépare à ces examens mais ne les organise pas.",
+    a: "Non. Les examens officiels SAP (C_TS4FI, C_TS4CO, etc.) sont passés directement sur SAP Training & Certification Hub (~500€ par voucher). HanaFlow vous prépare à ces examens mais ne les organise pas.",
   },
   {
     q: "Le plan Équipe est-il disponible maintenant ?",
@@ -163,7 +166,11 @@ export default function PricingPage() {
       {/* Plans */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-8 pb-16">
         <div className="grid md:grid-cols-3 gap-5">
-          {PLANS.map((plan, i) => (
+          {PLANS.map((plan, i) => {
+            const launchFree = "launchFree" in plan && plan.launchFree;
+            const displayPrice = annual && plan.annualPrice ? plan.annualPrice.split(" ")[0] : plan.price;
+            const displayPeriod = annual && plan.annualPrice ? "/ an" : plan.period;
+            return (
             <motion.div
               key={plan.id}
               initial={{ opacity: 0, y: 20 }}
@@ -185,15 +192,23 @@ export default function PricingPage() {
                 <div className="mb-5">
                   <h2 className="text-lg font-bold text-slate-900 dark:text-white">{plan.name}</h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{plan.desc}</p>
-                  <div className="mt-4 flex items-end gap-1">
-                    <span className="text-4xl font-black text-slate-900 dark:text-white">
-                      {annual && plan.annualPrice ? plan.annualPrice.split(" ")[0] : plan.price}
+                  {/* Pendant le lancement (launchFree) : 0€ en avant, prix barré —
+                      le badge "Lancement — Accès gratuit" et le CTA portent déjà
+                      le message, pas besoin d'un 3e libellé. */}
+                  <div className={`mt-4 flex items-end ${launchFree ? "gap-2" : "gap-1"}`}>
+                    {launchFree && <span className="text-4xl font-black text-slate-900 dark:text-white">0€</span>}
+                    <span
+                      className={
+                        launchFree
+                          ? "text-xl font-bold text-slate-400 dark:text-slate-500 line-through mb-0.5"
+                          : "text-4xl font-black text-slate-900 dark:text-white"
+                      }
+                    >
+                      {displayPrice}
                     </span>
-                    <span className="text-sm text-slate-500 dark:text-slate-400 mb-1">
-                      {annual && plan.annualPrice ? "/ an" : plan.period}
-                    </span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400 mb-1">{displayPeriod}</span>
                   </div>
-                  {annual && plan.annualPrice && plan.id !== "free" && (
+                  {!launchFree && annual && plan.annualPrice && plan.id !== "free" && (
                     <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">
                       Économisez 29€ par rapport au mensuel
                     </p>
@@ -250,7 +265,8 @@ export default function PricingPage() {
                 </ul>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Banner lancement */}
