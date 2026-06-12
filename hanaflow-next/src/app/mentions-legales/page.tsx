@@ -48,8 +48,8 @@ export default function MentionsLegales() {
         préalable.
       </p>
       <p>
-        SAP, S/4HANA, ABAP, Fiori et les codes de certification (C_TS4FI_2023,
-        C_TS4CO_2023, etc.) sont des marques déposées de SAP SE. HanaFlow n&apos;est
+        SAP, S/4HANA, ABAP, Fiori et les codes de certification (C_TS4FI,
+        C_TS4CO, etc.) sont des marques déposées de SAP SE. HanaFlow n&apos;est
         affilié, sponsorisé ni endossé par SAP SE. La plateforme propose un contenu
         pédagogique original visant à préparer les certifications officielles SAP.
       </p>

@@ -74,7 +74,7 @@ const faqItems = [
   { q: "HanaFlow remplace-t-il les formations officielles SAP ?", a: "Non. HanaFlow est un complément pédagogique — il structure et vulgarise les concepts SAP pour aider à comprendre le \"pourquoi\" avant de plonger dans les formations officielles (SAP Learning Hub, S4F12, etc.). L'idéal est d'utiliser les deux en parallèle." },
   { q: "À qui s'adresse HanaFlow ?", a: "À toute personne qui souhaite comprendre l'écosystème SAP S/4HANA : étudiants en informatique, personnes en reconversion, consultants juniors, key users ou tout profil curieux des métiers ERP. Le contenu est conçu pour être accessible, même sans background SAP." },
   { q: "Le contenu est-il à jour avec S/4HANA 2024 ?", a: "Oui — les pages couvrent les concepts S/4HANA actuels : Universal Journal (ACDOCA), SAP Fiori, Joule (IA générative), MRP Live, RISE with SAP et la méthodologie SAP Activate. Le contenu est régulièrement revu et enrichi." },
-  { q: "Puis-je passer la certification officielle après HanaFlow ?", a: "HanaFlow vous prépare aux certifications SAP Associate (C_TS4FI, C_TS4CO, C_TS4MM, C_TS4SD, C_THR81, C_TS422). Vous passez ensuite l'examen officiel directement sur SAP Training & Certification Hub, payant et indépendant d'HanaFlow." },
+  { q: "Puis-je passer la certification officielle après HanaFlow ?", a: "HanaFlow vous prépare aux certifications SAP Associate (C_TS4FI, C_TS4CO, C_TS452, C_TS460, C_TS422, C_AIG). Vous passez ensuite l'examen officiel directement sur SAP Training & Certification Hub, payant et indépendant d'HanaFlow." },
   { q: "Comment contacter HanaFlow ?", a: "Via la page contact ou par e-mail. Nous répondons aux demandes (support, partenariat école, RGPD) sous 48 heures ouvrées." },
 ];
 

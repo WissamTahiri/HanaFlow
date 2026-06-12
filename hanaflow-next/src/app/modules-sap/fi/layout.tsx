@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/JsonLd";
+import { certCode } from "@/lib/certCodes";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://hanaflow.vercel.app";
+
+// Code certif officiel — source de vérité cert-catalog.json (sap-cert-watch).
+const CERT_CODE = certCode("fi");
 
 export const metadata: Metadata = {
   title: "Module SAP FI — Finance",
   description:
-    "Apprends SAP Finance (FI) : comptabilité générale, fournisseurs, clients et immobilisations. Prépare la certification C_TS4FI_2023.",
+    `Apprends SAP Finance (FI) : comptabilité générale, fournisseurs, clients et immobilisations. Prépare la certification ${CERT_CODE}.`,
   openGraph: {
     title: "Module SAP FI — Finance | HanaFlow",
     description:
-      "Apprends SAP Finance (FI) : comptabilité générale, fournisseurs, clients et immobilisations. Prépare la certification C_TS4FI_2023.",
+      `Apprends SAP Finance (FI) : comptabilité générale, fournisseurs, clients et immobilisations. Prépare la certification ${CERT_CODE}.`,
     url: "/modules-sap/fi",
   },
 };
@@ -22,11 +26,11 @@ export default function FiLayout({ children }: { children: React.ReactNode }) {
         "@context": "https://schema.org",
         "@type": "Course",
         "name": "Module SAP FI — Finance",
-        "description": "Apprends SAP Finance (FI) : comptabilité générale, fournisseurs, clients et immobilisations. Prépare la certification C_TS4FI_2023.",
+        "description": `Apprends SAP Finance (FI) : comptabilité générale, fournisseurs, clients et immobilisations. Prépare la certification ${CERT_CODE}.`,
         "url": `${BASE}/modules-sap/fi`,
         "provider": { "@type": "EducationalOrganization", "name": "HanaFlow", "url": BASE },
         "educationalLevel": "Beginner to Intermediate",
-        "courseCode": "C_TS4FI_2023",
+        "courseCode": CERT_CODE,
         "inLanguage": "fr",
         "isAccessibleForFree": true,
       }} />

@@ -1,5 +1,5 @@
 /**
- * Contenu de la certification C_AIG_2404
+ * Contenu de la certification C_AIG
  * SAP Certified Associate – Generative AI Developer
  *
  * Structure :
@@ -18,7 +18,7 @@
 
 export const aiCertification = {
   id: "c-aig-2404",
-  code: "C_AIG_2404",
+  code: "C_AIG",
   name: "SAP Certified Associate – Generative AI Developer",
   shortName: "SAP Generative AI Developer",
   level: "Associate",

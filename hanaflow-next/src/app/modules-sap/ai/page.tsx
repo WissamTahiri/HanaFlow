@@ -40,7 +40,7 @@ const KeyConcepts = () => (
     className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6"
   >
     <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Concepts clés</h2>
-    <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les 6 notions fondamentales à maîtriser pour la certif C_AIG_2404.</p>
+    <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les 6 notions fondamentales à maîtriser pour la certif C_AIG.</p>
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {KEY_CONCEPTS.map((c) => (
         <div key={c.code} className={`rounded-xl border p-4 ${c.color.split(" ").filter((cls: string) => cls.startsWith("border")).join(" ")} bg-white dark:bg-slate-800`}>
@@ -404,7 +404,7 @@ const AI = () => (
   <ModuleLayout
     code="AI"
     title="Generative AI Developer SAP"
-    description="Maîtrise SAP AI Core, AI Launchpad, Joule, RAG et prompt engineering. Prépare la certification C_AIG_2404 — la spécialité SAP la mieux rémunérée en 2026."
+    description="Maîtrise SAP AI Core, AI Launchpad, Joule, RAG et prompt engineering. Prépare la certification C_AIG — la spécialité SAP la mieux rémunérée en 2026."
     gradient="from-purple-700 via-violet-700 to-fuchsia-600"
     badge="LLMs · RAG · Joule · Responsible AI"
   >

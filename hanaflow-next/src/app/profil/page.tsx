@@ -434,10 +434,10 @@ function ProfileContent() {
             <>
               <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
-                  "7 chapitres FI complets (C_TS4FI_2023)",
+                  "7 chapitres FI complets (certification C_TS4FI)",
                   "Simulateur d'examen complet (format réel)",
                   "Quiz par chapitre avec corrections",
-                  "Certifications CO, MM, SD (à venir)",
+                  "Certifications FI, CO, MM, SD, PP et IA générative",
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2 text-xs text-slate-500 dark:text-slate-400">
                     <span className="text-sap-blue mt-0.5 flex-shrink-0"><CheckIcon /></span>

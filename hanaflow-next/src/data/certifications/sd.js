@@ -1,5 +1,5 @@
 /**
- * Contenu de la certification C_TS4SD_2023
+ * Contenu de la certification C_TS460_2023
  * SAP Certified Associate – SAP S/4HANA for Sales and Distribution
  *
  * 7 chapitres · leçons · quiz · 40 questions simulateur
@@ -7,7 +7,7 @@
 
 export const sdCertification = {
   id: "c-ts4sd-2023",
-  code: "C_TS4SD_2023",
+  code: "C_TS460_2023",
   name: "SAP Certified Associate – SAP S/4HANA for Sales and Distribution",
   shortName: "SAP SD Certification",
   level: "Associate",

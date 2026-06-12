@@ -1,9 +1,9 @@
-// SAP PP (Production Planning) — C_TS422_2023
+// SAP PP (Production Planning) — C_TS422_2601
 // 7 chapitres, contenu pédagogique, 40 questions simulateur
 
 export const ppCertification = {
   id: "pp",
-  code: "C_TS422_2023",
+  code: "C_TS422_2601",
   title: "SAP Certified Application Associate – SAP S/4HANA Production Planning and Manufacturing",
   shortName: "SAP PP",
   description:

@@ -2,15 +2,36 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
+import certCatalog from "@/data/cert-catalog.json";
+import { certCode } from "@/lib/certCodes";
 
-const certifications = [
-  { id: "fi", code: "C_TS4FI_2023", name: "Financial Accounting", module: "SAP FI", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-blue-600 to-blue-800", path: "/certifications/fi" },
-  { id: "co", code: "C_TS4CO_2023", name: "Management Accounting", module: "SAP CO", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-indigo-600 to-indigo-800", path: "/certifications/co" },
-  { id: "mm", code: "C_TS4MM_2023", name: "Materials Management", module: "SAP MM", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-emerald-600 to-emerald-800", path: "/certifications/mm" },
-  { id: "sd", code: "C_TS4SD_2023", name: "Sales & Distribution", module: "SAP SD", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-purple-600 to-purple-800", path: "/certifications/sd" },
-  { id: "ai", code: "C_AIG_2404", name: "Generative AI Developer", module: "SAP AI / Joule", level: "Associate", questions: 60, duration: 120, chapters: 5, available: true, color: "from-violet-600 to-fuchsia-700", path: "/certifications/ai" },
-  { id: "pp", code: "C_TS422_2023", name: "Production Planning", module: "SAP PP", level: "Associate", questions: 80, duration: 180, chapters: 7, available: true, color: "from-rose-600 to-rose-800", path: "/certifications/pp" },
-];
+// Données de certification : toujours lues depuis cert-catalog.json (source
+// de vérité, mise à jour par scripts/sap-cert-watch.mjs) — jamais hardcodées
+// ici. Seuls l'habillage (couleur, libellés courts) reste local.
+const CARD_STYLE: Record<string, { name: string; module: string; color: string }> = {
+  fi: { name: "Financial Accounting",    module: "SAP FI",         color: "from-blue-600 to-blue-800" },
+  co: { name: "Management Accounting",   module: "SAP CO",         color: "from-indigo-600 to-indigo-800" },
+  mm: { name: "Materials Management",    module: "SAP MM",         color: "from-emerald-600 to-emerald-800" },
+  sd: { name: "Sales & Distribution",    module: "SAP SD",         color: "from-purple-600 to-purple-800" },
+  ai: { name: "Generative AI Developer", module: "SAP AI / Joule", color: "from-violet-600 to-fuchsia-700" },
+  pp: { name: "Production Planning",     module: "SAP PP",         color: "from-rose-600 to-rose-800" },
+};
+
+const certifications = ["fi", "co", "mm", "sd", "ai", "pp"].map((id) => {
+  const m = certCatalog.modules.find((mod) => mod.code.toLowerCase() === id)!;
+  return {
+    id,
+    code: certCode(id),
+    ...CARD_STYLE[id],
+    level: m.level,
+    questions: m.officialQuestions,
+    duration: m.durationMin,
+    chapters: m.chapters,
+    passingScore: m.passingScore,
+    available: true,
+    path: `/certifications/${id}`,
+  };
+});
 
 export default function CertificationsPage() {
   return (
@@ -96,7 +117,7 @@ export default function CertificationsPage() {
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-slate-500 dark:text-slate-400">Niveau {cert.level} · Seuil de réussite : 65%</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">Niveau {cert.level} · Seuil de réussite : {cert.passingScore}&nbsp;%</span>
                           <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 group-hover:underline">Commencer →</span>
                         </div>
                       </div>
@@ -141,7 +162,7 @@ export default function CertificationsPage() {
             <div className="space-y-4">
               {[
                 { q: "Dois-je refaire la formation sur le site de SAP ?", a: "Non. Les cours officiels SAP ne sont pas obligatoires. Vous passez l'examen directement sur SAP Certification Hub après votre préparation sur HanaFlow." },
-                { q: "Quel est le format de l'examen officiel ?", a: "80 questions à choix multiples, 180 minutes, seuil de réussite à 65%. L'examen se passe en ligne (proctored) ou dans un centre de test agréé." },
+                { q: "Quel est le format de l'examen officiel ?", a: "Selon la certification : 60 à 80 questions, 120 à 180 minutes, seuil de réussite entre 64 % et 76 % (le détail exact est sur la fiche de chaque certification et la page Comparer). L'examen se passe en ligne (proctored) ou dans un centre de test agréé." },
                 { q: "Combien coûte l'examen ?", a: "Un voucher d'examen SAP coûte environ 500€. Il vous donne accès à une tentative. En cas d'échec, un 2ème voucher peut être acheté." },
               ].map((item, i) => (
                 <div key={i} className="border-b border-gray-100 dark:border-slate-700 last:border-0 pb-4 last:pb-0">

@@ -1,5 +1,5 @@
 /**
- * Contenu de la certification C_TS4FI_2023
+ * Contenu de la certification C_TS4FI_2601
  * SAP Certified Associate – SAP S/4HANA for Financial Accounting Associates
  *
  * Structure :
@@ -11,7 +11,7 @@
 
 export const fiCertification = {
   id: "c-ts4fi-2023",
-  code: "C_TS4FI_2023",
+  code: "C_TS4FI_2601",
   name: "SAP Certified Associate – SAP S/4HANA for Financial Accounting",
   shortName: "SAP FI Certification",
   level: "Associate",

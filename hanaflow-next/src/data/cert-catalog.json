@@ -19,7 +19,11 @@
       "passingScore": 65,
       "officialQuestions": 80,
       "priceEur": 535,
-      "targetRoles": ["Consultant FI junior", "Comptable SAP", "Auditeur SI finance"],
+      "targetRoles": [
+        "Consultant FI junior",
+        "Comptable SAP",
+        "Auditeur SI finance"
+      ],
       "topics": [
         "FI Organizational structure",
         "Master data (comptes, clients, fournisseurs)",
@@ -45,7 +49,10 @@
       "passingScore": 65,
       "officialQuestions": 80,
       "priceEur": 535,
-      "targetRoles": ["Consultant CO junior", "Contrôleur de gestion SAP"],
+      "targetRoles": [
+        "Consultant CO junior",
+        "Contrôleur de gestion SAP"
+      ],
       "topics": [
         "Cost element / center accounting",
         "Internal orders",
@@ -71,7 +78,11 @@
       "passingScore": 76,
       "officialQuestions": 80,
       "priceEur": 535,
-      "targetRoles": ["Consultant MM junior", "Acheteur SAP", "Supply chain analyst"],
+      "targetRoles": [
+        "Consultant MM junior",
+        "Acheteur SAP",
+        "Supply chain analyst"
+      ],
       "topics": [
         "Master data (matériaux, fournisseurs, info records)",
         "Procurement processes (P2P)",
@@ -97,7 +108,10 @@
       "passingScore": 65,
       "officialQuestions": 80,
       "priceEur": 535,
-      "targetRoles": ["Consultant SD junior", "Customer service ops SAP"],
+      "targetRoles": [
+        "Consultant SD junior",
+        "Customer service ops SAP"
+      ],
       "topics": [
         "Master data (clients, articles, conditions)",
         "Sales order processing (OTC)",
@@ -123,7 +137,10 @@
       "passingScore": 64,
       "officialQuestions": 80,
       "priceEur": 535,
-      "targetRoles": ["Consultant PP junior", "Production scheduler SAP"],
+      "targetRoles": [
+        "Consultant PP junior",
+        "Production scheduler SAP"
+      ],
       "topics": [
         "Demand management & forecasting",
         "Material Requirements Planning (MRP)",
@@ -141,7 +158,7 @@
       "cert": "C_AIG",
       "certName": "SAP Certified Associate – SAP Generative AI Developer",
       "certSourceUrl": "https://learning.sap.com/certifications/sap-certified-associate-sap-generative-ai-developer",
-      "chapters": 7,
+      "chapters": 5,
       "questions": 40,
       "color": "from-violet-500 to-purple-700",
       "level": "Associate",
@@ -149,7 +166,11 @@
       "passingScore": 65,
       "officialQuestions": 60,
       "priceEur": 535,
-      "targetRoles": ["Dev IA SAP", "Solution architect Joule", "Consultant IA générative SAP"],
+      "targetRoles": [
+        "Dev IA SAP",
+        "Solution architect Joule",
+        "Consultant IA générative SAP"
+      ],
       "topics": [
         "Fondamentaux LLMs",
         "SAP AI Core & SAP AI Launchpad",

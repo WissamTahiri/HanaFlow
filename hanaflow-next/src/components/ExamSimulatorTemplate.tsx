@@ -70,12 +70,13 @@ function StartScreen({ onStart, questions, certInfo, certPath }: { onStart: () =
   );
 }
 
-function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath }: {
+function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, moduleId }: {
   answers: (number | null)[];
   questions: ExamQuestion[];
   timeUsed: number;
   certInfo: CertInfo;
   certPath: string;
+  moduleId: string;
 }) {
   const { user } = useAuth();
   const score = answers.filter((a, i) => a === questions[i].correctIndex).length;
@@ -176,7 +177,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath }: {
           </div>
           <CertificateDownloadButton
             userName={user?.name || ""}
-            moduleCode={certInfo.code}
+            moduleCode={moduleId.toUpperCase()}
             moduleName={certInfo.shortName}
             score={score}
             totalQuestions={questions.length}
@@ -369,7 +370,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
         )}
 
         {phase === "results" && (
-          <ResultsScreen answers={answers} questions={questions} timeUsed={timeUsed} certInfo={certInfo} certPath={certPath} />
+          <ResultsScreen answers={answers} questions={questions} timeUsed={timeUsed} certInfo={certInfo} certPath={certPath} moduleId={moduleId} />
         )}
       </div>
     </div>

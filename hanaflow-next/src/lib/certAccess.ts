@@ -1,4 +1,5 @@
 import "server-only";
+import { certCode } from "./certCodes";
 import { fiCertification, fiMockExamQuestions } from "@/data/certifications/fi.js";
 import { coCertification, coMockExamQuestions } from "@/data/certifications/co.js";
 import { mmCertification, mmMockExamQuestions } from "@/data/certifications/mm.js";
@@ -52,11 +53,13 @@ type CertShape = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getCertForPlan(moduleId: ModuleId, isPro: boolean): any {
   const data = CERT_MAP[moduleId];
-  if (isPro) return data.cert;
+  const code = certCode(moduleId);
+  if (isPro) return { ...(data.cert as CertShape), code };
 
   const cert = data.cert as CertShape;
   return {
     ...cert,
+    code,
     chapters: cert.chapters.map((ch) =>
       ch.isPremium
         ? { ...ch, lessons: [], quiz: [], locked: true }
@@ -73,6 +76,6 @@ export function getExamQuestions(moduleId: ModuleId) {
 }
 
 export function getCertMeta(moduleId: ModuleId) {
-  const cert = CERT_MAP[moduleId].cert as { code: string; shortName: string };
-  return { code: cert.code, shortName: cert.shortName };
+  const cert = CERT_MAP[moduleId].cert as { shortName: string };
+  return { code: certCode(moduleId), shortName: cert.shortName };
 }

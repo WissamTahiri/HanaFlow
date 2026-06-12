@@ -1,5 +1,5 @@
 /**
- * Contenu de la certification C_TS4MM_2023
+ * Contenu de la certification C_TS452_2601
  * SAP Certified Associate – SAP S/4HANA for Materials Management
  *
  * 7 chapitres couvrant 100% du périmètre de l'examen officiel
@@ -9,7 +9,7 @@
 
 export const mmCertification = {
   id: "c-ts4mm-2023",
-  code: "C_TS4MM_2023",
+  code: "C_TS452_2601",
   name: "SAP Certified Associate – SAP S/4HANA for Materials Management",
   shortName: "SAP MM Certification",
   level: "Associate",

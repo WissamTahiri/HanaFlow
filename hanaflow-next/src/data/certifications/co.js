@@ -1,5 +1,5 @@
 /**
- * Contenu de la certification C_TS4CO_2023
+ * Contenu de la certification C_TS4CO_2601
  * SAP Certified Associate – SAP S/4HANA for Management Accounting
  *
  * Structure :
@@ -11,7 +11,7 @@
 
 export const coCertification = {
   id: "c-ts4co-2023",
-  code: "C_TS4CO_2023",
+  code: "C_TS4CO_2601",
   name: "SAP Certified Associate – SAP S/4HANA for Management Accounting",
   shortName: "SAP CO Certification",
   level: "Associate",
