@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProGate from "@/components/ProGate";
 
 type Level = "beginner" | "some-knowledge" | "experienced";
 type Goal =
@@ -502,8 +502,18 @@ function RoadmapResult({ roadmap, onReset }: { roadmap: Roadmap; onReset: () => 
 
 export default function RoadmapPersonnaliseePage() {
   return (
-    <ProtectedRoute>
+    <ProGate
+      requirePro={false}
+      featureName="Roadmap IA personnalisée"
+      featureDescription="L'IA construit ton parcours SAP semaine par semaine selon ton niveau, ton objectif et ton temps disponible — gratuit avec un compte."
+      perks={[
+        "Plan d'étude semaine par semaine adapté à ton profil",
+        "Ordre des modules optimisé selon ton objectif métier",
+        "Jalons concrets : quiz, simulateurs, certification visée",
+        "Gratuit — il suffit d'un compte HanaFlow",
+      ]}
+    >
       <RoadmapPersoContent />
-    </ProtectedRoute>
+    </ProGate>
   );
 }

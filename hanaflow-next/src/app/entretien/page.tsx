@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import ProGate from "@/components/ProGate";
 
 /**
@@ -555,8 +554,7 @@ function EntretienContent() {
 
 export default function EntretienPage() {
   return (
-    <ProtectedRoute>
-      <ProGate
+    <ProGate
         featureName="Mock Interview SAP IA"
         featureDescription="Un recruteur IA te pose 6 questions adaptées à ton module et ta séniorité, puis te score sur 100 avec feedback détaillé par question."
         perks={[
@@ -567,8 +565,7 @@ export default function EntretienPage() {
           "3 entretiens par heure (free tier IA)",
         ]}
       >
-        <EntretienContent />
-      </ProGate>
-    </ProtectedRoute>
+      <EntretienContent />
+    </ProGate>
   );
 }

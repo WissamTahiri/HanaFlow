@@ -27,13 +27,16 @@ const courses = [
   { href: "/modules-sap/pp",  label: "PP — Production" },
 ];
 
+// Navigation secondaire : ces pages ne sont volontairement pas dans la navbar
+// (allégée à 5 entrées) — le footer est leur point d'accès permanent.
 const platform = [
-  { href: "/",                 label: "Accueil" },
-  { href: "/modules-sap",      label: "Vue des modules" },
-  { href: "/s4hana",           label: "S/4HANA" },
-  { href: "/ai-joule",         label: "IA & Joule" },
-  { href: "/processus-metier", label: "Processus métier" },
-  { href: "/roadmap",          label: "Roadmap consultant" },
+  { href: "/",                        label: "Accueil" },
+  { href: "/modules-sap",             label: "Vue des modules" },
+  { href: "/s4hana",                  label: "S/4HANA" },
+  { href: "/ai-joule",                label: "IA & Joule" },
+  { href: "/processus-metier",        label: "Processus métier" },
+  { href: "/roadmap",                 label: "Roadmap consultant" },
+  { href: "/certifications/comparer", label: "Comparer les certifications" },
 ];
 
 export default function Footer() {

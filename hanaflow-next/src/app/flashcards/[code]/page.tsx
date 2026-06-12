@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { getDeck, type FlashCard } from "@/data/flashcards";
 import { newCardProgress, review, sortByPriority, type CardProgress, type Quality } from "@/lib/sm2";
 import { notFound } from "next/navigation";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import ProGate from "@/components/ProGate";
 
 /**
@@ -52,8 +51,7 @@ const RATINGS: { label: string; quality: Quality; color: string; key: string }[]
 
 export default function FlashcardSessionPage({ params }: { params: Promise<{ code: string }> }) {
   return (
-    <ProtectedRoute>
-      <ProGate
+    <ProGate
         featureName="Flashcards SAP Pro"
         featureDescription="Mémorise les T-codes, tables et processus SAP avec un système de spaced repetition (SM-2) qui s'adapte à ce que tu retiens vraiment."
         perks={[
@@ -64,9 +62,8 @@ export default function FlashcardSessionPage({ params }: { params: Promise<{ cod
           "Raccourcis clavier pour réviser à vitesse réelle",
         ]}
       >
-        <FlashcardSessionContent params={params} />
-      </ProGate>
-    </ProtectedRoute>
+      <FlashcardSessionContent params={params} />
+    </ProGate>
   );
 }
 

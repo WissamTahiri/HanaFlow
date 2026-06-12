@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { useAuth } from "@/context/AuthContext";
 
 /**
- * ProGate — wrappe une page premium et la masque pour les comptes sans Pro.
+ * ProGate — wrappe une page outil et la masque selon le statut du visiteur.
  *
  * Comportements :
- *  - User non connecté → on laisse passer (la page elle-même peut être
- *    derrière ProtectedRoute si nécessaire ; sinon le serveur retourne 401)
- *  - User connecté + isPro=true → on rend les `children`
+ *  - Visiteur non connecté → teaser de la feature + CTA inscription/connexion
+ *    (on ne redirige jamais : le visiteur voit ce qu'il rate)
+ *  - User connecté + (isPro ou requirePro=false) → on rend les `children`
  *  - User connecté + isPro=false → paywall UI avec CTA vers /pricing
  *  - Admins : `useSubscription` les considère selon isPro réel en DB. Si tu
  *    veux qu'un admin voie tout sans payer, set isPro=true sur ton compte.
@@ -27,10 +28,12 @@ type ProGateProps = {
   featureDescription: string;
   /** Liste de bullets affichés sous "Ce que tu débloques" */
   perks?: string[];
+  /** false → un simple compte (gratuit) suffit, pas besoin de Pro. */
+  requirePro?: boolean;
   children: React.ReactNode;
 };
 
-export default function ProGate({ featureName, featureDescription, perks, children }: ProGateProps) {
+export default function ProGate({ featureName, featureDescription, perks, requirePro = true, children }: ProGateProps) {
   const { isAuthenticated, loading } = useAuth();
   const { isPro } = useSubscription();
 
@@ -43,10 +46,11 @@ export default function ProGate({ featureName, featureDescription, perks, childr
     );
   }
 
-  // Pas connecté → on laisse passer, ProtectedRoute ou la route serveur géreront.
-  if (!isAuthenticated) return <>{children}</>;
+  if (!isAuthenticated) {
+    return <Paywall featureName={featureName} featureDescription={featureDescription} perks={perks} loggedOut />;
+  }
 
-  if (isPro) return <>{children}</>;
+  if (!requirePro || isPro) return <>{children}</>;
 
   return <Paywall featureName={featureName} featureDescription={featureDescription} perks={perks} />;
 }
@@ -55,11 +59,14 @@ function Paywall({
   featureName,
   featureDescription,
   perks,
+  loggedOut = false,
 }: {
   featureName: string;
   featureDescription: string;
   perks?: string[];
+  loggedOut?: boolean;
 }) {
+  const pathname = usePathname();
   return (
     <div className="min-h-screen bg-sap-gray-light dark:bg-sap-dark py-12 sm:py-20">
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
@@ -72,7 +79,7 @@ function Paywall({
           {/* Hero gradient */}
           <div className="bg-linear-to-br from-sap-blue-dark via-sap-blue to-blue-500 p-8 sm:p-10 text-white text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-[11px] font-bold uppercase tracking-wider mb-4">
-              <LockIcon /> Réservé aux membres Pro
+              <LockIcon /> {loggedOut ? "Compte requis" : "Réservé aux membres Pro"}
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-3 text-balance">{featureName}</h1>
             <p className="text-white/85 max-w-md mx-auto leading-relaxed">{featureDescription}</p>
@@ -83,7 +90,7 @@ function Paywall({
             {perks && perks.length > 0 && (
               <>
                 <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-4 text-center">
-                  Ce que tu débloques avec Pro
+                  {loggedOut ? "Ce que tu débloques" : "Ce que tu débloques avec Pro"}
                 </h2>
                 <ul className="space-y-3 mb-8 max-w-md mx-auto">
                   {perks.map((p, i) => (
@@ -99,23 +106,42 @@ function Paywall({
             )}
 
             <div className="flex flex-col items-center gap-3">
-              <Link
-                href="/pricing"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sap-blue text-white font-bold hover:bg-sap-blue-dark transition-all active:scale-[0.98] shadow-[0_6px_24px_rgba(37,99,235,0.30)]"
-              >
-                Activer le plan Pro →
-              </Link>
-              <p className="text-[11px] text-slate-400 text-center">
-                Garantie 14 jours · Annulation en un clic
-              </p>
+              {loggedOut ? (
+                <>
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sap-blue text-white font-bold hover:bg-sap-blue-dark transition-all active:scale-[0.98] shadow-[0_6px_24px_rgba(37,99,235,0.30)]"
+                  >
+                    Créer un compte gratuit →
+                  </Link>
+                  <p className="text-[11px] text-slate-400 text-center">
+                    Déjà un compte ?{" "}
+                    <Link href={`/login?next=${encodeURIComponent(pathname)}`} className="text-sap-blue underline">
+                      Se connecter
+                    </Link>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sap-blue text-white font-bold hover:bg-sap-blue-dark transition-all active:scale-[0.98] shadow-[0_6px_24px_rgba(37,99,235,0.30)]"
+                  >
+                    Activer le plan Pro →
+                  </Link>
+                  <p className="text-[11px] text-slate-400 text-center">
+                    Garantie 14 jours · Annulation en un clic
+                  </p>
+                </>
+              )}
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-100 dark:border-slate-700 text-center">
               <Link
-                href="/dashboard"
+                href={loggedOut ? "/" : "/dashboard"}
                 className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               >
-                ← Retour au dashboard
+                {loggedOut ? "← Retour à l'accueil" : "← Retour au dashboard"}
               </Link>
             </div>
           </div>

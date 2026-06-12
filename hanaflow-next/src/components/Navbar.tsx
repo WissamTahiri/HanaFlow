@@ -165,10 +165,6 @@ export default function Navbar() {
               )}
             </div>
 
-            <NavItem href="/s4hana" label="S/4HANA" />
-            <NavItem href="/ai-joule" label="IA & Joule" />
-            <NavItem href="/processus-metier" label="Processus" />
-
             {/* Dropdown Outils IA */}
             <div className="relative" ref={toolsRef}>
               <button
@@ -190,11 +186,10 @@ export default function Navbar() {
                                 shadow-[0_8px_40px_rgba(0,0,0,0.10)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.35)]
                                 p-2 z-50">
                   {[
+                    { href: "/roadmap", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil", pro: false },
                     { href: "/entretien", label: "Mock Interview IA", desc: "Entretien IA avec scoring détaillé", pro: true },
                     { href: "/cv-builder", label: "CV Builder ATS", desc: "Génère un CV SAP optimisé ATS", pro: true },
                     { href: "/flashcards", label: "Flashcards SAP", desc: "Révision active spaced repetition", pro: true },
-                    { href: "/roadmap", label: "Roadmap IA personnalisée", desc: "Parcours adapté à ton profil", pro: false },
-                    { href: "/certifications/comparer", label: "Comparateur certifs", desc: "Compare les certifs SAP", pro: false },
                   ].map(({ href, label, desc, pro }) => (
                     <Link
                       key={href}
@@ -356,20 +351,13 @@ export default function Navbar() {
         aria-label="Navigation mobile"
       >
         <div className="px-4 py-5 space-y-0.5">
+          {/* Navigation principale mobile — 4 items top-level, le reste vit
+              dans les sections Modules / Outils ci-dessous et dans le footer. */}
           {[
-            { href: "/",                 label: "Accueil",           exact: true },
-            { href: "/modules-sap",      label: "Vue modules" },
-            { href: "/s4hana",           label: "S/4HANA" },
-            { href: "/ai-joule",         label: "IA & Joule" },
-            { href: "/processus-metier", label: "Processus métier" },
-            { href: "/roadmap",          label: "Roadmap IA" },
-            { href: "/entretien",        label: "Mock Interview IA" },
-            { href: "/cv-builder",       label: "CV Builder ATS" },
-            { href: "/flashcards",       label: "Flashcards SAP" },
-            { href: "/a-propos",         label: "À propos" },
-            { href: "/certifications",   label: "Certifications" },
-            { href: "/certifications/comparer", label: "Comparer certifs" },
-            { href: "/pricing",          label: "Tarifs" },
+            { href: "/",               label: "Accueil",        exact: true },
+            { href: "/modules-sap",    label: "Vue modules" },
+            { href: "/certifications", label: "Certifications", exact: true },
+            { href: "/pricing",        label: "Tarifs" },
           ].map(({ href, label, exact }) => {
             const isActive = exact ? pathname === href : pathname.startsWith(href);
             return (
@@ -406,6 +394,33 @@ export default function Navbar() {
                 </Link>
               ))}
             </div>
+          </div>
+
+          {/* Outils IA section */}
+          <div className="pt-4 pb-1">
+            <p className="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.12em] mb-2">
+              Outils IA
+            </p>
+            {[
+              { href: "/roadmap",    label: "Roadmap IA personnalisée", pro: false },
+              { href: "/entretien",  label: "Mock Interview IA",        pro: true },
+              { href: "/cv-builder", label: "CV Builder ATS",           pro: true },
+              { href: "/flashcards", label: "Flashcards SAP",           pro: true },
+            ].map(({ href, label, pro }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
+                           text-slate-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                {label}
+                {pro && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase tracking-wider">
+                    Pro
+                  </span>
+                )}
+              </Link>
+            ))}
           </div>
 
           {/* Auth mobile */}
