@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Home from "./_home";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: {
@@ -15,6 +16,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
-  return <Home />;
+// Seuil en dessous duquel on n'affiche PAS le compteur d'inscrits :
+// « 12 inscrits » dessert plus qu'il ne rassure. En dessous, la stats bar
+// garde « 100 % Gratuit ».
+const USER_COUNT_DISPLAY_THRESHOLD = 20;
+
+export default async function Page() {
+  let userCount: number | null = null;
+  try {
+    const count = await prisma.user.count();
+    if (count >= USER_COUNT_DISPLAY_THRESHOLD) userCount = count;
+  } catch {
+    // DB indisponible → on rend la home sans le compteur.
+  }
+  return <Home userCount={userCount} />;
 }

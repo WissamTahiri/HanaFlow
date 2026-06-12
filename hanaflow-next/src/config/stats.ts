@@ -20,6 +20,12 @@ export const HANAFLOW_STATS = {
   questionsQuiz: 233,
   /** Un simulateur d'examen par module. */
   simulateurs: 6,
+  /**
+   * Estimations marketing (non comptées depuis le contenu, donc non
+   * vérifiées par stats.test.ts) — à réviser à la main si le contenu évolue.
+   */
+  tcodesCouverts: "200+",
+  heuresContenu: "48h+",
 } as const;
 
 /** Total toutes questions confondues (simulateurs + quiz de chapitre). */

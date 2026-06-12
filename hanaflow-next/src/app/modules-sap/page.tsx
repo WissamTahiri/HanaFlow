@@ -108,8 +108,8 @@ const DIFFICULTIES = ["Tous", "Fondamental", "Intermédiaire", "Avancé"];
 
 const stats = [
   { value: `${HANAFLOW_STATS.modules}`, label: "Modules fonctionnels" },
-  { value: "48h+", label: "Contenu estimé" },
-  { value: "200+", label: "T-codes couverts" },
+  { value: HANAFLOW_STATS.heuresContenu, label: "Contenu estimé" },
+  { value: HANAFLOW_STATS.tcodesCouverts, label: "T-codes couverts" },
   { value: "3",    label: "Flux métier (P2P · O2C · R2R)" },
 ];
 

@@ -85,7 +85,7 @@ const features = [
   { icon: <MapIcon />,        title: "Roadmap consultant", desc: "Chemin balisé pour devenir consultant SAP junior en partant de zéro." },
 ];
 
-export default function Home() {
+export default function Home({ userCount = null }: { userCount?: number | null }) {
   return (
     <div className="flex flex-col">
 
@@ -188,7 +188,11 @@ export default function Home() {
               { value: HANAFLOW_STATS.modules, suffix: "", label: "Modules SAP", duration: 900 },
               { value: HANAFLOW_STATS.chapitres, suffix: "", label: "Chapitres", duration: 1200 },
               { value: HANAFLOW_STATS.questionsExamen, suffix: "", label: "Questions d'examen", duration: 1500 },
-              { value: 100, suffix: " %", label: "Gratuit", duration: 1200 },
+              // Compteur d'inscrits réel (seuil géré côté serveur dans page.tsx) ;
+              // tant qu'il est null on garde la gratuité comme 4e preuve.
+              userCount !== null
+                ? { value: userCount, suffix: "+", label: "Inscrits", duration: 1200 }
+                : { value: 100, suffix: " %", label: "Gratuit", duration: 1200 },
             ].map((s) => (
               <div key={s.label} className="flex items-baseline sm:items-center gap-2 justify-center sm:justify-start">
                 <StatCounter value={s.value} suffix={s.suffix} duration={s.duration} className="text-2xl sm:text-3xl font-extrabold tabular-nums" />
