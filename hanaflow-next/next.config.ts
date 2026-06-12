@@ -46,6 +46,23 @@ const nextConfig: NextConfig = {
   // Le composant CvDocument reste de toute façon chargé via next/dynamic
   // ssr:false côté client uniquement.
   transpilePackages: ["@react-pdf/renderer"],
+  async redirects() {
+    return [
+      // HCM a été remplacé par AI (certif SAP C_THR12 retirée en mars 2025).
+      // 308 permanent → préserve les anciens liens et sort l'URL HCM de l'index
+      // Google proprement, sans garder de route fantôme dans src/app.
+      {
+        source: "/modules-sap/hcm",
+        destination: "/modules-sap/ai",
+        permanent: true,
+      },
+      {
+        source: "/modules-sap/hcm/:path*",
+        destination: "/modules-sap/ai",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
