@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HANAFLOW_STATS } from "@/config/stats";
-import { CONTACT } from "@/config/contact";
 import DemoRequestForm from "./DemoRequestForm";
 
 export const metadata: Metadata = {
@@ -132,10 +131,10 @@ export default function EcolesPage() {
             Demander une démo
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-8">
-            Réponse sous 48 h ouvrées. Vous pouvez aussi nous écrire directement à{" "}
-            <a href={`mailto:${CONTACT.email}`} className="text-sap-blue hover:underline">
-              {CONTACT.email}
-            </a>
+            Réponse sous 48 h ouvrées. Vous pouvez aussi passer par le{" "}
+            <Link href="/contact" className="text-sap-blue hover:underline">
+              formulaire de contact
+            </Link>
             .
           </p>
           <DemoRequestForm />

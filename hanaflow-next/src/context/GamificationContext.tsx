@@ -88,7 +88,10 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     if (firstNew) setNotification({ badge: firstNew, ts: Date.now() });
   }, []);
 
-  // Au login : remplacer l'état local par l'état serveur.
+  // Au login : remplacer l'état local par l'état serveur. Si l'état serveur
+  // est vierge mais que le localStorage contient une ancienne progression
+  // (compte pré-migration), on l'importe une fois via /migrate — le serveur
+  // recalcule l'XP depuis les badges, le client ne décide rien.
   useEffect(() => {
     if (!isAuthenticated || !token) return;
     let cancelled = false;
@@ -97,10 +100,22 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
         const res = await fetch("/api/gamification", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (res.ok && !cancelled) {
-          const data = await res.json();
-          applyServerState(data.gamification);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        let state: ServerState = data.gamification;
+
+        const legacyBadges = load<string[]>("hf_badges", []);
+        if (state.totalXp === 0 && state.badges.length === 0 && legacyBadges.length > 0) {
+          const mig = await fetch("/api/gamification/migrate", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ badges: legacyBadges, streak: load("hf_streak", 0) }),
+          });
+          if (mig.ok && !cancelled) {
+            state = (await mig.json()).gamification;
+          }
         }
+        if (!cancelled) applyServerState(state);
       } catch { /* offline : on garde l'affichage courant */ }
     })();
     return () => { cancelled = true; };

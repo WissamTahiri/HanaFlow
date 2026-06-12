@@ -228,12 +228,12 @@ export default function PricingPage() {
                     </button>
                   )
                 ) : (
-                  <a
-                    href="mailto:contact@hanaflow.fr"
+                  <Link
+                    href="/ecoles#demande-demo"
                     className={`block w-full py-2.5 text-center text-sm font-semibold rounded-xl transition-colors mb-5 ${plan.ctaStyle}`}
                   >
                     {plan.cta}
-                  </a>
+                  </Link>
                 )}
 
                 {/* Features */}
@@ -356,8 +356,8 @@ export default function PricingPage() {
           className="mt-10 text-center"
         >
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-            Des questions ? Contactez-nous à{" "}
-            <a href="mailto:contact@hanaflow.fr" className="text-sap-blue hover:underline">contact@hanaflow.fr</a>
+            Des questions ?{" "}
+            <Link href="/contact" className="text-sap-blue hover:underline">Contactez-nous</Link>
           </p>
           <Link href="/certifications" className="inline-flex items-center gap-2 text-sm text-sap-blue dark:text-blue-400 hover:underline font-medium">
             ← Voir les certifications disponibles

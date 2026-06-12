@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { CONTACT } from "@/config/contact";
+import { useAuth } from "@/context/AuthContext";
 
 const SUBJECTS = [
   { value: "general", label: "Question générale" },
@@ -15,17 +16,37 @@ const SUBJECTS = [
 ];
 
 export default function Contact() {
+  const { token } = useAuth();
   const [subject, setSubject] = useState("general");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const handleSubmit = (e: FormEvent) => {
+  // Soumission via /api/feedback (inbox admin en DB) plutôt qu'un mailto :
+  // fonctionne sans client mail configuré et sans dépendre d'une boîte
+  // contact@ encore en cours de mise en place.
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setStatus("sending");
     const subjectLabel = SUBJECTS.find((s) => s.value === subject)?.label ?? subject;
-    const body = `Nom : ${name}\nE-mail : ${email}\n\n${message}`;
-    const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent(`[HanaFlow] ${subjectLabel}`)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          context: `/contact — ${subjectLabel}`,
+          improveWhat: `Nom : ${name}\n${message}`,
+          contactEmail: email,
+        }),
+      });
+      setStatus(res.ok ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -176,12 +197,28 @@ export default function Contact() {
             </Link>.
           </p>
 
-          <button
-            type="submit"
-            className="btn-primary px-6 py-2.5"
-          >
-            Envoyer le message →
-          </button>
+          {status === "sent" ? (
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl px-4 py-3">
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                Message envoyé ✓ — nous revenons vers vous sous 48 h ouvrées.
+              </p>
+            </div>
+          ) : (
+            <>
+              {status === "error" && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  Échec de l&apos;envoi — réessayez dans quelques minutes.
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={status === "sending"}
+                className="btn-primary px-6 py-2.5 disabled:opacity-60"
+              >
+                {status === "sending" ? "Envoi en cours…" : "Envoyer le message →"}
+              </button>
+            </>
+          )}
         </form>
       </div>
     </div>

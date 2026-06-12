@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const validated = validateBody(inputSchema, body);
   if (!validated.success) return err(validated.error, 400);
 
-  const { moduleCode, examScore, examQuestions } = validated.data;
+  const { moduleCode, examScore } = validated.data;
 
   const moduleInfo = certCatalog.modules.find((m) => m.code === moduleCode);
   if (!moduleInfo) return err("Module SAP inconnu", 400);
@@ -61,6 +61,30 @@ export async function POST(req: NextRequest) {
       400,
     );
   }
+
+  // Anti-fraude : on ne croit pas le score déclaré par le client. Il doit
+  // correspondre à une tentative de simulateur réellement enregistrée
+  // (POST /api/quiz/submit, fait automatiquement en fin d'examen) dans les
+  // 2 dernières heures. Le score certifié est celui de la MEILLEURE
+  // tentative récente en DB, pas celui du payload.
+  const recentAttempt = await prisma.quizAttempt.findFirst({
+    where: {
+      userId: auth.user.userId,
+      moduleCode: moduleCode.toLowerCase(),
+      kind: "exam",
+      score: { gte: moduleInfo.passingScore },
+      attemptedAt: { gte: new Date(Date.now() - 2 * 60 * 60 * 1000) },
+    },
+    orderBy: { score: "desc" },
+  });
+  if (!recentAttempt) {
+    return err(
+      "Aucune tentative de simulateur récente trouvée pour ce module. Termine le simulateur d'examen puis réessaie.",
+      400,
+    );
+  }
+  const certifiedScore = recentAttempt.score;
+  const certifiedQuestions = recentAttempt.questionsTotal;
 
   // Récupère le user pour avoir son nom à la date d'émission
   const dbUser = await prisma.user.findUnique({
@@ -82,7 +106,7 @@ export async function POST(req: NextRequest) {
     where: { userId_moduleCode: { userId: auth.user.userId, moduleCode } },
   });
 
-  if (existing && existing.examScore >= examScore) {
+  if (existing && existing.examScore >= certifiedScore) {
     // Score pas meilleur → on renvoie le cert actuel, pas de nouvelle écriture.
     return ok({ certificate: existing, isNew: false, improved: false });
   }
@@ -95,12 +119,12 @@ export async function POST(req: NextRequest) {
       moduleLabel: moduleInfo.name,
       certCode: moduleInfo.cert,
       candidateName: dbUser.name,
-      examScore,
-      examQuestions,
+      examScore: certifiedScore,
+      examQuestions: certifiedQuestions,
     },
     update: {
-      examScore,
-      examQuestions,
+      examScore: certifiedScore,
+      examQuestions: certifiedQuestions,
       issuedAt: new Date(),
       // Garde le nom et le moduleLabel snapshot du premier passage si
       // l'utilisateur a renommé son compte entre temps : on remet à jour
@@ -117,6 +141,6 @@ export async function POST(req: NextRequest) {
   return ok({
     certificate: cert,
     isNew: !existing,
-    improved: !!existing && existing.examScore < examScore,
+    improved: !!existing && existing.examScore < certifiedScore,
   });
 }
