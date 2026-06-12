@@ -101,7 +101,7 @@ export default async function RootLayout({
           "url": BASE,
           "logo": `${BASE}/icons/icon-512.png`,
           "description": "Plateforme éducative dédiée à l'apprentissage de SAP pour les étudiants et futurs consultants.",
-          "sameAs": []
+          "sameAs": ["https://www.linkedin.com/in/wissam-tahiri-730a47326", "https://github.com/WissamTahiri"]
         }} />
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-sap-dark text-slate-900 dark:text-slate-100 antialiased">

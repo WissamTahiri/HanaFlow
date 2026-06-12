@@ -4,7 +4,7 @@ import { CONTACT } from "@/config/contact";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
-  description: "Mentions légales de la plateforme HanaFlow.",
+  description: "Mentions légales de HanaFlow : éditeur, hébergement Vercel, propriété intellectuelle et marques SAP citées à titre pédagogique.",
   alternates: { canonical: "/mentions-legales" },
 };
 

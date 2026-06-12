@@ -4,7 +4,7 @@ import { CONTACT } from "@/config/contact";
 
 export const metadata: Metadata = {
   title: "Conditions générales d'utilisation",
-  description: "Conditions générales d'utilisation de la plateforme HanaFlow.",
+  description: "Conditions générales d'utilisation de HanaFlow : comptes, plan Pro, contenu pédagogique SAP, certificats de réussite et responsabilités de l'éditeur.",
   alternates: { canonical: "/cgu" },
 };
 

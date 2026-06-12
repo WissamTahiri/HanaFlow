@@ -26,6 +26,7 @@ export default function MmLayout({ children }: { children: React.ReactNode }) {
         "url": `${BASE}/modules-sap/mm`,
         "provider": { "@type": "EducationalOrganization", "name": "HanaFlow", "url": BASE },
         "educationalLevel": "Beginner to Intermediate",
+        "courseCode": "C_TS452_2310",
         "inLanguage": "fr",
         "isAccessibleForFree": true,
       }} />

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SAP AI Joule | HanaFlow",
     description:
-      "Découvre Joule, l'assistant IA de SAP. Comment l'intelligence artificielle transforme les ERP SAP.",
+      "Découvre Joule, l'assistant IA générative de SAP : cas d'usage par module (FI, MM, SD), architecture AI Core, RAG et impact sur le métier de consultant S/4HANA.",
     url: "/ai-joule",
   },
 };

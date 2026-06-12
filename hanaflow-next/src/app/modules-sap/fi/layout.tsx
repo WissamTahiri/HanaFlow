@@ -26,6 +26,7 @@ export default function FiLayout({ children }: { children: React.ReactNode }) {
         "url": `${BASE}/modules-sap/fi`,
         "provider": { "@type": "EducationalOrganization", "name": "HanaFlow", "url": BASE },
         "educationalLevel": "Beginner to Intermediate",
+        "courseCode": "C_TS4FI_2023",
         "inLanguage": "fr",
         "isAccessibleForFree": true,
       }} />

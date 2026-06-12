@@ -26,6 +26,7 @@ export default function AiLayout({ children }: { children: React.ReactNode }) {
         "url": `${BASE}/modules-sap/ai`,
         "provider": { "@type": "EducationalOrganization", "name": "HanaFlow", "url": BASE },
         "educationalLevel": "Intermediate",
+        "courseCode": "C_AIG_2404",
         "inLanguage": "fr",
         "isAccessibleForFree": true,
       }} />

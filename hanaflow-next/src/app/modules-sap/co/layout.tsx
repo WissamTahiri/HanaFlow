@@ -26,6 +26,7 @@ export default function CoLayout({ children }: { children: React.ReactNode }) {
         "url": `${BASE}/modules-sap/co`,
         "provider": { "@type": "EducationalOrganization", "name": "HanaFlow", "url": BASE },
         "educationalLevel": "Intermediate",
+        "courseCode": "C_TS4CO_2023",
         "inLanguage": "fr",
         "isAccessibleForFree": true,
       }} />

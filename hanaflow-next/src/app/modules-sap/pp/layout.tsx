@@ -26,6 +26,7 @@ export default function PpLayout({ children }: { children: React.ReactNode }) {
         "url": `${BASE}/modules-sap/pp`,
         "provider": { "@type": "EducationalOrganization", "name": "HanaFlow", "url": BASE },
         "educationalLevel": "Intermediate",
+        "courseCode": "C_TS422_2023",
         "inLanguage": "fr",
         "isAccessibleForFree": true,
       }} />

@@ -26,6 +26,7 @@ export default function SdLayout({ children }: { children: React.ReactNode }) {
         "url": `${BASE}/modules-sap/sd`,
         "provider": { "@type": "EducationalOrganization", "name": "HanaFlow", "url": BASE },
         "educationalLevel": "Intermediate",
+        "courseCode": "C_TS460_2023",
         "inLanguage": "fr",
         "isAccessibleForFree": true,
       }} />
