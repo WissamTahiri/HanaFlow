@@ -111,16 +111,17 @@ export default function Home() {
 
             {/* Headline : 1ère ligne en blanc, 2ème en italique + accent doux pour respiration */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.02] tracking-[-0.02em] mb-6 text-balance">
-              Apprends SAP comme en école,
+              De zéro à consultant SAP
               <br className="hidden sm:block" />{" "}
               <span className="bg-linear-to-r from-white via-sky-100 to-blue-100 bg-clip-text text-transparent">
-                obtiens un certificat reconnu.
+                certifié.
               </span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/85 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Modules FI, CO, MM, SD, PP, et désormais une certif IA générative. Cours structurés,
-              simulateurs d&apos;examen alignés sur les certifications officielles SAP.
+              La référence francophone pour apprendre SAP S/4HANA : {HANAFLOW_STATS.modules} modules,{" "}
+              {HANAFLOW_STATS.chapitres} chapitres et {HANAFLOW_STATS.questionsExamen} questions au format
+              des examens officiels — 100&nbsp;% gratuit, sans carte bancaire.
             </p>
 
             {/* CTA — primary button-in-button + secondary link discret */}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
+import { CONTACT } from "@/config/contact";
 
 const SUBJECTS = [
   { value: "general", label: "Question générale" },
@@ -23,7 +24,7 @@ export default function Contact() {
     e.preventDefault();
     const subjectLabel = SUBJECTS.find((s) => s.value === subject)?.label ?? subject;
     const body = `Nom : ${name}\nE-mail : ${email}\n\n${message}`;
-    const mailto = `mailto:wisstahiri91@gmail.com?subject=${encodeURIComponent(`[HanaFlow] ${subjectLabel}`)}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent(`[HanaFlow] ${subjectLabel}`)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
   };
 
@@ -49,10 +50,10 @@ export default function Contact() {
               E-mail
             </h3>
             <a
-              href="mailto:wisstahiri91@gmail.com"
+              href={`mailto:${CONTACT.email}`}
               className="text-sm font-medium text-sap-blue hover:underline"
             >
-              wisstahiri91@gmail.com
+              {CONTACT.email}
             </a>
           </div>
           <div>

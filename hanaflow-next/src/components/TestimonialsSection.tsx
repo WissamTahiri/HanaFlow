@@ -55,10 +55,10 @@ export default function TestimonialsSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-sap-blue mb-3">
-            Ils en parlent
+            Témoignages d&apos;apprenants bêta
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
-            Ce que disent les consultants formés sur HanaFlow
+            Ce que disent les premiers apprenants
           </h2>
         </div>
 

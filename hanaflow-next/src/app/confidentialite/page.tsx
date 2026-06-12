@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
+import { CONTACT } from "@/config/contact";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
@@ -17,7 +18,7 @@ export default function Confidentialite() {
       <h2>1. Responsable du traitement</h2>
       <p>
         Le responsable du traitement des données personnelles est <strong>Wissam Tahiri</strong>,
-        éditeur de HanaFlow. Pour toute demande relative à vos données : <a href="mailto:wisstahiri91@gmail.com">wisstahiri91@gmail.com</a>.
+        éditeur de HanaFlow. Pour toute demande relative à vos données : <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
       </p>
 
       <h2>2. Données collectées</h2>
@@ -86,7 +87,7 @@ export default function Confidentialite() {
         <li><strong>Droit de limitation</strong> du traitement</li>
       </ul>
       <p>
-        Pour exercer ces droits : <a href="mailto:wisstahiri91@gmail.com">wisstahiri91@gmail.com</a>.
+        Pour exercer ces droits : <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
         Une réponse est apportée sous <strong>1 mois maximum</strong>.
       </p>
       <p>

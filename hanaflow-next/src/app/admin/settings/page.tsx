@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { CONTACT } from "@/config/contact";
 
 interface Setting {
   key: string;
@@ -12,8 +13,8 @@ interface Setting {
 }
 
 const DEFAULT_SETTINGS: Omit<Setting, "updatedAt" | "updatedBy">[] = [
-  { key: "contact_email",         value: "wisstahiri91@gmail.com",  category: "contact" },
-  { key: "support_email",         value: "wisstahiri91@gmail.com",  category: "contact" },
+  { key: "contact_email",         value: CONTACT.email,  category: "contact" },
+  { key: "support_email",         value: CONTACT.email,  category: "contact" },
   { key: "linkedin_url",          value: "https://www.linkedin.com/in/wissam-tahiri-730a47326", category: "contact" },
   { key: "github_url",            value: "https://github.com/WissamTahiri", category: "contact" },
   { key: "banner_enabled",        value: "false",                    category: "banner" },

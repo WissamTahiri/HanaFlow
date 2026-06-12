@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
+import { CONTACT } from "@/config/contact";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
@@ -20,7 +21,7 @@ export default function MentionsLegales() {
       </p>
       <ul>
         <li><strong>Wissam Tahiri</strong>, en qualité d&apos;éditeur indépendant</li>
-        <li>Adresse de contact : <a href="mailto:wisstahiri91@gmail.com">wisstahiri91@gmail.com</a></li>
+        <li>Adresse de contact : <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></li>
         <li>Statut : projet personnel à vocation éducative (mise à jour de ce statut prévue lors de la création d&apos;une structure juridique)</li>
       </ul>
 
@@ -62,7 +63,7 @@ export default function MentionsLegales() {
 
       <h2>Contact</h2>
       <p>
-        Pour toute question relative à ces mentions légales : <a href="mailto:wisstahiri91@gmail.com">wisstahiri91@gmail.com</a>
+        Pour toute question relative à ces mentions légales : <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
         {" "}ou via la page <a href="/contact">contact</a>.
       </p>
     </LegalPage>

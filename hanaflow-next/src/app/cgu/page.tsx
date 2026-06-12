@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
+import { CONTACT } from "@/config/contact";
 
 export const metadata: Metadata = {
   title: "Conditions générales d'utilisation",
@@ -90,7 +91,7 @@ export default function CGU() {
       </p>
       <p>
         L&apos;Utilisateur peut à tout moment supprimer son compte depuis la page profil
-        ou en contactant <a href="mailto:wisstahiri91@gmail.com">wisstahiri91@gmail.com</a>.
+        ou en contactant <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
       </p>
 
       <h2>9. Limitation de responsabilité</h2>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT } from "@/config/contact";
 
 const LinkedInIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -70,7 +71,7 @@ export default function Footer() {
                             text-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-150">
                 <GitHubIcon />
               </a>
-              <a href="mailto:wisstahiri91@gmail.com" aria-label="Envoyer un email"
+              <a href={`mailto:${CONTACT.email}`} aria-label="Envoyer un email"
                  className="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800
                             text-slate-500 hover:bg-sap-blue hover:text-white transition-all duration-150">
                 <MailIcon />
@@ -112,6 +113,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {[
                 { href: "/a-propos", label: "Le projet" },
+                { href: "/ecoles",   label: "Pour les écoles & entreprises" },
                 { href: "/contact",  label: "Contact" },
                 { href: "/register", label: "S'inscrire gratuitement" },
                 { href: "/login",    label: "Se connecter" },
