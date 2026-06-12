@@ -42,8 +42,58 @@ model User {
   certificates  CompletionCertificate[]
   feedback      Feedback[]
   npsResponses  NPSResponse[]
+  gamification  UserGamification?
+  quizAttempts  QuizAttempt[]
 
   @@map("users")
+}
+
+/**
+ * État de gamification serveur (1 ligne par user). Source de vérité pour
+ * XP / badges / streak — le localStorage ne sert plus que de cache pour les
+ * visiteurs non connectés. Le serveur recalcule l'XP depuis les badges +
+ * événements pour éviter qu'un client n'envoie un total arbitraire.
+ */
+model UserGamification {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique @map("user_id")
+  totalXp       Int      @default(0) @map("total_xp")
+  /** IDs des badges gagnés (JSON array de strings). */
+  badges        Json     @default("[]")
+  streakCurrent Int      @default(0) @map("streak_current")
+  streakBest    Int      @default(0) @map("streak_best")
+  /** Dernier jour d'activité compté dans le streak (date à minuit UTC). */
+  lastActivityAt DateTime? @map("last_activity_at") @db.Timestamptz
+  /** Compteur de quiz réussis (seuil du badge quiz_pass). */
+  quizPassCount Int      @default(0) @map("quiz_pass_count")
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_gamification")
+}
+
+/**
+ * Historique des tentatives de quiz de chapitre et de simulateurs d'examen.
+ * kind = "quiz" (quiz de chapitre) | "exam" (simulateur complet).
+ */
+model QuizAttempt {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  moduleCode     String   @map("module_code") @db.VarChar(10)
+  kind           String   @default("quiz") @db.VarChar(10)
+  /** ID du chapitre pour les quiz (ex: "ch3") — null pour les examens. */
+  chapterId      String?  @map("chapter_id") @db.VarChar(20)
+  /** Score en pourcentage (0-100). */
+  score          Int
+  questionsTotal Int      @map("questions_total")
+  attemptedAt    DateTime @default(now()) @map("attempted_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, moduleCode, attemptedAt])
+  @@index([userId, attemptedAt])
+  @@map("quiz_attempts")
 }
 
 /**

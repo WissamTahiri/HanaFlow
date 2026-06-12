@@ -208,7 +208,7 @@ interface ExamSimulatorTemplateProps {
 
 export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, certPath }: ExamSimulatorTemplateProps) {
   const { canAccess } = useSubscription();
-  const { onExamComplete } = useGamification();
+  const { submitQuizAttempt } = useGamification();
 
   const [phase, setPhase] = useState<"start" | "exam" | "results">("start");
   const [currentQ, setCurrentQ] = useState(0);
@@ -226,7 +226,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
           if (timerRef.current) clearInterval(timerRef.current);
           setAnswers((ans) => {
             const score = ans.filter((a, i) => a === questions[i].correctIndex).length;
-            onExamComplete(moduleId, Math.round((score / questions.length) * 100) >= 65);
+            submitQuizAttempt({ module: moduleId, kind: "exam", scorePct: Math.round((score / questions.length) * 100), questionsTotal: questions.length });
             return ans;
           });
           setPhase("results");
@@ -236,7 +236,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
       });
       setTimeUsed((u) => u + 1);
     }, 1000);
-  }, [moduleId, onExamComplete, questions]);
+  }, [moduleId, submitQuizAttempt, questions]);
 
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
@@ -269,7 +269,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
     if (timerRef.current) clearInterval(timerRef.current);
     const score = answers.filter((a, i) => a === questions[i].correctIndex).length;
     const pct = Math.round((score / questions.length) * 100);
-    onExamComplete(moduleId, pct >= 65);
+    submitQuizAttempt({ module: moduleId, kind: "exam", scorePct: pct, questionsTotal: questions.length });
     setPhase("results");
   };
 

@@ -9,6 +9,7 @@ import { useProgress, SAP_MODULES } from "@/hooks/useProgress";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { useGamification, BADGES, getLevelInfo } from "@/context/GamificationContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import QuizHistorySection from "@/components/QuizHistorySection";
 
 const CheckIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -398,6 +399,9 @@ function DashboardContent() {
             })}
           </div>
         </motion.div>
+
+        {/* Historique quiz / examens */}
+        <QuizHistorySection />
 
         {/* Liens rapides */}
         <motion.div

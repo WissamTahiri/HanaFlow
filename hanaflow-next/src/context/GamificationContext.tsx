@@ -1,73 +1,24 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { BADGES, LEVELS, getLevelInfo, getBadge, quizXp, examXp, LESSON_XP } from "@/lib/gamification";
+import type { Badge, LevelInfo } from "@/lib/gamification";
 
-export interface Badge {
-  id: string;
-  icon: string;
-  name: string;
-  desc: string;
-  xp: number;
-  category: string;
-}
+// Ré-exports : le catalogue vit dans lib/gamification (partagé serveur),
+// mais les composants existants importent depuis ce contexte.
+export { BADGES, LEVELS, getLevelInfo };
+export type { Badge, LevelInfo };
 
-export interface LevelInfo {
-  current: { level: number; name: string; minXP: number };
-  next: { level: number; name: string; minXP: number } | null;
-  progress: number;
-  xpInLevel: number;
-  xpToNext: number;
-}
-
-export const BADGES: Badge[] = [
-  { id: "welcome",      icon: "👋", name: "Bienvenue !",    desc: "Créer un compte sur HanaFlow",                  xp: 50,  category: "Démarrage" },
-  { id: "first_module", icon: "🚀", name: "Premier pas",    desc: "Visiter un premier module SAP",                 xp: 100, category: "Démarrage" },
-  { id: "explorer",     icon: "🔭", name: "Explorateur",    desc: "Visiter 3 modules SAP différents",              xp: 150, category: "Démarrage" },
-  { id: "sap_expert",   icon: "🏆", name: "Expert SAP",     desc: "Visiter les 6 modules SAP",                     xp: 300, category: "Démarrage" },
-  { id: "lesson_fi",    icon: "📚", name: "Étudiant FI",    desc: "Compléter 5 leçons en certification FI",        xp: 150, category: "Certifications" },
-  { id: "lesson_co",    icon: "📊", name: "Étudiant CO",    desc: "Compléter 5 leçons en certification CO",        xp: 150, category: "Certifications" },
-  { id: "lesson_mm",    icon: "📦", name: "Étudiant MM",    desc: "Compléter 5 leçons en certification MM",        xp: 150, category: "Certifications" },
-  { id: "lesson_sd",    icon: "🚚", name: "Étudiant SD",    desc: "Compléter 5 leçons en certification SD",        xp: 150, category: "Certifications" },
-  { id: "quiz_perfect", icon: "💯", name: "Sans faute",     desc: "Réussir un quiz de chapitre avec 100%",         xp: 200, category: "Quiz" },
-  { id: "quiz_pass",    icon: "✅", name: "Validé",          desc: "Réussir 3 quiz de chapitre (≥65%)",             xp: 200, category: "Quiz" },
-  { id: "exam_fi",      icon: "🎓", name: "Simulateur FI",  desc: "Terminer le simulateur d'examen FI",            xp: 300, category: "Examens" },
-  { id: "exam_co",      icon: "🎓", name: "Simulateur CO",  desc: "Terminer le simulateur d'examen CO",            xp: 300, category: "Examens" },
-  { id: "exam_mm",      icon: "🎓", name: "Simulateur MM",  desc: "Terminer le simulateur d'examen MM",            xp: 300, category: "Examens" },
-  { id: "exam_sd",      icon: "🎓", name: "Simulateur SD",  desc: "Terminer le simulateur d'examen SD",            xp: 300, category: "Examens" },
-  { id: "exam_pass",    icon: "⭐", name: "Reçu !",          desc: "Passer un simulateur d'examen avec ≥65%",       xp: 500, category: "Examens" },
-  { id: "streak_3",     icon: "🔥", name: "En feu",          desc: "Se connecter 3 jours consécutifs",              xp: 100, category: "Régularité" },
-  { id: "streak_7",     icon: "💪", name: "Dédié",           desc: "Se connecter 7 jours consécutifs",              xp: 250, category: "Régularité" },
-  { id: "pro_member",   icon: "👑", name: "Membre Pro",     desc: "Activer le plan Pro",                           xp: 100, category: "Abonnement" },
-];
-
-export const LEVELS = [
-  { level: 1,  name: "Débutant",   minXP: 0 },
-  { level: 2,  name: "Initié",     minXP: 200 },
-  { level: 3,  name: "Apprenti",   minXP: 500 },
-  { level: 4,  name: "Confirmé",   minXP: 1000 },
-  { level: 5,  name: "Praticien",  minXP: 1800 },
-  { level: 6,  name: "Consultant", minXP: 2800 },
-  { level: 7,  name: "Senior",     minXP: 4000 },
-  { level: 8,  name: "Expert SAP", minXP: 5500 },
-  { level: 9,  name: "Architecte", minXP: 7500 },
-  { level: 10, name: "SAP Master", minXP: 10000 },
-];
-
-export function getLevelInfo(xp: number): LevelInfo {
-  let current = LEVELS[0];
-  let next: typeof LEVELS[0] | null = LEVELS[1];
-  for (let i = LEVELS.length - 1; i >= 0; i--) {
-    if (xp >= LEVELS[i].minXP) {
-      current = LEVELS[i];
-      next = LEVELS[i + 1] ?? null;
-      break;
-    }
-  }
-  const progress = next
-    ? Math.round(((xp - current.minXP) / (next.minXP - current.minXP)) * 100)
-    : 100;
-  return { current, next, progress, xpInLevel: xp - current.minXP, xpToNext: next ? next.minXP - xp : 0 };
-}
+/**
+ * Gamification — XP, badges, streaks.
+ *
+ * - User CONNECTÉ : le serveur est la source de vérité (table
+ *   user_gamification). Chaque action déclenche un événement API ; le client
+ *   ne fait qu'afficher l'état renvoyé. Impossible de tricher en éditant le
+ *   localStorage : il n'est même plus lu.
+ * - Visiteur ANONYME : fallback localStorage (aperçu local, non synchronisé).
+ */
 
 const load = <T,>(key: string, fallback: T): T => {
   if (typeof window === "undefined") return fallback;
@@ -80,17 +31,24 @@ const save = (key: string, val: unknown) => {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
 };
 
+type QuizSubmission = {
+  module: string;
+  kind: "quiz" | "exam";
+  chapterId?: string;
+  /** Score en pourcentage 0-100. */
+  scorePct: number;
+  questionsTotal: number;
+};
+
 interface GamificationContextValue {
   xp: number;
   earnedBadges: string[];
   hasBadge: (id: string) => boolean;
-  awardBadge: (id: string) => void;
-  addXP: (amount: number) => void;
   onLogin: () => void;
   onModuleVisit: (visitedCount: number) => void;
   onLessonComplete: (module: string, lessonCount: number) => void;
-  onQuizPass: (score100: number) => void;
-  onExamComplete: (module: string, passed: boolean) => void;
+  /** Enregistre la tentative (DB si connecté) + XP/badges. */
+  submitQuizAttempt: (s: QuizSubmission) => void;
   onProActivated: () => void;
   notification: { badge: Badge; ts: number } | null;
   dismissNotification: () => void;
@@ -100,21 +58,77 @@ interface GamificationContextValue {
 
 const GamificationContext = createContext<GamificationContextValue | null>(null);
 
+type ServerState = {
+  totalXp: number;
+  badges: string[];
+  streakCurrent: number;
+  streakBest: number;
+  quizPassCount: number;
+};
+
 export function GamificationProvider({ children }: { children: React.ReactNode }) {
+  const { token, isAuthenticated } = useAuth();
+  // Ref mise à jour en effect (règle react-hooks/refs) : les callbacks
+  // d'événements lisent toujours le token courant sans se re-créer.
+  const tokenRef = useRef<string | null>(null);
+  useEffect(() => { tokenRef.current = token; }, [token]);
+
   const [xp, setXP] = useState(() => load("hf_xp", 0));
   const [earnedBadges, setEarnedBadges] = useState<string[]>(() => load("hf_badges", []));
-  // Compteur de quiz réussis : la valeur n'est jamais lue (juste persistée
-  // localement et utilisée comme seuil dans le setter), d'où le préfixe `_`.
   const [, setQuizPassCount] = useState(() => load("hf_quiz_pass", 0));
   const [streak, setStreak] = useState(() => load("hf_streak", 0));
   const [notification, setNotification] = useState<{ badge: Badge; ts: number } | null>(null);
 
-  const hasBadge = useCallback((id: string) => earnedBadges.includes(id), [earnedBadges]);
+  const applyServerState = useCallback((state: ServerState, newBadges: string[] = []) => {
+    setXP(state.totalXp);
+    setEarnedBadges(state.badges);
+    setStreak(state.streakCurrent);
+    setQuizPassCount(state.quizPassCount);
+    const firstNew = newBadges.map(getBadge).find(Boolean);
+    if (firstNew) setNotification({ badge: firstNew, ts: Date.now() });
+  }, []);
 
-  const awardBadge = useCallback((id: string) => {
+  // Au login : remplacer l'état local par l'état serveur.
+  useEffect(() => {
+    if (!isAuthenticated || !token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/gamification", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          applyServerState(data.gamification);
+        }
+      } catch { /* offline : on garde l'affichage courant */ }
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, token, applyServerState]);
+
+  /** POST un événement serveur ; renvoie false si non connecté. */
+  const sendEvent = useCallback((payload: Record<string, unknown>, path = "/api/gamification/event") => {
+    const t = tokenRef.current;
+    if (!t) return false;
+    fetch(path, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${t}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        applyServerState(data.gamification, data.newBadges);
+      })
+      .catch(() => { /* silencieux si offline */ });
+    return true;
+  }, [applyServerState]);
+
+  // ── Fallback local (visiteurs anonymes uniquement) ─────────────────
+  const localAward = useCallback((id: string) => {
     setEarnedBadges((prev) => {
       if (prev.includes(id)) return prev;
-      const badge = BADGES.find((b) => b.id === id);
+      const badge = getBadge(id);
       if (!badge) return prev;
       const next = [...prev, id];
       save("hf_badges", next);
@@ -124,12 +138,15 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     });
   }, []);
 
-  const addXP = useCallback((amount: number) => {
+  const localAddXP = useCallback((amount: number) => {
     setXP((prev) => { const next = prev + amount; save("hf_xp", next); return next; });
   }, []);
 
+  const hasBadge = useCallback((id: string) => earnedBadges.includes(id), [earnedBadges]);
+
   const onLogin = useCallback(() => {
-    awardBadge("welcome");
+    if (sendEvent({ type: "login" })) return;
+    localAward("welcome");
     const today = new Date().toDateString();
     const lastLogin = load<string | null>("hf_last_login", null);
     if (lastLogin !== today) {
@@ -137,50 +154,64 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
       setStreak((prev) => {
         const newStreak = lastLogin === yesterday ? prev + 1 : 1;
         save("hf_streak", newStreak);
-        if (newStreak >= 7) awardBadge("streak_7");
-        else if (newStreak >= 3) awardBadge("streak_3");
+        if (newStreak >= 7) localAward("streak_7");
+        else if (newStreak >= 3) localAward("streak_3");
         return newStreak;
       });
       save("hf_last_login", today);
     }
-  }, [awardBadge]);
+  }, [sendEvent, localAward]);
 
   const onModuleVisit = useCallback((visitedCount: number) => {
-    if (visitedCount >= 1) awardBadge("first_module");
-    if (visitedCount >= 3) awardBadge("explorer");
-    if (visitedCount >= 6) awardBadge("sap_expert");
-  }, [awardBadge]);
+    if (sendEvent({ type: "module_visit" })) return;
+    if (visitedCount >= 1) localAward("first_module");
+    if (visitedCount >= 3) localAward("explorer");
+    if (visitedCount >= 6) localAward("sap_expert");
+  }, [sendEvent, localAward]);
 
   const onLessonComplete = useCallback((module: string, lessonCount: number) => {
-    addXP(25);
-    if (lessonCount >= 5) awardBadge(`lesson_${module}`);
-  }, [awardBadge, addXP]);
+    if (sendEvent({ type: "lesson_complete", module, lessonCount })) return;
+    localAddXP(LESSON_XP);
+    if (lessonCount >= 5) localAward(`lesson_${module}`);
+  }, [sendEvent, localAward, localAddXP]);
 
-  const onQuizPass = useCallback((score100: number) => {
-    addXP(score100 === 100 ? 150 : 75);
-    if (score100 === 100) awardBadge("quiz_perfect");
-    setQuizPassCount((prev) => {
-      const next = prev + 1;
-      save("hf_quiz_pass", next);
-      if (next >= 3) awardBadge("quiz_pass");
-      return next;
-    });
-  }, [awardBadge, addXP]);
+  const submitQuizAttempt = useCallback(({ module, kind, chapterId, scorePct, questionsTotal }: QuizSubmission) => {
+    const sent = sendEvent(
+      { moduleCode: module, kind, chapterId, score: scorePct, questionsTotal },
+      "/api/quiz/submit",
+    );
+    if (sent) return;
+    // Anonyme : XP local, pas d'historique de tentative possible.
+    if (kind === "quiz") {
+      localAddXP(quizXp(scorePct));
+      if (scorePct === 100) localAward("quiz_perfect");
+      if (scorePct >= 65) {
+        setQuizPassCount((prev) => {
+          const next = prev + 1;
+          save("hf_quiz_pass", next);
+          if (next >= 3) localAward("quiz_pass");
+          return next;
+        });
+      }
+    } else {
+      const passed = scorePct >= 65;
+      localAddXP(examXp(passed));
+      localAward(`exam_${module}`);
+      if (passed) localAward("exam_pass");
+    }
+  }, [sendEvent, localAward, localAddXP]);
 
-  const onExamComplete = useCallback((module: string, passed: boolean) => {
-    addXP(passed ? 400 : 150);
-    awardBadge(`exam_${module}`);
-    if (passed) awardBadge("exam_pass");
-  }, [awardBadge, addXP]);
-
-  const onProActivated = useCallback(() => awardBadge("pro_member"), [awardBadge]);
+  const onProActivated = useCallback(() => {
+    if (sendEvent({ type: "pro_activated" })) return;
+    localAward("pro_member");
+  }, [sendEvent, localAward]);
 
   const dismissNotification = useCallback(() => setNotification(null), []);
 
   return (
     <GamificationContext.Provider value={{
-      xp, earnedBadges, hasBadge, awardBadge, addXP,
-      onLogin, onModuleVisit, onLessonComplete, onQuizPass, onExamComplete, onProActivated,
+      xp, earnedBadges, hasBadge,
+      onLogin, onModuleVisit, onLessonComplete, submitQuizAttempt, onProActivated,
       notification, dismissNotification,
       levelInfo: getLevelInfo(xp),
       streak,

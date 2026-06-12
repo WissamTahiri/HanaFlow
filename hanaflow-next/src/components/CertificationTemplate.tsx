@@ -201,7 +201,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
   const { isPro, canAccess } = useSubscription();
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { onLessonComplete, onQuizPass } = useGamification();
+  const { onLessonComplete, submitQuizAttempt } = useGamification();
 
   const storageKey = `${moduleId}_completed_lessons`;
 
@@ -417,7 +417,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                         ) : showQuiz ? (
                           <motion.div key="quiz" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-5">Quiz — {chapter.title}</h3>
-                            <QuizBlock quiz={chapter.quiz ?? []} onComplete={(s, t) => onQuizPass(Math.round((s / t) * 100))} />
+                            <QuizBlock quiz={chapter.quiz ?? []} onComplete={(s, t) => submitQuizAttempt({ module: moduleId, kind: "quiz", chapterId: chapter.id, scorePct: Math.round((s / t) * 100), questionsTotal: t })} />
                           </motion.div>
                         ) : null}
                       </AnimatePresence>
