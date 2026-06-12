@@ -5,6 +5,8 @@ import { motion } from "motion/react";
 import certCatalog from "@/data/cert-catalog.json";
 import { HANAFLOW_STATS } from "@/config/stats";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import SapNetworkBackground from "@/components/animations/SapNetworkBackground";
+import StatCounter from "@/components/animations/StatCounter";
 
 /**
  * Home v6 — design d'origine HanaFlow polish + inspirations plateformes
@@ -93,6 +95,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.08]" aria-hidden />
         <div className="absolute top-0 right-0 w-[40vw] h-[40vw] rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.5), transparent 70%)" }} aria-hidden />
         <div className="absolute bottom-0 left-0 w-[30vw] h-[30vw] rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, rgba(147,197,253,0.5), transparent 70%)" }} aria-hidden />
+        <SapNetworkBackground />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
@@ -182,13 +185,13 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-white text-center sm:text-left">
             {[
-              { value: `${HANAFLOW_STATS.modules}`, label: "Modules SAP" },
-              { value: `${HANAFLOW_STATS.chapitres}`, label: "Chapitres" },
-              { value: `${HANAFLOW_STATS.questionsExamen}`, label: "Questions d'examen" },
-              { value: "100 %", label: "Gratuit" },
+              { value: HANAFLOW_STATS.modules, suffix: "", label: "Modules SAP", duration: 900 },
+              { value: HANAFLOW_STATS.chapitres, suffix: "", label: "Chapitres", duration: 1200 },
+              { value: HANAFLOW_STATS.questionsExamen, suffix: "", label: "Questions d'examen", duration: 1500 },
+              { value: 100, suffix: " %", label: "Gratuit", duration: 1200 },
             ].map((s) => (
               <div key={s.label} className="flex items-baseline sm:items-center gap-2 justify-center sm:justify-start">
-                <span className="text-2xl sm:text-3xl font-extrabold">{s.value}</span>
+                <StatCounter value={s.value} suffix={s.suffix} duration={s.duration} className="text-2xl sm:text-3xl font-extrabold tabular-nums" />
                 <span className="text-sm text-white/80">{s.label}</span>
               </div>
             ))}
@@ -263,7 +266,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Link href={mod.href} className="card-interactive group flex flex-col h-full p-6">
+                <Link href={mod.href} data-module={mod.code.toLowerCase()} className="card-interactive module-card group flex flex-col h-full p-6">
                   {/* En-tête : icône module + badge certif */}
                   <div className="flex items-start justify-between mb-5">
                     <div className={`h-14 w-14 rounded-2xl bg-linear-to-br ${mod.color} flex items-center justify-center text-white font-extrabold text-base shadow-soft`}>

@@ -230,9 +230,9 @@ export default function ModulesOverview() {
                 >
                   <Link
                     href={m.path}
-                    className="group flex flex-col h-full bg-white dark:bg-slate-800 rounded-2xl border
-                               border-gray-100 dark:border-slate-700 overflow-hidden
-                               hover:shadow-medium hover:-translate-y-1 transition-all duration-300 relative"
+                    data-module={m.slug}
+                    className="module-card group flex flex-col h-full bg-white dark:bg-slate-800 rounded-2xl border
+                               border-gray-100 dark:border-slate-700 overflow-hidden relative"
                   >
                     {visited && (
                       <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1
