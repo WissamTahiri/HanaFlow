@@ -1,18 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+// NB : /certifications/* n'est volontairement PAS ici — les pages d'intro
+// sont publiques (funnel d'acquisition + SEO) et les pages /examen affichent
+// elles-mêmes un paywall serveur (ProPaywall) aux non connectés / non-Pro.
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/profil",
   "/achievements",
   "/admin",
-  "/certifications",
   "/certificats",
   "/stats",
 ];
 
 // Pages publiques qui matchent un PROTECTED_PREFIXES mais doivent rester
 // accessibles sans login (SEO, funnel d'acquisition).
-const PUBLIC_EXCEPTIONS = ["/certifications/comparer"];
+const PUBLIC_EXCEPTIONS: string[] = [];
 
 const ADMIN_PREFIX = "/admin";
 
