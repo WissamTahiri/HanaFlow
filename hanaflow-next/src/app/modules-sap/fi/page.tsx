@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { motion } from "motion/react";
+import FlowDiagram from "@/components/diagrams/FlowDiagram";
+import FiOrgDiagram from "@/components/diagrams/FiOrgDiagram";
 import ModuleLayout from "@/components/ModuleLayout";
 
 /* ─────────────────────────────────────────────────────────────
@@ -99,6 +101,9 @@ const OrgStructure = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
       Avant toute configuration, le consultant FI cartographie la structure financière du client.
     </p>
+    <div className="mb-5">
+      <FiOrgDiagram />
+    </div>
     <div className="grid sm:grid-cols-2 gap-4">
       {[
         { term: "Company Code", def: "Entité légale pour laquelle on produit bilan et compte de résultat." },
@@ -137,6 +142,18 @@ const Processes = () => (
           <span className="px-2 py-0.5 rounded text-xs font-bold bg-sap-blue text-white">P2P</span>
           <h3 className="text-base font-semibold text-slate-900 dark:text-white">Procure-to-Pay — Achats intégrés FI/MM</h3>
         </div>
+        <div className="mb-3">
+          <FlowDiagram
+            title="Flux Procure-to-Pay"
+            steps={[
+              { label: "Demande d'achat", sublabel: "ME51N · MM" },
+              { label: "Commande", sublabel: "ME21N · MM" },
+              { label: "Réception", sublabel: "MIGO · MM" },
+              { label: "Facture", sublabel: "MIRO · FI-AP" },
+              { label: "Paiement", sublabel: "F110 · FI" },
+            ]}
+          />
+        </div>
         <ol className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
           {[
             "Demande d'achat et commande créées dans MM.",
@@ -159,6 +176,18 @@ const Processes = () => (
         <div className="flex items-center gap-2 mb-2">
           <span className="px-2 py-0.5 rounded text-xs font-bold bg-teal-600 text-white">O2C</span>
           <h3 className="text-base font-semibold text-slate-900 dark:text-white">Order-to-Cash — Ventes intégrées FI/SD</h3>
+        </div>
+        <div className="mb-3">
+          <FlowDiagram
+            title="Flux Order-to-Cash"
+            steps={[
+              { label: "Commande client", sublabel: "VA01 · SD", color: "bg-teal-500/10 border-teal-500/30 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300" },
+              { label: "Livraison + PGI", sublabel: "VL01N · SD", color: "bg-teal-500/10 border-teal-500/30 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300" },
+              { label: "Facturation", sublabel: "VF01 · SD", color: "bg-teal-500/10 border-teal-500/30 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300" },
+              { label: "Document FI-AR", sublabel: "auto · FI", color: "bg-teal-500/10 border-teal-500/30 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300" },
+              { label: "Encaissement", sublabel: "F-28 · FI", color: "bg-teal-500/10 border-teal-500/30 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300" },
+            ]}
+          />
         </div>
         <ol className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
           {[
