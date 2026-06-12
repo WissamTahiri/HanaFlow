@@ -435,7 +435,7 @@ function ProfileContent() {
               <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   "7 chapitres FI complets (C_TS4FI_2023)",
-                  "Simulateur d'examen 40 questions",
+                  "Simulateur d'examen complet (format réel)",
                   "Quiz par chapitre avec corrections",
                   "Certifications CO, MM, SD (à venir)",
                 ].map((item) => (

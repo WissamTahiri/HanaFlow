@@ -260,7 +260,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Ce chapitre est réservé aux membres Pro. Passez au plan Pro pour accéder à l'intégralité des chapitres et au simulateur d'examen.</p>
               </div>
               <div className="space-y-2 mb-5">
-                {["Accès à tous les chapitres (6 chapitres Pro)", "Simulateur d'examen complet (40 questions)", "Quiz détaillés avec explications", "Suivi de progression complet"].map((f) => (
+                {["Accès à tous les chapitres Pro", "Simulateur d'examen complet (format réel)", "Quiz détaillés avec explications", "Suivi de progression complet"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
                     <span className="h-5 w-5 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center text-emerald-600 flex-shrink-0"><CheckIcon /></span>
                     {f}
@@ -367,7 +367,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                   <div className="px-4 py-3 border-t border-gray-100 dark:border-slate-700">
                     {canAccess(true) ? (
                       <Link href={examPath} className="block w-full text-center py-2.5 bg-sap-blue text-white rounded-xl text-sm font-semibold hover:bg-sap-blue-dark transition-colors">
-                        Simuler l'examen (40 questions)
+                        Simuler l'examen blanc
                       </Link>
                     ) : (
                       <button onClick={() => setShowUpgradeModal(true)} className="w-full text-center py-2.5 bg-gray-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">

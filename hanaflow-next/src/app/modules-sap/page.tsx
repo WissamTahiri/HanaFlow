@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/hooks/useProgress";
+import { HANAFLOW_STATS } from "@/config/stats";
 
 const ArrowRight = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -106,7 +107,7 @@ const RECOMMENDED_ORDER = ["fi", "mm", "sd", "co", "pp", "ai"];
 const DIFFICULTIES = ["Tous", "Fondamental", "Intermédiaire", "Avancé"];
 
 const stats = [
-  { value: "6",    label: "Modules fonctionnels" },
+  { value: `${HANAFLOW_STATS.modules}`, label: "Modules fonctionnels" },
   { value: "48h+", label: "Contenu estimé" },
   { value: "200+", label: "T-codes couverts" },
   { value: "3",    label: "Flux métier (P2P · O2C · R2R)" },

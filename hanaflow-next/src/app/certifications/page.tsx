@@ -31,7 +31,7 @@ export default function CertificationsPage() {
               {[
                 { step: "1", title: "Étudiez les chapitres", desc: "Contenu aligné sur le périmètre officiel de l'examen" },
                 { step: "2", title: "Validez par les quiz", desc: "Quiz de chapitre dans le format des vraies questions SAP" },
-                { step: "3", title: "Simulez l'examen", desc: "40 questions chronométrées avec résultats détaillés" },
+                { step: "3", title: "Simulez l'examen", desc: "Questions chronométrées au format officiel avec résultats détaillés" },
               ].map((s) => (
                 <div key={s.step} className="flex items-start gap-3 bg-white/10 rounded-xl p-4">
                   <span className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold flex-shrink-0">{s.step}</span>

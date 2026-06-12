@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import certCatalog from "@/data/cert-catalog.json";
+import { HANAFLOW_STATS } from "@/config/stats";
 import TestimonialsSection from "@/components/TestimonialsSection";
 
 /**
@@ -70,8 +71,8 @@ const modules = certCatalog.modules;
 
 const steps = [
   { num: "01", icon: <UserIcon />, title: "Crée ton compte", desc: "Inscription gratuite en 30 secondes, sans carte bancaire." },
-  { num: "02", icon: <BookIcon />, title: "Étudie les modules", desc: "Sept chapitres progressifs par module, avec quiz à chaque étape." },
-  { num: "03", icon: <TargetIcon />, title: "Passe le simulateur", desc: "40 questions en conditions réelles, corrections détaillées." },
+  { num: "02", icon: <BookIcon />, title: "Étudie les modules", desc: "Jusqu'à sept chapitres progressifs par module, avec quiz à chaque étape." },
+  { num: "03", icon: <TargetIcon />, title: "Passe le simulateur", desc: "Questions au format de l'examen réel, corrections détaillées." },
   { num: "04", icon: <CertificateIcon />, title: "Obtiens ton certificat", desc: "Certificat PDF délivré dès 65 % de réussite au simulateur." },
 ];
 
@@ -180,9 +181,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-white text-center sm:text-left">
             {[
-              { value: "6", label: "Modules SAP" },
-              { value: "42", label: "Chapitres" },
-              { value: "240+", label: "Questions d'examen" },
+              { value: `${HANAFLOW_STATS.modules}`, label: "Modules SAP" },
+              { value: `${HANAFLOW_STATS.chapitres}`, label: "Chapitres" },
+              { value: `${HANAFLOW_STATS.questionsExamen}`, label: "Questions d'examen" },
               { value: "100 %", label: "Gratuit" },
             ].map((s) => (
               <div key={s.label} className="flex items-baseline sm:items-center gap-2 justify-center sm:justify-start">
@@ -318,7 +319,7 @@ export default function Home() {
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
                 Chaque module suit fidèlement le syllabus de la certification SAP
                 correspondante. Le simulateur d&apos;examen reproduit les conditions
-                réelles : 40 questions, scoring équivalent, corrections détaillées.
+                réelles : questions au format officiel, scoring équivalent, corrections détaillées.
               </p>
               <Link href="/certifications" className="btn-primary">
                 Voir les certifications →

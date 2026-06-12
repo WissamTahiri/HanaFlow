@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
 import ProPaywall from "@/components/ProPaywall";
 import { getServerUser } from "@/lib/serverAuth";
@@ -8,8 +7,9 @@ import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
 // que le serveur n'a pas vérifié que l'utilisateur est connecté ET Pro.
 export default async function FIExamPage() {
   const user = await getServerUser();
-  if (!user) redirect("/login?next=/certifications/fi/examen");
-  if (!user.isPro) return <ProPaywall certPath="/certifications/fi" />;
+  if (!user || !user.isPro) {
+    return <ProPaywall certPath="/certifications/fi" loggedOut={!user} nextPath="/certifications/fi/examen" />;
+  }
 
   return (
     <ExamSimulatorTemplate

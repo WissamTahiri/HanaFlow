@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import PageLayout from "@/components/PageLayout";
+import { HANAFLOW_STATS, QUESTIONS_TOTAL } from "@/config/stats";
 
 const BookIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -42,10 +43,10 @@ const BriefcaseIcon = () => (
 );
 
 const projectStats = [
-  { value: "6", label: "modules SAP complets" },
-  { value: "60+", label: "concepts clés documentés" },
-  { value: "200+", label: "questions de quiz" },
-  { value: "6", label: "simulateurs d'examen" },
+  { value: `${HANAFLOW_STATS.modules}`, label: "modules SAP complets" },
+  { value: `${HANAFLOW_STATS.lecons}`, label: "leçons documentées" },
+  { value: `${QUESTIONS_TOTAL}`, label: "questions de quiz et d'examen" },
+  { value: `${HANAFLOW_STATS.simulateurs}`, label: "simulateurs d'examen" },
 ];
 
 const sapCoverage = [

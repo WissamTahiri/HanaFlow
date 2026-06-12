@@ -35,7 +35,7 @@ const PLANS = [
       { label: "Roadmap personnalisée (basique)", included: true },
       { label: "Suivi de progression (modules visités)", included: true },
       { label: "Chapitres 2-7 des certifications", included: false },
-      { label: "Simulateurs d'examen (40 questions)", included: false },
+      { label: "Simulateurs d'examen complets (jusqu'à 80 questions par module)", included: false },
       { label: "Quiz par chapitre avec explications", included: false },
       { label: "Badges et gamification", included: false },
       { label: "Roadmap personnalisée complète", included: false },
@@ -58,7 +58,7 @@ const PLANS = [
       { label: "Roadmap personnalisée (basique)", included: true },
       { label: "Suivi de progression (modules visités)", included: true },
       { label: "Chapitres 2-7 des certifications (FI, CO, MM, SD)", included: true },
-      { label: "Simulateurs d'examen (40 questions, format réel)", included: true },
+      { label: "Simulateurs d'examen complets (format réel, jusqu'à 80 questions)", included: true },
       { label: "Quiz par chapitre avec explications détaillées", included: true },
       { label: "Badges et gamification", included: true },
       { label: "Roadmap personnalisée complète", included: true },
@@ -67,12 +67,11 @@ const PLANS = [
   {
     id: "team",
     name: "Équipe",
-    price: "29€",
-    period: "/ mois",
-    annualPrice: "249€ / an",
-    desc: "Pour former plusieurs consultants SAP en entreprise.",
+    price: "Sur devis",
+    period: "",
+    desc: "Pour former plusieurs consultants SAP en entreprise ou en école.",
     color: "border-gray-200 dark:border-slate-700",
-    badge: { label: "Bientôt disponible", color: "bg-slate-700 text-white" },
+    badge: { label: "Écoles & entreprises", color: "bg-slate-700 text-white" },
     cta: "Nous contacter",
     ctaStyle: "bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600",
     features: [
@@ -108,7 +107,7 @@ const FAQ = [
   },
   {
     q: "Le plan Équipe est-il disponible maintenant ?",
-    a: "Le plan Équipe est en cours de développement. Contactez-nous pour rejoindre la liste d'attente ou discuter d'un accès anticipé pour votre équipe.",
+    a: "Le plan Équipe est proposé sur devis, selon la taille de votre équipe ou promotion. Contactez-nous par email pour discuter de vos besoins (tableau de bord, suivi de progression, facturation entreprise).",
   },
 ];
 
@@ -196,7 +195,7 @@ export default function PricingPage() {
                   </div>
                   {annual && plan.annualPrice && plan.id !== "free" && (
                     <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">
-                      Économisez {plan.id === "pro" ? "29€" : "99€"} par rapport au mensuel
+                      Économisez 29€ par rapport au mensuel
                     </p>
                   )}
                 </div>
@@ -231,7 +230,7 @@ export default function PricingPage() {
                 ) : (
                   <a
                     href="mailto:contact@hanaflow.fr"
-                    className={`block w-full py-2.5 text-center text-sm font-semibold rounded-xl transition-colors mb-5 opacity-70 cursor-not-allowed ${plan.ctaStyle}`}
+                    className={`block w-full py-2.5 text-center text-sm font-semibold rounded-xl transition-colors mb-5 ${plan.ctaStyle}`}
                   >
                     {plan.cta}
                   </a>

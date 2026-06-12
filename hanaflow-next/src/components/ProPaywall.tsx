@@ -2,7 +2,16 @@ import Link from "next/link";
 
 // Server component — paywall affiché aux non-Pro qui tentent d'accéder à un
 // simulateur d'examen. Aucune question ne fait partie du bundle de cette page.
-export default function ProPaywall({ certPath }: { certPath: string }) {
+// `loggedOut` : visiteur sans compte → CTA de connexion plutôt que "Passer en Pro".
+export default function ProPaywall({
+  certPath,
+  loggedOut = false,
+  nextPath,
+}: {
+  certPath: string;
+  loggedOut?: boolean;
+  nextPath?: string;
+}) {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-sap-dark flex items-center justify-center p-4">
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-8 text-center max-w-md">
@@ -12,17 +21,36 @@ export default function ProPaywall({ certPath }: { certPath: string }) {
           </svg>
         </div>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-          Simulateur d&apos;examen — Accès Pro
+          {loggedOut ? "Simulateur d'examen — Connexion requise" : "Simulateur d'examen — Accès Pro"}
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
-          Le simulateur d&apos;examen est réservé aux membres Pro. Active le plan Pro pour accéder à toutes les questions et corrections détaillées.
+          {loggedOut
+            ? "Connecte-toi ou crée un compte gratuit pour accéder au simulateur d'examen et suivre ta progression."
+            : "Le simulateur d'examen est réservé aux membres Pro. Active le plan Pro pour accéder à toutes les questions et corrections détaillées."}
         </p>
-        <Link
-          href="/pricing"
-          className="block w-full py-2.5 bg-sap-blue text-white rounded-xl font-semibold text-sm hover:bg-sap-blue-dark transition-colors"
-        >
-          Passer en Pro
-        </Link>
+        {loggedOut ? (
+          <>
+            <Link
+              href={`/login${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`}
+              className="block w-full py-2.5 bg-sap-blue text-white rounded-xl font-semibold text-sm hover:bg-sap-blue-dark transition-colors"
+            >
+              Se connecter
+            </Link>
+            <Link
+              href="/register"
+              className="block mt-3 w-full py-2.5 border border-sap-blue text-sap-blue rounded-xl font-semibold text-sm hover:bg-sap-blue/5 transition-colors"
+            >
+              Créer un compte gratuit
+            </Link>
+          </>
+        ) : (
+          <Link
+            href="/pricing"
+            className="block w-full py-2.5 bg-sap-blue text-white rounded-xl font-semibold text-sm hover:bg-sap-blue-dark transition-colors"
+          >
+            Passer en Pro
+          </Link>
+        )}
         <Link
           href={certPath}
           className="block mt-3 text-sm text-slate-500 hover:text-sap-blue transition-colors"

@@ -57,7 +57,7 @@ function StartScreen({ onStart, questions, certInfo, certPath }: { onStart: () =
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 text-left">
           <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-2">Avant de commencer :</p>
           <ul className="text-sm text-amber-700 dark:text-amber-400 space-y-1">
-            <li>• 40 questions à choix multiple, 4 options chacune</li>
+            <li>• {questions.length} questions à choix multiple, 4 options chacune</li>
             <li>• Chronomètre de 90 minutes (l'examen réel dure 180 min pour 80 questions)</li>
             <li>• Vous pouvez naviguer entre les questions</li>
             <li>• Score et explications détaillés à la fin</li>
