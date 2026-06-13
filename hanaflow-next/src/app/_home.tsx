@@ -72,7 +72,7 @@ const CertificateIcon = () => (
 const modules = certCatalog.modules;
 
 const steps = [
-  { num: "01", icon: <UserIcon />, title: "Crée ton compte", desc: "Inscription gratuite en 30 secondes, sans carte bancaire." },
+  { num: "01", icon: <UserIcon />, title: "Crée ton compte", desc: "Gratuit, et ta progression est sauvegardée à vie." },
   { num: "02", icon: <BookIcon />, title: "Étudie les modules", desc: "Jusqu'à sept chapitres progressifs par module, avec quiz à chaque étape." },
   { num: "03", icon: <TargetIcon />, title: "Passe le simulateur", desc: "Questions au format de l'examen réel, corrections détaillées." },
   { num: "04", icon: <CertificateIcon />, title: "Obtiens ton certificat", desc: "Certificat PDF délivré dès 65 % de réussite au simulateur." },
@@ -122,9 +122,9 @@ export default function Home({ userCount = null }: { userCount?: number | null }
             </h1>
 
             <p className="text-lg sm:text-xl text-white/85 max-w-2xl mx-auto mb-10 leading-relaxed">
-              La référence francophone pour apprendre SAP S/4HANA : {HANAFLOW_STATS.modules} modules,{" "}
-              {HANAFLOW_STATS.chapitres} chapitres et {HANAFLOW_STATS.questionsExamen} questions au format
-              des examens officiels — 100&nbsp;% gratuit, sans carte bancaire.
+              Comprends vraiment SAP S/4HANA — le « pourquoi » derrière chaque
+              transaction. Entraîne-toi sur des simulateurs au format de l&apos;examen réel,
+              et décroche la certification qui lance ta carrière.
             </p>
 
             {/* CTA — primary button-in-button + secondary link discret */}
@@ -152,9 +152,9 @@ export default function Home({ userCount = null }: { userCount?: number | null }
               </Link>
             </div>
 
-            {/* Micro proof line — sous les CTA, rassurant et concret */}
+            {/* Micro proof line — triptyque de valeur (apprendre → s'entraîner → certifier) */}
             <p className="text-sm text-white/60 mb-10">
-              Compte créé en 30 secondes · sans carte bancaire · contenu certifiant officiel SAP
+              Cours structurés · Simulateurs au format réel · Certificat vérifiable à la clé
             </p>
 
             {/* Trust strip — codes officiels comme badges cliquables */}
@@ -403,8 +403,8 @@ export default function Home({ userCount = null }: { userCount?: number | null }
                 Prêt à démarrer ta carrière SAP ?
               </h2>
               <p className="text-white/85 max-w-xl mx-auto mb-8 leading-relaxed">
-                Inscription gratuite en 30 secondes. Aucune carte bancaire,
-                aucune confirmation par étape.
+                Tout le contenu est gratuit pendant le lancement : tous les modules,
+                les simulateurs d&apos;examen et les certificats, accessibles dès aujourd&apos;hui.
               </p>
               <Link href="/register" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-sap-blue font-bold text-base hover:bg-slate-100 transition-all duration-150 active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.15)]">
                 Créer mon compte gratuit
