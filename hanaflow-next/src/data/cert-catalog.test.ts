@@ -20,7 +20,7 @@ import { aiCertification } from "./certifications/ai.js";
 
 const EXPECTED_MODULES = ["FI", "CO", "MM", "SD", "PP", "AI"] as const;
 
-const DATA_FILES: Record<string, { code: string; chapters: unknown[] }> = {
+const DATA_FILES: Record<string, { code: string; chapters: unknown[]; passingScore: number }> = {
   FI: fiCertification,
   CO: coCertification,
   MM: mmCertification,
@@ -50,6 +50,12 @@ describe("cert-catalog.json — invariants", () => {
   it("annonce le même nombre de chapitres que les data files", () => {
     for (const m of certCatalog.modules) {
       expect(DATA_FILES[m.code].chapters.length, `module ${m.code}`).toBe(m.chapters);
+    }
+  });
+
+  it("a le même passingScore dans le catalogue et les data files", () => {
+    for (const m of certCatalog.modules) {
+      expect(DATA_FILES[m.code].passingScore, `module ${m.code}`).toBe(m.passingScore);
     }
   });
 });

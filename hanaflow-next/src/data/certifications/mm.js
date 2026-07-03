@@ -16,7 +16,7 @@ export const mmCertification = {
   examDuration: 180,
   examQuestions: 80,
   simulatorQuestions: 80,
-  passingScore: 65,
+  passingScore: 76,
   officialLink: "https://training.sap.com/certification/c_ts4mm_2023",
   color: "from-emerald-900 via-emerald-700 to-emerald-500",
 

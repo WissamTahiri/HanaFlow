@@ -10,7 +10,7 @@ export const ppCertification = {
     "Maîtrisez la planification de production et la fabrication dans SAP S/4HANA : structures organisationnelles, MRP, ordres de fabrication, gestion d'atelier et intégrations.",
   duration: 180,
   questions: 80,
-  passingScore: 65,
+  passingScore: 64,
   color: "from-rose-600 to-rose-800",
 
   chapters: [
