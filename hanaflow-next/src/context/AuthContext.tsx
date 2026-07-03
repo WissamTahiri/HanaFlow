@@ -56,6 +56,14 @@ interface AuthContextValue {
    * Tokens vivent UNIQUEMENT en mémoire React — jamais dans localStorage (résistance XSS).
    */
   getToken: () => Promise<string | null>;
+  /**
+   * Fetch authentifié : injecte le bearer courant et, sur 401, tente UN refresh
+   * silencieux puis rejoue la requête. Empêche la perte silencieuse d'écritures
+   * quand le token expire en cours de session (ex : résultat d'un examen long
+   * soumis après l'expiration du token). `path` est une URL complète (ex.
+   * "/api/quiz/submit"), pas préfixée par API_URL.
+   */
+  authFetch: (path: string, options?: RequestInit) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -302,6 +310,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return ok ? tokenRef.current : null;
   };
 
+  const authFetch = async (path: string, options: RequestInit = {}): Promise<Response> => {
+    const send = (bearer: string | null) =>
+      fetch(path, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
+          ...options.headers,
+        },
+      });
+    let res = await send(await getToken());
+    // Token présent mais expiré → 401 : getToken() ne rafraîchit pas un token
+    // non-null, donc on force un refresh puis on rejoue une seule fois.
+    if (res.status === 401) {
+      const refreshed = await silentRefresh();
+      if (refreshed) res = await send(tokenRef.current);
+    }
+    return res;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -318,6 +346,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         startImpersonation,
         stopImpersonation,
         getToken,
+        authFetch,
       }}
     >
       {children}

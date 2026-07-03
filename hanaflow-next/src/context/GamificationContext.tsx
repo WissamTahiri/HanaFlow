@@ -67,7 +67,7 @@ type ServerState = {
 };
 
 export function GamificationProvider({ children }: { children: React.ReactNode }) {
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, authFetch } = useAuth();
   // Ref mise à jour en effect (règle react-hooks/refs) : les callbacks
   // d'événements lisent toujours le token courant sans se re-créer.
   const tokenRef = useRef<string | null>(null);
@@ -121,23 +121,28 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     return () => { cancelled = true; };
   }, [isAuthenticated, token, applyServerState]);
 
-  /** POST un événement serveur ; renvoie false si non connecté. */
+  /**
+   * POST un événement serveur ; renvoie false si non connecté (→ fallback local).
+   * Passe par `authFetch` : sur 401 (token expiré en cours de session, typique
+   * d'un examen de 90 min avec onglet en arrière-plan) il rafraîchit puis rejoue
+   * la requête, au lieu de perdre silencieusement le résultat.
+   */
   const sendEvent = useCallback((payload: Record<string, unknown>, path = "/api/gamification/event") => {
-    const t = tokenRef.current;
-    if (!t) return false;
-    fetch(path, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${t}`, "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
+    if (!tokenRef.current) return false;
+    authFetch(path, { method: "POST", body: JSON.stringify(payload) })
       .then(async (res) => {
-        if (!res.ok) return;
+        if (!res.ok) {
+          // Échec définitif (même après refresh+retry) : on le journalise au
+          // lieu de le masquer, pour ne pas laisser croire à un enregistrement.
+          console.warn(`[gamification] échec d'enregistrement (${res.status}) sur ${path}`);
+          return;
+        }
         const data = await res.json();
         applyServerState(data.gamification, data.newBadges);
       })
-      .catch(() => { /* silencieux si offline */ });
+      .catch((e) => { console.warn(`[gamification] réseau KO sur ${path}`, e); });
     return true;
-  }, [applyServerState]);
+  }, [applyServerState, authFetch]);
 
   // ── Fallback local (visiteurs anonymes uniquement) ─────────────────
   const localAward = useCallback((id: string) => {

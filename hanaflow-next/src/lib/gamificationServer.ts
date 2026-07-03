@@ -62,12 +62,42 @@ export async function getGamification(userId: number) {
 /** Jour UTC (YYYY-MM-DD) d'une date — pour comparer les streaks. */
 const utcDay = (d: Date) => d.toISOString().slice(0, 10);
 
+/** Client de transaction Prisma (sous-ensemble utilisé ici). */
+type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+
+/** Conflit d'écriture / deadlock sérialisable → rejouable une fois. */
+function isWriteConflict(e: unknown): boolean {
+  return !!e && typeof e === "object" && (e as { code?: string }).code === "P2034";
+}
+
 /**
  * Applique un événement et persiste. Renvoie l'état à jour + les badges
  * nouvellement gagnés (pour la notification client).
+ *
+ * Le read (état courant) et le write sont exécutés dans UNE transaction
+ * SERIALIZABLE : sans ça, deux événements concurrents du même user peuvent
+ * lire le même `badges` avant d'écrire, décerner deux fois l'XP d'un badge qui
+ * n'apparaît qu'une fois → total XP incohérent et non réconciliable. En cas de
+ * conflit d'écriture (P2034), on rejoue une seule fois.
  */
 export async function applyGamificationEvent(userId: number, event: GamificationEvent) {
-  const current = await getGamification(userId);
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await prisma.$transaction(
+        (tx) => runGamificationEvent(tx, userId, event),
+        { isolationLevel: "Serializable" },
+      );
+    } catch (e) {
+      if (attempt === 0 && isWriteConflict(e)) continue;
+      throw e;
+    }
+  }
+}
+
+async function runGamificationEvent(tx: Tx, userId: number, event: GamificationEvent) {
+  const current = toState(
+    await tx.userGamification.upsert({ where: { userId }, create: { userId }, update: {} }),
+  );
   const badges = new Set(current.badges);
   const newBadges: string[] = [];
   let xpDelta = 0;
@@ -100,7 +130,7 @@ export async function applyGamificationEvent(userId: number, event: Gamification
     }
     case "module_visit": {
       // Vérifiable en DB : on recompte les modules réellement visités.
-      const visited = await prisma.userProgress.count({ where: { userId } });
+      const visited = await tx.userProgress.count({ where: { userId } });
       if (visited >= 1) award("first_module");
       if (visited >= 3) award("explorer");
       if (visited >= 6) award("sap_expert");
@@ -130,13 +160,13 @@ export async function applyGamificationEvent(userId: number, event: Gamification
     }
     case "pro_activated": {
       // On ne croit pas le client : vérification du flag en DB.
-      const user = await prisma.user.findUnique({ where: { id: userId }, select: { isPro: true } });
+      const user = await tx.user.findUnique({ where: { id: userId }, select: { isPro: true } });
       if (user?.isPro) award("pro_member");
       break;
     }
   }
 
-  const row = await prisma.userGamification.update({
+  const row = await tx.userGamification.update({
     where: { userId },
     data: {
       totalXp: { increment: xpDelta },
