@@ -71,6 +71,20 @@ export async function PATCH(
 
   const { password, ...rest } = validated.data;
 
+  // Auto-protection : un admin ne peut pas se dé-promouvoir ni s'auto-suspendre
+  // (mêmes garde-fous que DELETE ligne ~145 et la route bulk). Sinon un
+  // (mis)clic ou une session admin détournée pourrait verrouiller le dernier
+  // admin hors du panel — un changement de rôle/suspension révoque en plus ses
+  // propres sessions (cf. plus bas).
+  if (userId === auth.user.userId) {
+    if (rest.role !== undefined) {
+      return err("Impossible de changer son propre rôle", 400);
+    }
+    if (rest.isSuspended === true) {
+      return err("Impossible de suspendre son propre compte", 400);
+    }
+  }
+
   // Step-up auth : reset de mot de passe ou changement de rôle exigent
   // que l'admin reconfirme son propre mot de passe (header X-Confirm-Password).
   const requiresStepUp = Boolean(password) || rest.role !== undefined;

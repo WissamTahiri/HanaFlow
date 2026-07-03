@@ -96,10 +96,13 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
-  const updates: { name?: string; passwordHash?: string } = {};
+  const updates: { name?: string; passwordHash?: string; pwdChangedAt?: Date } = {};
   if (data.name) updates.name = data.name;
   if (data.password) {
     updates.passwordHash = await argon2.hash(data.password, { type: argon2.argon2id });
+    // Horodate le changement — invalide les access tokens émis avant (cf.
+    // reset-password, qui fait de même). Cohérence du champ `pwdChangedAt`.
+    updates.pwdChangedAt = new Date();
   }
 
   const user = await prisma.user.update({
