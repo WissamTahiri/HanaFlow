@@ -5,17 +5,21 @@ import { z } from "zod";
 /**
  * Couche d'abstraction LLM pour HanaFlow.
  *
- * Stratégie : Gemini en primary (qualité/coût), Groq Llama 3.3 70B en
+ * Stratégie : Gemini en primary (qualité/coût), Groq (gpt-oss-120b) en
  * fallback automatique sur 429 / RESOURCE_EXHAUSTED. Permet de survivre
  * aux pannes de quota gratuit Google AI Studio (`limit: 0`), qui
  * arrivent régulièrement quand le free tier d'une clé n'est pas
  * provisionné.
  *
+ * Note migration : Groq a déprécié `llama-3.3-70b-versatile`
+ * (décommission le 2026-08-16). On est passé à `openai/gpt-oss-120b`,
+ * le remplaçant recommandé (meilleure qualité, JSON mode supporté).
+ * Surchargeable via GROQ_MODEL.
+ *
  * Pourquoi Groq comme fallback :
- *  - Free tier ferme (30 RPM / 1000 RPD sur llama-3.3-70b-versatile)
- *  - Inférence ~10x plus rapide que Gemini Flash (matters pour le mock interview)
- *  - API OpenAI-compatible, JSON mode supporté
- *  - Pas de carte requise
+ *  - Free tier généreux, pas de carte requise
+ *  - Inférence très rapide (matters pour le mock interview)
+ *  - API OpenAI-compatible, JSON mode (`response_format: json_object`) supporté
  *
  * Le wrapper expose deux helpers :
  *  - generateJSON  : pour les outputs structurés (roadmap, interview)
@@ -26,7 +30,7 @@ import { z } from "zod";
  */
 
 export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-lite";
-export const GROQ_MODEL = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
+export const GROQ_MODEL = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b";
 
 type Provider = "gemini" | "groq";
 
@@ -83,6 +87,8 @@ type GenerateJSONOpts<T> = {
   /** Zod schema pour validation finale (s'applique aux deux providers). */
   zodSchema: z.ZodSchema<T>;
   temperature?: number;
+  /** Plafond de tokens de sortie (borne le coût). Défaut 4096. */
+  maxOutputTokens?: number;
   /** Identifiant de la route appelante (pour les logs). */
   caller: string;
 };
@@ -94,7 +100,7 @@ export type GenerateJSONResult<T> = {
 };
 
 export async function generateJSON<T>(opts: GenerateJSONOpts<T>): Promise<GenerateJSONResult<T>> {
-  const { systemInstruction, userPrompt, geminiSchema, zodSchema, temperature = 0.7, caller } = opts;
+  const { systemInstruction, userPrompt, geminiSchema, zodSchema, temperature = 0.7, maxOutputTokens = 4096, caller } = opts;
 
   // ── Tentative Gemini ────────────────────────────────────────────────
   const gemini = geminiClient();
@@ -108,6 +114,7 @@ export async function generateJSON<T>(opts: GenerateJSONOpts<T>): Promise<Genera
           responseMimeType: "application/json",
           responseSchema: geminiSchema,
           temperature,
+          maxOutputTokens,
         },
       });
       const text = response.text;
@@ -181,7 +188,7 @@ Pas de markdown, pas de texte avant ou après, juste l'objet JSON brut.`;
       ],
       temperature,
       response_format: { type: "json_object" },
-      max_tokens: 4096,
+      max_tokens: maxOutputTokens,
     });
 
     const text = completion.choices[0]?.message?.content;
