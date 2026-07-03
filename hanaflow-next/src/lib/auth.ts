@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "1h";
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN ?? "7d";
 const IMPERSONATION_EXPIRES_IN = "15m";
@@ -23,16 +22,8 @@ export function signImpersonationToken(payload: JwtPayload): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: IMPERSONATION_EXPIRES_IN } as jwt.SignOptions);
 }
 
-export function signRefreshToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN } as jwt.SignOptions);
-}
-
 export function verifyAccessToken(token: string): JwtPayload {
   return jwt.verify(token, JWT_SECRET) as JwtPayload;
-}
-
-export function verifyRefreshToken(token: string): JwtPayload {
-  return jwt.verify(token, JWT_REFRESH_SECRET) as JwtPayload;
 }
 
 export function hashToken(token: string): string {
