@@ -37,7 +37,7 @@ plus pages S/4HANA / AI Joule), avec :
 - Tailwind CSS v4
 - Prisma + PostgreSQL Neon
 - Argon2id + JWT (access + refresh httpOnly cookie) + TOTP 2FA + vérification email
-- **IA** : `@google/genai` (Gemini, primary) + `groq-sdk` (Llama 3.3 70B, fallback)
+- **IA** : `groq-sdk` (provider unique, `openai/gpt-oss-120b`)
 - **PDF** : `@react-pdf/renderer` (certificats, CV)
 - Vitest (unit, colocalisé) + Playwright (`e2e/`)
 - Resend pour l'email (fallback console si pas de clé) + Serwist (PWA)
@@ -103,7 +103,7 @@ src/
 │                         # flashcards.ts, certifications/*.js (banques de questions)
 ├── hooks/                # useProgress, useCountUp, useInView, useReducedMotion
 ├── lib/                  # prisma, auth (JWT/hash) + serverAuth + apiHelpers,
-│                         # ai (Gemini→Groq fallback), gamificationServer, sm2,
+│                         # ai (Groq), gamificationServer, sm2,
 │                         # audit, settings, email, totp + totpCrypto, certAccess,
 │                         # certCodes, passwordBreach, emailVerification
 ├── types/                # index.ts, cv.ts
@@ -129,15 +129,18 @@ src/
 
 ## Couche IA (`lib/ai.ts`)
 
-Abstraction unique pour tous les appels LLM. **Ne jamais instancier `GoogleGenAI` ou
-`Groq` directement dans une route** — tout passe par ce module pour bénéficier du
-fallback uniforme.
+Abstraction unique pour tous les appels LLM. **Ne jamais instancier `Groq`
+directement dans une route** — tout passe par ce module.
 
-- **Gemini primary** (`gemini-2.0-flash-lite`) → **fallback Groq** (`llama-3.3-70b-versatile`)
-  automatique sur rate-limit / auth error / 5xx.
-- `generateJSON` : output structuré validé par Zod (roadmap, interview) — schéma Gemini
-  natif, dérivé en JSON Schema injecté au prompt pour Groq.
-- `generateText` : chat libre multi-turn (tuteur SAP).
+- **Provider unique : Groq** (`openai/gpt-oss-120b` par défaut, override via
+  `GROQ_MODEL`). Gemini a été retiré (2026-07-15) — le double-provider
+  primary/fallback masquait des pannes silencieuses du tuteur (quota Gemini
+  épuisé sans bascule fiable) ; un seul provider bien monitoré est plus simple.
+- `generateJSON` : output structuré validé par Zod (roadmap, interview, CV) —
+  JSON Schema dérivé du `zodSchema` (via `z.toJSONSchema`), injecté au system
+  prompt, réponse re-validée strictement avec ce même schema.
+- `generateText` : chat libre multi-turn (tuteur SAP), prend un historique
+  `ChatMessage[]` (`{role: "user"|"model", text}`).
 - Erreurs typées via `aiError` / `isAiError` (kind : rate_limit | auth | no_provider | …)
   pour que les routes choisissent le code HTTP.
 
@@ -174,7 +177,7 @@ fallback uniforme.
 Vercel, auto-deploy sur `master`. `vercel.json` : framework `nextjs`, région `cdg1`.
 
 Variables d'env requises en prod (voir `hanaflow-next/README.md`) :
-`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `NEXT_PUBLIC_APP_URL`, et optionnellement `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `JWT_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`, `TOTP_ENCRYPTION_KEY` (chiffre les secrets TOTP), `GEMINI_API_KEY` + `GROQ_API_KEY` (features IA ; sans clé, les routes IA renvoient `no_provider`), `GEMINI_MODEL`/`GROQ_MODEL` (override). Voir `hanaflow-next/.env.example`.
+`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `NEXT_PUBLIC_APP_URL`, et optionnellement `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `JWT_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`, `TOTP_ENCRYPTION_KEY` (chiffre les secrets TOTP), `GROQ_API_KEY` (features IA ; sans clé, les routes IA renvoient `no_provider`), `GROQ_MODEL` (override). Voir `hanaflow-next/.env.example`.
 
 ## Promouvoir un admin
 
