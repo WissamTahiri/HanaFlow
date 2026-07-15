@@ -15,7 +15,9 @@ import type { CvData } from "@/types/cv";
  *  2. POST /api/cv/optimize avec les données brutes
  *  3. Résultat : score ATS + tips + CV optimisé + bouton PDF
  *
- * Persistance : localStorage `hf_cv_draft` pour ne pas perdre la saisie au reload.
+ * Persistance : localStorage `hf_cv_draft` pour ne pas perdre la saisie au reload,
+ * et `hf_cv_optimized` (résultat final) pour que /emplois/[id] puisse pré-remplir
+ * une candidature sans refaire tout le wizard.
  */
 
 // PDFDownloadLink doit être chargé côté client uniquement (utilise des APIs browser).
@@ -28,6 +30,7 @@ const PDFDownloadLink = dynamic(
 const CvDocument = dynamic(() => import("@/components/CvDocument"), { ssr: false });
 
 const STORAGE_KEY = "hf_cv_draft";
+const OPTIMIZED_STORAGE_KEY = "hf_cv_optimized";
 
 type Experience = {
   title: string;
@@ -195,6 +198,7 @@ function CvBuilderContent() {
       }
       setResult(d.cv);
       setPhase("result");
+      try { localStorage.setItem(OPTIMIZED_STORAGE_KEY, JSON.stringify(d.cv)); } catch { /* stockage plein — on accepte */ }
     } catch {
       setError("Erreur réseau, réessaie.");
       setPhase("form");
