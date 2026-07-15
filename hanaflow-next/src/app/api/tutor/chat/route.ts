@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { type Content } from "@google/genai";
 import { z } from "zod";
 import "server-only";
 import {
@@ -11,7 +10,7 @@ import {
   validateBody,
 } from "@/lib/apiHelpers";
 import { isValidModule, type ModuleId } from "@/lib/certAccess";
-import { generateText, isAiError } from "@/lib/ai";
+import { generateText, isAiError, type ChatMessage } from "@/lib/ai";
 
 /**
  * POST /api/tutor/chat
@@ -19,13 +18,13 @@ import { generateText, isAiError } from "@/lib/ai";
  * Tuteur IA SAP : répond aux questions de l'apprenant dans le contexte d'un
  * module SAP spécifique (FI, CO, MM, SD, PP, AI). Le serveur charge le
  * contenu du module et l'injecte en system prompt — c'est un RAG basique
- * sans vector DB (le content tient largement dans le contexte Gemini 1M).
+ * sans vector DB (le content tient largement dans le contexte).
  *
  * Multi-turn : history de la conversation passée en `contents`, ce qui permet
  * un dialogue suivi (le tuteur se souvient de la question précédente).
  *
- * Rate-limit : 10 messages/user/heure et 30/IP/heure. Free tier Gemini
- * (1500 req/jour) couvre ~150 utilisateurs actifs en moyenne.
+ * Provider : Groq uniquement (voir lib/ai.ts). Rate-limit : 10 messages/user/
+ * heure et 30/IP/heure.
  */
 
 const moduleCodeSchema = z.enum(["fi", "co", "mm", "sd", "pp", "ai"]);
@@ -143,16 +142,9 @@ Règles strictes :
 
 Tu réponds toujours en français.`;
 
-  // Convertit l'history du format frontend (role: user|model) vers le format Gemini.
-  const contents: Content[] = [
-    ...(history ?? []).map((m) => ({
-      role: m.role,
-      parts: [{ text: m.text }],
-    })),
-    {
-      role: "user",
-      parts: [{ text: message }],
-    },
+  const contents: ChatMessage[] = [
+    ...(history ?? []).map((m) => ({ role: m.role, text: m.text })),
+    { role: "user" as const, text: message },
   ];
 
   try {
@@ -163,7 +155,7 @@ Tu réponds toujours en français.`;
       temperature: 0.5,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
     });
-    return ok({ reply: result.text, provider: result.provider, usage: result.usage });
+    return ok({ reply: result.text, usage: result.usage });
   } catch (e) {
     if (isAiError(e)) {
       if (e.kind === "rate_limit") {

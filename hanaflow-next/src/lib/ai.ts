@@ -1,38 +1,24 @@
-import { GoogleGenAI, type Content } from "@google/genai";
 import Groq from "groq-sdk";
 import { z } from "zod";
 
 /**
  * Couche d'abstraction LLM pour HanaFlow.
  *
- * Stratégie : Gemini en primary (qualité/coût), Groq (gpt-oss-120b) en
- * fallback automatique sur 429 / RESOURCE_EXHAUSTED. Permet de survivre
- * aux pannes de quota gratuit Google AI Studio (`limit: 0`), qui
- * arrivent régulièrement quand le free tier d'une clé n'est pas
- * provisionné.
- *
- * Note migration : Groq a déprécié `llama-3.3-70b-versatile`
- * (décommission le 2026-08-16). On est passé à `openai/gpt-oss-120b`,
- * le remplaçant recommandé (meilleure qualité, JSON mode supporté).
- * Surchargeable via GROQ_MODEL.
- *
- * Pourquoi Groq comme fallback :
- *  - Free tier généreux, pas de carte requise
- *  - Inférence très rapide (matters pour le mock interview)
- *  - API OpenAI-compatible, JSON mode (`response_format: json_object`) supporté
+ * Provider unique : Groq (`openai/gpt-oss-120b` par défaut, surchargeable via
+ * GROQ_MODEL). Gemini a été retiré (2026-07-15) — le double-provider
+ * primary/fallback créait des pannes silencieuses du tuteur difficiles à
+ * diagnostiquer (quota Gemini épuisé sans bascule fiable). Un seul provider,
+ * bien monitoré, est plus simple à opérer correctement.
  *
  * Le wrapper expose deux helpers :
  *  - generateJSON  : pour les outputs structurés (roadmap, interview)
  *  - generateText  : pour le chat libre (tuteur SAP)
  *
- * Chaque route IA NE DOIT PAS instancier GoogleGenAI ou Groq directement —
- * tout passe par ce module pour bénéficier du fallback uniformément.
+ * Chaque route IA NE DOIT PAS instancier Groq directement — tout passe par
+ * ce module pour bénéficier de la gestion d'erreurs uniforme.
  */
 
-export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-lite";
 export const GROQ_MODEL = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b";
-
-type Provider = "gemini" | "groq";
 
 export type AiUsage = {
   promptTokens: number;
@@ -46,20 +32,14 @@ export type AiError = {
   retryAfterSeconds?: number;
 };
 
-function geminiClient() {
-  const apiKey = process.env.GEMINI_API_KEY;
-  return apiKey ? new GoogleGenAI({ apiKey }) : null;
-}
-
 function groqClient() {
   const apiKey = process.env.GROQ_API_KEY;
   return apiKey ? new Groq({ apiKey }) : null;
 }
 
-/** Détecte les erreurs de rate-limit Gemini (RESOURCE_EXHAUSTED, 429). */
 function isRateLimit(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
-  return /quota|rate.?limit|RESOURCE_EXHAUSTED|429|exceeded/i.test(msg);
+  return /quota|rate.?limit|429|exceeded/i.test(msg);
 }
 
 function isAuthError(err: unknown): boolean {
@@ -74,17 +54,13 @@ function extractRetryAfter(err: unknown): number | undefined {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// generateJSON — output structuré (roadmap, interview start/grade)
+// generateJSON — output structuré (roadmap, interview start/grade, CV)
 // ════════════════════════════════════════════════════════════════════
-
-type GeminiResponseSchema = Record<string, unknown>;
 
 type GenerateJSONOpts<T> = {
   systemInstruction: string;
   userPrompt: string;
-  /** Schéma au format Gemini (Type.OBJECT). Voir routes existantes. */
-  geminiSchema: GeminiResponseSchema;
-  /** Zod schema pour validation finale (s'applique aux deux providers). */
+  /** Zod schema — sert à la fois de validation finale et de JSON Schema injecté au prompt. */
   zodSchema: z.ZodSchema<T>;
   temperature?: number;
   /** Plafond de tokens de sortie (borne le coût). Défaut 4096. */
@@ -95,71 +71,20 @@ type GenerateJSONOpts<T> = {
 
 export type GenerateJSONResult<T> = {
   data: T;
-  provider: Provider;
   usage: AiUsage;
 };
 
 export async function generateJSON<T>(opts: GenerateJSONOpts<T>): Promise<GenerateJSONResult<T>> {
-  const { systemInstruction, userPrompt, geminiSchema, zodSchema, temperature = 0.7, maxOutputTokens = 4096, caller } = opts;
+  const { systemInstruction, userPrompt, zodSchema, temperature = 0.7, maxOutputTokens = 4096, caller } = opts;
 
-  // ── Tentative Gemini ────────────────────────────────────────────────
-  const gemini = geminiClient();
-  if (gemini) {
-    try {
-      const response = await gemini.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-        config: {
-          systemInstruction,
-          responseMimeType: "application/json",
-          responseSchema: geminiSchema,
-          temperature,
-          maxOutputTokens,
-        },
-      });
-      const text = response.text;
-      if (!text) throw new Error("Gemini: empty response");
-      const parsed = JSON.parse(text);
-      const validated = zodSchema.safeParse(parsed);
-      if (!validated.success) {
-        console.error(`[ai:${caller}] gemini schema invalid:`, validated.error.issues);
-        throw new Error(`Gemini response failed validation: ${validated.error.issues[0]?.message}`);
-      }
-      return {
-        data: validated.data,
-        provider: "gemini",
-        usage: {
-          promptTokens: response.usageMetadata?.promptTokenCount ?? 0,
-          outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
-          totalTokens: response.usageMetadata?.totalTokenCount ?? 0,
-        },
-      };
-    } catch (err) {
-      if (isRateLimit(err)) {
-        console.warn(`[ai:${caller}] gemini rate-limited → fallback to groq`);
-      } else if (isAuthError(err)) {
-        console.warn(`[ai:${caller}] gemini auth error → fallback to groq:`, (err as Error).message);
-      } else {
-        console.error(`[ai:${caller}] gemini failed:`, err);
-        // Pour les erreurs non rate-limit/auth, on tente quand même Groq —
-        // ça couvre les pannes Gemini transient (5xx, timeouts).
-      }
-      // continue → Groq
-    }
-  }
-
-  // ── Fallback Groq ───────────────────────────────────────────────────
   const groq = groqClient();
   if (!groq) {
-    const reason = !gemini
-      ? "Aucun provider IA configuré (GEMINI_API_KEY et GROQ_API_KEY manquants)"
-      : "Gemini en échec et GROQ_API_KEY non configurée pour fallback";
-    throw aiError("no_provider", reason);
+    throw aiError("no_provider", "Aucun provider IA configuré (GROQ_API_KEY manquante)");
   }
 
-  // Pour Groq, on dérive un JSON Schema depuis Zod 4 (toJSONSchema natif)
-  // et on l'injecte en system prompt. Groq comprend "response_format json_object"
-  // mais ne supporte pas un schema structuré — donc on guide via prompt + Zod valide.
+  // Groq comprend "response_format json_object" mais ne supporte pas un schema
+  // structuré natif — on guide via un JSON Schema dérivé de Zod, injecté dans
+  // le system prompt, puis on valide strictement la réponse avec ce même schema.
   let jsonSchemaDescription: string;
   try {
     const jsonSchema = z.toJSONSchema(zodSchema);
@@ -189,6 +114,11 @@ Pas de markdown, pas de texte avant ou après, juste l'objet JSON brut.`;
       temperature,
       response_format: { type: "json_object" },
       max_tokens: maxOutputTokens,
+      // gpt-oss-120b est un modèle de raisonnement : sans ce paramètre, il peut
+      // consommer tout maxOutputTokens en raisonnement interne et renvoyer un
+      // `content` vide (finish_reason="length") avant même d'écrire la réponse.
+      // "low" suffit largement pour du JSON structuré factuel.
+      reasoning_effort: "low",
     });
 
     const text = completion.choices[0]?.message?.content;
@@ -210,7 +140,6 @@ Pas de markdown, pas de texte avant ou après, juste l'objet JSON brut.`;
 
     return {
       data: validated.data,
-      provider: "groq",
       usage: {
         promptTokens: completion.usage?.prompt_tokens ?? 0,
         outputTokens: completion.usage?.completion_tokens ?? 0,
@@ -220,13 +149,13 @@ Pas de markdown, pas de texte avant ou après, juste l'objet JSON brut.`;
   } catch (err) {
     if (isAiError(err)) throw err;
     if (isRateLimit(err)) {
-      throw aiError("rate_limit", "Groq aussi rate-limit. Réessaie dans quelques minutes.", extractRetryAfter(err));
+      throw aiError("rate_limit", "Le service IA est saturé. Réessaie dans quelques minutes.", extractRetryAfter(err));
     }
     if (isAuthError(err)) {
       throw aiError("auth", "Clé Groq invalide ou expirée");
     }
     console.error(`[ai:${caller}] groq failed:`, err);
-    throw aiError("unknown", "Les deux providers IA sont en échec");
+    throw aiError("unknown", "Le service IA est en échec");
   }
 }
 
@@ -234,10 +163,12 @@ Pas de markdown, pas de texte avant ou après, juste l'objet JSON brut.`;
 // generateText — chat libre (tuteur SAP multi-turn)
 // ════════════════════════════════════════════════════════════════════
 
+export type ChatMessage = { role: "user" | "model"; text: string };
+
 type GenerateTextOpts = {
   systemInstruction: string;
-  /** Format Gemini : alternance user/model. Converti automatiquement pour Groq. */
-  contents: Content[];
+  /** Historique de conversation, alternance user/model. */
+  contents: ChatMessage[];
   temperature?: number;
   maxOutputTokens?: number;
   caller: string;
@@ -245,66 +176,22 @@ type GenerateTextOpts = {
 
 export type GenerateTextResult = {
   text: string;
-  provider: Provider;
   usage: AiUsage;
 };
 
 export async function generateText(opts: GenerateTextOpts): Promise<GenerateTextResult> {
   const { systemInstruction, contents, temperature = 0.5, maxOutputTokens = 1500, caller } = opts;
 
-  // ── Gemini ──────────────────────────────────────────────────────────
-  const gemini = geminiClient();
-  if (gemini) {
-    try {
-      const response = await gemini.models.generateContent({
-        model: GEMINI_MODEL,
-        contents,
-        config: {
-          systemInstruction,
-          temperature,
-          maxOutputTokens,
-        },
-      });
-      const text = response.text;
-      if (!text) throw new Error("Gemini: empty response");
-      return {
-        text,
-        provider: "gemini",
-        usage: {
-          promptTokens: response.usageMetadata?.promptTokenCount ?? 0,
-          outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
-          totalTokens: response.usageMetadata?.totalTokenCount ?? 0,
-        },
-      };
-    } catch (err) {
-      if (isRateLimit(err)) {
-        console.warn(`[ai:${caller}] gemini rate-limited → fallback to groq`);
-      } else if (isAuthError(err)) {
-        console.warn(`[ai:${caller}] gemini auth error → fallback to groq`);
-      } else {
-        console.error(`[ai:${caller}] gemini failed:`, err);
-      }
-    }
-  }
-
-  // ── Fallback Groq ───────────────────────────────────────────────────
   const groq = groqClient();
   if (!groq) {
-    throw aiError("no_provider", !gemini
-      ? "Aucun provider IA configuré"
-      : "Gemini en échec et GROQ_API_KEY non configurée");
+    throw aiError("no_provider", "Aucun provider IA configuré (GROQ_API_KEY manquante)");
   }
 
-  // Convertit Gemini Content[] → Groq messages[]
-  // Gemini: { role: "user"|"model", parts: [{text}] }
-  // Groq:   { role: "user"|"assistant", content: string }
   const groqMessages: { role: "system" | "user" | "assistant"; content: string }[] = [
     { role: "system", content: systemInstruction },
     ...contents.map((c) => ({
       role: (c.role === "model" ? "assistant" : "user") as "user" | "assistant",
-      content: (c.parts ?? [])
-        .map((p) => ("text" in p && typeof p.text === "string" ? p.text : ""))
-        .join("\n"),
+      content: c.text,
     })),
   ];
 
@@ -314,6 +201,9 @@ export async function generateText(opts: GenerateTextOpts): Promise<GenerateText
       messages: groqMessages,
       temperature,
       max_tokens: maxOutputTokens,
+      // Voir generateJSON : évite qu'une réponse de chat soit vidée par le
+      // raisonnement interne du modèle avant d'atteindre le texte visible.
+      reasoning_effort: "low",
     });
 
     const text = completion.choices[0]?.message?.content;
@@ -321,7 +211,6 @@ export async function generateText(opts: GenerateTextOpts): Promise<GenerateText
 
     return {
       text,
-      provider: "groq",
       usage: {
         promptTokens: completion.usage?.prompt_tokens ?? 0,
         outputTokens: completion.usage?.completion_tokens ?? 0,
@@ -331,13 +220,13 @@ export async function generateText(opts: GenerateTextOpts): Promise<GenerateText
   } catch (err) {
     if (isAiError(err)) throw err;
     if (isRateLimit(err)) {
-      throw aiError("rate_limit", "Groq aussi rate-limit. Réessaie dans quelques minutes.", extractRetryAfter(err));
+      throw aiError("rate_limit", "Le service IA est saturé. Réessaie dans quelques minutes.", extractRetryAfter(err));
     }
     if (isAuthError(err)) {
       throw aiError("auth", "Clé Groq invalide ou expirée");
     }
     console.error(`[ai:${caller}] groq failed:`, err);
-    throw aiError("unknown", "Les deux providers IA sont en échec");
+    throw aiError("unknown", "Le service IA est en échec");
   }
 }
 

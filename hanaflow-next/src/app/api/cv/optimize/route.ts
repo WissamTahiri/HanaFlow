@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { Type } from "@google/genai";
 import { z } from "zod";
 import {
   requireProUser,
@@ -132,145 +131,6 @@ const responseZod = z.object({
   atsScore: z.number().int().min(0).max(100), // score de "ATS-readiness"
 });
 
-const geminiResponseSchema = {
-  type: Type.OBJECT,
-  properties: {
-    identity: {
-      type: Type.OBJECT,
-      properties: {
-        name: { type: Type.STRING },
-        title: {
-          type: Type.STRING,
-          description: "Titre/poste actuel — peut être reformulé pour matcher le targetRole",
-        },
-        email: { type: Type.STRING },
-        phone: { type: Type.STRING },
-        location: { type: Type.STRING },
-        linkedin: { type: Type.STRING },
-      },
-      required: ["name", "title", "email"],
-    },
-    summary: {
-      type: Type.STRING,
-      description:
-        "3-5 phrases. Inclut années d'XP, modules SAP maîtrisés, secteur, valeur ajoutée chiffrée. Reformulé pour matcher le targetRole. PAS de 'passionné, dynamique, motivé'.",
-    },
-    experiences: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          title: { type: Type.STRING },
-          company: { type: Type.STRING },
-          location: { type: Type.STRING },
-          startDate: { type: Type.STRING },
-          endDate: { type: Type.STRING },
-          current: { type: Type.BOOLEAN },
-          bullets: {
-            type: Type.ARRAY,
-            description:
-              "3-5 bullets factuels. Format ATS : ACTION VERB + tâche + résultat chiffré + tech SAP. Ex: 'Configuré le module FI sur S/4HANA Cloud pour 12 sociétés (FB50, F-02, FBL3N), réduisant la clôture mensuelle de 8 à 3 jours.'",
-            items: { type: Type.STRING },
-          },
-        },
-        required: ["title", "company", "startDate", "bullets"],
-      },
-    },
-    education: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          degree: { type: Type.STRING },
-          school: { type: Type.STRING },
-          location: { type: Type.STRING },
-          startDate: { type: Type.STRING },
-          endDate: { type: Type.STRING },
-        },
-        required: ["degree", "school"],
-      },
-    },
-    skills: {
-      type: Type.OBJECT,
-      description: "Skills catégorisés en 4 buckets pour faciliter le parsing ATS",
-      properties: {
-        sap: {
-          type: Type.ARRAY,
-          description:
-            "Modules SAP, T-codes, technos SAP officielles : FI, CO, MM, SD, PP, S/4HANA, ACDOCA, Fiori, BTP, ABAP, BW/4HANA, AI Core, AI Launchpad, Joule, RAG…",
-          items: { type: Type.STRING },
-        },
-        technical: {
-          type: Type.ARRAY,
-          description: "Hors SAP : SQL, Python, REST, Excel avancé, Power BI…",
-          items: { type: Type.STRING },
-        },
-        methods: {
-          type: Type.ARRAY,
-          description: "Méthodologies : Agile, SAP Activate, ITIL, PRINCE2…",
-          items: { type: Type.STRING },
-        },
-        soft: {
-          type: Type.ARRAY,
-          description:
-            "Soft skills CONCRÈTES : 'Animation atelier client', 'Reporting comité de pilotage', 'Coaching consultants juniors'. PAS 'rigoureux, organisé'.",
-          items: { type: Type.STRING },
-        },
-      },
-      required: ["sap", "technical", "methods", "soft"],
-    },
-    certifications: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          name: { type: Type.STRING },
-          code: {
-            type: Type.STRING,
-            description: "Code officiel SAP si reconnu (ex: C_TS4FI_2601)",
-          },
-          year: { type: Type.STRING },
-          issuer: { type: Type.STRING },
-        },
-        required: ["name"],
-      },
-    },
-    languages: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          name: { type: Type.STRING },
-          level: { type: Type.STRING },
-        },
-        required: ["name", "level"],
-      },
-    },
-    atsTips: {
-      type: Type.ARRAY,
-      description:
-        "2-5 conseils ACTIONNABLES pour améliorer le CV (ex: 'Ajoute le T-code FBL3N dans ton bullet sur les rapprochements', 'Précise la version S/4HANA utilisée'). PAS 'soigne la mise en page' (générique).",
-      items: { type: Type.STRING },
-    },
-    atsScore: {
-      type: Type.INTEGER,
-      description:
-        "Score de lisibilité ATS sur 100. Critères : keywords SAP, action verbs, quantification, structure standard, exhaustivité. <60 = à retravailler. 80+ = solide.",
-    },
-  },
-  required: [
-    "identity",
-    "summary",
-    "experiences",
-    "education",
-    "skills",
-    "certifications",
-    "languages",
-    "atsTips",
-    "atsScore",
-  ],
-};
-
 export async function POST(req: NextRequest) {
   const auth = await requireProUser(req);
   if ("status" in auth) return auth;
@@ -336,11 +196,10 @@ Optimise ce CV pour ATS selon les règles. Renvoie le JSON structuré complet.`;
       caller: "cv/optimize",
       systemInstruction,
       userPrompt,
-      geminiSchema: geminiResponseSchema,
       zodSchema: responseZod,
       temperature: 0.4, // peu créatif : on veut du factuel
     });
-    return ok({ cv: result.data, provider: result.provider, usage: result.usage });
+    return ok({ cv: result.data, usage: result.usage });
   } catch (e) {
     if (isAiError(e)) {
       if (e.kind === "rate_limit") {

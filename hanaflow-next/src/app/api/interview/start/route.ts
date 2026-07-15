@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { Type } from "@google/genai";
 import { z } from "zod";
 import {
   requireProUser,
@@ -19,7 +18,7 @@ import { generateJSON, isAiError } from "@/lib/ai";
  * Pas de state serveur : le client garde {moduleCode, seniority, questions}
  * et les renvoie lors du POST /api/interview/grade.
  *
- * Coût : 1 appel Gemini Flash, ~1.5K tokens output → toujours sous le free tier.
+ * Provider : Groq (voir lib/ai.ts).
  */
 
 const inputSchema = z.object({
@@ -44,42 +43,13 @@ const responseZod = z.object({
     .length(QUESTION_COUNT),
 });
 
-const geminiResponseSchema = {
-  type: Type.OBJECT,
-  properties: {
-    questions: {
-      type: Type.ARRAY,
-      description: `Exactement ${QUESTION_COUNT} questions d'entretien, mélange de difficultés`,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          id: { type: Type.INTEGER, description: "Index 1-based" },
-          text: { type: Type.STRING, description: "Question posée au candidat, en français" },
-          difficulty: { type: Type.STRING, enum: ["easy", "medium", "hard"] },
-          focus: {
-            type: Type.STRING,
-            description: "Tag court (1-3 mots) : sujet/T-code/processus couvert",
-          },
-          idealAnswer: {
-            type: Type.STRING,
-            description:
-              "Réponse modèle attendue (3-6 phrases). Utilisée plus tard pour la notation, NON montrée au candidat à ce stade.",
-          },
-        },
-        required: ["id", "text", "difficulty", "focus", "idealAnswer"],
-      },
-    },
-  },
-  required: ["questions"],
-};
-
 export async function POST(req: NextRequest) {
   const auth = await requireProUser(req);
   if ("status" in auth) return auth;
 
   const ip = getClientIp(req);
   // 3 interviews / heure / user, 8 / heure / IP. Plus serré que la roadmap
-  // car chaque interview = 2 appels Gemini.
+  // car chaque interview = 2 appels IA (start + grade).
   if (!(await rateLimit(`itv-start:user:${auth.user.userId}`, 3, 60 * 60 * 1000))) {
     return err("Tu as déjà lancé 3 entretiens cette heure. Réessaie plus tard.", 429);
   }
@@ -137,7 +107,6 @@ Tutoie le candidat. Français professionnel sans jargon RH.`;
       caller: "interview/start",
       systemInstruction,
       userPrompt,
-      geminiSchema: geminiResponseSchema,
       zodSchema: responseZod,
       temperature: 0.8,
     });
@@ -146,7 +115,6 @@ Tutoie le candidat. Français professionnel sans jargon RH.`;
       seniority,
       style,
       questions: result.data.questions,
-      provider: result.provider,
       usage: result.usage,
     });
   } catch (e) {

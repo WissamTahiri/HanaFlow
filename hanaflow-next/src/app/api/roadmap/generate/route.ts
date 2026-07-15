@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { Type } from "@google/genai";
 import { z } from "zod";
 import {
   requireAuth,
@@ -15,18 +14,11 @@ import { generateJSON, isAiError } from "@/lib/ai";
 /**
  * POST /api/roadmap/generate
  *
- * Génère une roadmap SAP personnalisée via Google Gemini 2.0 Flash.
- *
- * Pourquoi Gemini plutôt qu'Anthropic ici :
- *  - Free tier Google AI Studio : ~1500 req/jour gratuites
- *  - Pas de carte bancaire requise → 0€ garanti (cap à 429 si dépassement,
- *    jamais facturable)
- *  - Qualité Gemini 2.0 Flash suffisante pour du structured-JSON
+ * Génère une roadmap SAP personnalisée via Groq (voir lib/ai.ts).
  *
  * Best practices :
  *  - Auth + double rate-limit (user + IP)
- *  - Structured output via responseSchema
- *  - System instruction séparée du user prompt (convention Gemini)
+ *  - Structured output guidé par un JSON Schema dérivé du zodSchema
  *  - Re-validation Zod côté serveur (le LLM peut déborder du schéma)
  */
 
@@ -44,7 +36,7 @@ const inputSchema = z.object({
   preferredModule: z.enum(["FI", "CO", "MM", "SD", "PP", "AI"]).optional(),
 });
 
-// Validation côté serveur de ce que Gemini renvoie.
+// Validation côté serveur de ce que le LLM renvoie.
 const roadmapResponseSchema = z.object({
   summary: z.string().min(1),
   estimatedTotalWeeks: z.number().int().min(1).max(104),
@@ -71,72 +63,11 @@ const roadmapResponseSchema = z.object({
   nextSteps: z.array(z.string().min(1)).min(3).max(6),
 });
 
-// Schéma au format Gemini (enum Type au lieu de strings JSON).
-const geminiResponseSchema = {
-  type: Type.OBJECT,
-  properties: {
-    summary: {
-      type: Type.STRING,
-      description: "Résumé du parcours en 1-2 phrases en français",
-    },
-    estimatedTotalWeeks: {
-      type: Type.INTEGER,
-      description: "Durée totale estimée du parcours en semaines",
-    },
-    modules: {
-      type: Type.ARRAY,
-      description: "Modules SAP ordonnés selon le parcours optimal",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          code: {
-            type: Type.STRING,
-            enum: ["FI", "CO", "MM", "SD", "PP", "AI"],
-          },
-          order: { type: Type.INTEGER },
-          weeks: { type: Type.INTEGER },
-          why: {
-            type: Type.STRING,
-            description: "Pourquoi ce module à cette position, 1-2 phrases",
-          },
-        },
-        required: ["code", "order", "weeks", "why"],
-      },
-    },
-    milestones: {
-      type: Type.ARRAY,
-      description: "3 à 6 jalons clés du parcours",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          week: { type: Type.INTEGER },
-          title: { type: Type.STRING },
-          description: { type: Type.STRING },
-        },
-        required: ["week", "title", "description"],
-      },
-    },
-    nextSteps: {
-      type: Type.ARRAY,
-      description: "3 à 5 actions très concrètes à faire DÈS AUJOURD'HUI",
-      items: { type: Type.STRING },
-    },
-  },
-  required: [
-    "summary",
-    "estimatedTotalWeeks",
-    "modules",
-    "milestones",
-    "nextSteps",
-  ],
-};
-
 export async function POST(req: NextRequest) {
   const auth = requireAuth(req);
   if ("status" in auth) return auth;
 
-  // Rate-limit doublé : user + IP. Couvre aussi le free tier Google
-  // (1500 req/jour, ~10 req/min).
+  // Rate-limit doublé : user + IP.
   const ip = getClientIp(req);
   if (!(await rateLimit(`roadmap:user:${auth.user.userId}`, 5, 60 * 60 * 1000))) {
     return err(
@@ -212,11 +143,10 @@ Génère la roadmap personnalisée pour ce profil.`;
       caller: "roadmap/generate",
       systemInstruction,
       userPrompt,
-      geminiSchema: geminiResponseSchema,
       zodSchema: roadmapResponseSchema,
       temperature: 0.7,
     });
-    return ok({ roadmap: result.data, provider: result.provider, usage: result.usage });
+    return ok({ roadmap: result.data, usage: result.usage });
   } catch (e) {
     if (isAiError(e)) {
       if (e.kind === "rate_limit") {

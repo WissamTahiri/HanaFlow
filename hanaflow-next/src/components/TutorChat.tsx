@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 
 /**
  * TutorChat — widget floating qui appelle /api/tutor/chat pour discuter
- * d'un module SAP avec un tuteur IA (Gemini).
+ * d'un module SAP avec un tuteur IA (Groq).
  *
  * Comportement :
  *  - Bouton rond en bas-droite qui ouvre/ferme le panel
@@ -211,7 +211,7 @@ export default function TutorChat({ moduleCode, chapterId, moduleName }: Props) 
                     Tuteur {moduleName ?? moduleCode.toUpperCase()}
                   </p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                    Powered by Gemini · 10 messages/h
+                    Powered by Groq · 10 messages/h
                   </p>
                 </div>
               </div>

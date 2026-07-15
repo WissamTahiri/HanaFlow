@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { Type } from "@google/genai";
 import { z } from "zod";
 import {
   requireProUser,
@@ -15,11 +14,12 @@ import { generateJSON, isAiError } from "@/lib/ai";
 /**
  * POST /api/interview/grade
  *
- * Note un entretien entier en UN appel Gemini. Le client envoie toutes les
- * questions (avec idealAnswer issu de /start) et les réponses du candidat.
+ * Note un entretien entier en UN appel IA (Groq, voir lib/ai.ts). Le client
+ * envoie toutes les questions (avec idealAnswer issu de /start) et les
+ * réponses du candidat.
  *
- * Pourquoi noter en batch : (a) un seul appel = un seul coût, (b) Gemini peut
- * voir l'ensemble pour repérer cohérence / contradictions, (c) la verdict
+ * Pourquoi noter en batch : (a) un seul appel = un seul coût, (b) le LLM peut
+ * voir l'ensemble pour repérer cohérence / contradictions, (c) le verdict
  * global tient compte du parcours complet.
  *
  * idealAnswer est passé au LLM comme barème de référence. On le renvoie ensuite
@@ -44,7 +44,7 @@ const inputSchema = z.object({
     .max(10),
 });
 
-// Validation Zod du JSON renvoyé par Gemini.
+// Validation Zod du JSON renvoyé par le LLM.
 const responseZod = z.object({
   perQuestion: z.array(
     z.object({
@@ -64,63 +64,6 @@ const responseZod = z.object({
     hireability: z.enum(["hire", "borderline", "no-hire"]),
   }),
 });
-
-const geminiResponseSchema = {
-  type: Type.OBJECT,
-  properties: {
-    perQuestion: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          id: { type: Type.INTEGER },
-          score: { type: Type.INTEGER, description: "Note sur 10" },
-          verdict: { type: Type.STRING, enum: ["correct", "partial", "incorrect", "blank"] },
-          feedback: {
-            type: Type.STRING,
-            description:
-              "2-4 phrases. Pointe les bons éléments, ce qui manque, ce qui est faux. Cite T-codes/tables manquants si pertinent.",
-          },
-        },
-        required: ["id", "score", "verdict", "feedback"],
-      },
-    },
-    overall: {
-      type: Type.OBJECT,
-      properties: {
-        score: { type: Type.INTEGER, description: "Score global sur 100" },
-        grade: { type: Type.STRING, enum: ["A", "B", "C", "D", "F"] },
-        verdict: {
-          type: Type.STRING,
-          description: "1-2 phrases : impression générale après l'entretien",
-        },
-        strengths: {
-          type: Type.ARRAY,
-          description: "1-3 points forts concrets",
-          items: { type: Type.STRING },
-        },
-        weaknesses: {
-          type: Type.ARRAY,
-          description: "0-3 axes d'amélioration concrets",
-          items: { type: Type.STRING },
-        },
-        recommendation: {
-          type: Type.STRING,
-          description:
-            "Action concrète à faire en priorité (chapitre HanaFlow, T-codes à pratiquer, etc.)",
-        },
-        hireability: {
-          type: Type.STRING,
-          enum: ["hire", "borderline", "no-hire"],
-          description:
-            "Décision de recrutement simulée pour le poste visé à cette séniorité",
-        },
-      },
-      required: ["score", "grade", "verdict", "strengths", "weaknesses", "recommendation", "hireability"],
-    },
-  },
-  required: ["perQuestion", "overall"],
-};
 
 export async function POST(req: NextRequest) {
   const auth = await requireProUser(req);
@@ -196,7 +139,6 @@ Note chaque question selon le barème, puis donne ton verdict global.`;
       caller: "interview/grade",
       systemInstruction,
       userPrompt,
-      geminiSchema: geminiResponseSchema,
       zodSchema: responseZod,
       temperature: 0.3,
     });
@@ -205,7 +147,6 @@ Note chaque question selon le barème, puis donne ton verdict global.`;
       overall: result.data.overall,
       // On renvoie aussi les idealAnswers pour que le front les affiche en révision
       idealAnswers: items.map((it) => ({ id: it.id, idealAnswer: it.idealAnswer })),
-      provider: result.provider,
       usage: result.usage,
     });
   } catch (e) {
