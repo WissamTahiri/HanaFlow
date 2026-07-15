@@ -114,8 +114,9 @@ export default function EcolesPage() {
             ))}
           </ul>
           <p className="mt-10 text-center text-sm text-slate-500 dark:text-slate-400">
-            Tarification <strong className="text-slate-900 dark:text-white">sur devis</strong> selon la
-            taille de la promotion — voir aussi{" "}
+            Tarification <strong className="text-slate-900 dark:text-white">sur devis</strong>, avec des
+            paliers dégressifs selon la taille de la promotion — réponse sous 48h ouvrées, sans
+            engagement à la démo. Voir aussi{" "}
             <Link href="/pricing" className="text-sap-blue hover:underline">
               nos tarifs individuels
             </Link>

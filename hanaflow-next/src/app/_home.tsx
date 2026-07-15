@@ -65,6 +65,26 @@ const CertificateIcon = () => (
     <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><polyline points="22 4 12 14.01 9 11.01"/>
   </svg>
 );
+const ChatIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+);
+const ResumeIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>
+  </svg>
+);
+const MicIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+  </svg>
+);
+const BriefcaseIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+  </svg>
+);
 
 // Catalogue de modules + codes certifs : source de vérité dans
 // src/data/cert-catalog.json (mis à jour automatiquement par le workflow
@@ -83,6 +103,14 @@ const features = [
   { icon: <AwardIcon />,      title: "Certifications", desc: "Simulateurs d'examens avec corrections détaillées et certificats PDF." },
   { icon: <ZapIcon />,        title: "Gamification", desc: "Badges, XP et niveaux pour rester motivé tout au long de ton parcours." },
   { icon: <MapIcon />,        title: "Roadmap consultant", desc: "Chemin balisé pour devenir consultant SAP junior en partant de zéro." },
+];
+
+// Suite carrière IA (Groq) — au-delà de l'apprentissage, jusqu'à l'emploi.
+const careerTools = [
+  { icon: <ChatIcon />,      title: "Tuteur SAP IA",     desc: "Pose tes questions, obtiens des réponses ancrées dans le module en cours — T-codes à l'appui.", href: "/modules-sap", pro: false },
+  { icon: <ResumeIcon />,    title: "CV Builder ATS",    desc: "L'IA réécrit ton CV avec le vocabulaire SAP officiel pour passer les filtres des ESN.", href: "/cv-builder", pro: true },
+  { icon: <MicIcon />,       title: "Mock Interview noté",desc: "Entretien technique simulé, questions adaptées à ta séniorité, feedback détaillé.", href: "/entretien", pro: true },
+  { icon: <BriefcaseIcon />, title: "Offres d'emploi",   desc: "Postule directement avec ton CV IA aux opportunités SAP publiées sur HanaFlow.", href: "/emplois", pro: true },
 ];
 
 export default function Home({ userCount = null }: { userCount?: number | null }) {
@@ -384,6 +412,51 @@ export default function Home({ userCount = null }: { userCount?: number | null }
                 </div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-2">{f.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SUITE CARRIÈRE IA ── jusqu'à l'emploi, pas juste la certif ── */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-sap-blue mb-3">
+              Au-delà de la certification
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-3 text-balance">
+              Une suite IA pour décrocher le poste, pas juste réviser
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+              Tuteur conversationnel, CV optimisé ATS, entretien blanc noté, et des offres SAP
+              où postuler directement — propulsés par IA.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {careerTools.map((c, i) => (
+              <motion.div
+                key={c.title}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+              >
+                <Link href={c.href} className="card p-6 h-full flex flex-col hover:shadow-soft transition-all duration-200">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="h-12 w-12 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue dark:text-sap-accent flex items-center justify-center">
+                      {c.icon}
+                    </div>
+                    {c.pro && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase tracking-wider">
+                        Pro
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-2">{c.title}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{c.desc}</p>
+                </Link>
               </motion.div>
             ))}
           </div>
