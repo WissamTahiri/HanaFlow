@@ -35,15 +35,17 @@ model User {
   // confirmé son email (accès partiel ou bloqué selon la politique).
   emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
 
-  refreshTokens RefreshToken[]
-  progress      UserProgress[]
+  refreshTokens       RefreshToken[]
+  progress            UserProgress[]
   passwordResetTokens PasswordResetToken[]
   emailVerifications  EmailVerificationToken[]
-  certificates  CompletionCertificate[]
-  feedback      Feedback[]
-  npsResponses  NPSResponse[]
-  gamification  UserGamification?
-  quizAttempts  QuizAttempt[]
+  certificates        CompletionCertificate[]
+  feedback            Feedback[]
+  npsResponses        NPSResponse[]
+  gamification        UserGamification?
+  quizAttempts        QuizAttempt[]
+  organizationMember  OrganizationMember?
+  jobApplications     JobApplication[]
 
   @@map("users")
 }
@@ -55,18 +57,24 @@ model User {
  * événements pour éviter qu'un client n'envoie un total arbitraire.
  */
 model UserGamification {
-  id            Int      @id @default(autoincrement())
-  userId        Int      @unique @map("user_id")
-  totalXp       Int      @default(0) @map("total_xp")
-  /** IDs des badges gagnés (JSON array de strings). */
-  badges        Json     @default("[]")
-  streakCurrent Int      @default(0) @map("streak_current")
-  streakBest    Int      @default(0) @map("streak_best")
-  /** Dernier jour d'activité compté dans le streak (date à minuit UTC). */
+  id             Int       @id @default(autoincrement())
+  userId         Int       @unique @map("user_id")
+  totalXp        Int       @default(0) @map("total_xp")
+  /**
+   * IDs des badges gagnés (JSON array de strings).
+   */
+  badges         Json      @default("[]")
+  streakCurrent  Int       @default(0) @map("streak_current")
+  streakBest     Int       @default(0) @map("streak_best")
+  /**
+   * Dernier jour d'activité compté dans le streak (date à minuit UTC).
+   */
   lastActivityAt DateTime? @map("last_activity_at") @db.Timestamptz
-  /** Compteur de quiz réussis (seuil du badge quiz_pass). */
-  quizPassCount Int      @default(0) @map("quiz_pass_count")
-  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  /**
+   * Compteur de quiz réussis (seuil du badge quiz_pass).
+   */
+  quizPassCount  Int       @default(0) @map("quiz_pass_count")
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -82,9 +90,13 @@ model QuizAttempt {
   userId         Int      @map("user_id")
   moduleCode     String   @map("module_code") @db.VarChar(10)
   kind           String   @default("quiz") @db.VarChar(10)
-  /** ID du chapitre pour les quiz (ex: "ch3") — null pour les examens. */
+  /**
+   * ID du chapitre pour les quiz (ex: "ch3") — null pour les examens.
+   */
   chapterId      String?  @map("chapter_id") @db.VarChar(20)
-  /** Score en pourcentage (0-100). */
+  /**
+   * Score en pourcentage (0-100).
+   */
   score          Int
   questionsTotal Int      @map("questions_total")
   attemptedAt    DateTime @default(now()) @map("attempted_at") @db.Timestamptz
@@ -102,20 +114,30 @@ model QuizAttempt {
  * rate-limit anti-spam et la modération.
  */
 model Feedback {
-  id          Int      @id @default(autoincrement())
-  userId      Int?     @map("user_id")
-  /** URL où le user était quand il a soumis (ex: /modules-sap/fi). */
-  context     String?  @db.VarChar(200)
-  /** Ce qui marche bien (peut être vide). */
-  goodWhat    String?  @map("good_what") @db.Text
-  /** Ce qui manque / à améliorer (peut être vide). */
-  improveWhat String?  @map("improve_what") @db.Text
-  /** Statut de traitement par l'admin. */
-  status      String   @default("new") @db.VarChar(20)
-  ipAddress   String?  @map("ip_address") @db.VarChar(64)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
-  /** Optionnel : email pour relancer le user si feedback anonyme intéressant. */
-  contactEmail String? @map("contact_email") @db.VarChar(255)
+  id           Int      @id @default(autoincrement())
+  userId       Int?     @map("user_id")
+  /**
+   * URL où le user était quand il a soumis (ex: /modules-sap/fi).
+   */
+  context      String?  @db.VarChar(200)
+  /**
+   * Ce qui marche bien (peut être vide).
+   */
+  goodWhat     String?  @map("good_what") @db.Text
+  /**
+   * Ce qui manque / à améliorer (peut être vide).
+   */
+  improveWhat  String?  @map("improve_what") @db.Text
+  /**
+   * Statut de traitement par l'admin.
+   */
+  status       String   @default("new") @db.VarChar(20)
+  ipAddress    String?  @map("ip_address") @db.VarChar(64)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  /**
+   * Optionnel : email pour relancer le user si feedback anonyme intéressant.
+   */
+  contactEmail String?  @map("contact_email") @db.VarChar(255)
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -131,7 +153,9 @@ model Feedback {
 model NPSResponse {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-  /** Score sur 11 (0-10). */
+  /**
+   * Score sur 11 (0-10).
+   */
   score     Int
   comment   String?  @db.Text
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
@@ -148,22 +172,30 @@ model NPSResponse {
  * pricing page comme social proof.
  */
 model Testimonial {
-  id               Int      @id @default(autoincrement())
-  authorName       String   @map("author_name") @db.VarChar(120)
-  /** Rôle court (ex: "Consultant SAP FI junior"). */
-  authorRole       String?  @map("author_role") @db.VarChar(120)
-  authorCompany    String?  @map("author_company") @db.VarChar(120)
-  authorPhotoUrl   String?  @map("author_photo_url") @db.Text
-  authorLinkedInUrl String? @map("author_linkedin_url") @db.Text
-  quote            String   @db.Text
-  /** 1-5 étoiles, optionnel. */
-  rating           Int?
-  isPublished      Boolean  @default(true) @map("is_published")
-  /** À mettre en hero / featured (1-2 max). */
-  isFeatured       Boolean  @default(false) @map("is_featured")
-  /** Ordre d'affichage manuel (ascending). */
-  sortOrder        Int      @default(0) @map("sort_order")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id                Int      @id @default(autoincrement())
+  authorName        String   @map("author_name") @db.VarChar(120)
+  /**
+   * Rôle court (ex: "Consultant SAP FI junior").
+   */
+  authorRole        String?  @map("author_role") @db.VarChar(120)
+  authorCompany     String?  @map("author_company") @db.VarChar(120)
+  authorPhotoUrl    String?  @map("author_photo_url") @db.Text
+  authorLinkedInUrl String?  @map("author_linkedin_url") @db.Text
+  quote             String   @db.Text
+  /**
+   * 1-5 étoiles, optionnel.
+   */
+  rating            Int?
+  isPublished       Boolean  @default(true) @map("is_published")
+  /**
+   * À mettre en hero / featured (1-2 max).
+   */
+  isFeatured        Boolean  @default(false) @map("is_featured")
+  /**
+   * Ordre d'affichage manuel (ascending).
+   */
+  sortOrder         Int      @default(0) @map("sort_order")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([isPublished, sortOrder])
   @@map("testimonials")
@@ -172,21 +204,33 @@ model Testimonial {
 model CompletionCertificate {
   // ID public (cuid) : utilisé dans l'URL de vérification.
   // Pas d'autoincrement → on ne révèle pas le volume de certifs émis.
-  id            String   @id @default(cuid())
-  userId        Int      @map("user_id")
-  moduleCode    String   @map("module_code") @db.VarChar(10)
-  /** Module label snapshot (au cas où le catalogue change après émission). */
-  moduleLabel   String   @map("module_label") @db.VarChar(120)
-  /** Code certif officiel SAP snapshot (ex: C_TS4FI_2601). */
-  certCode      String?  @map("cert_code") @db.VarChar(40)
-  /** Nom complet du candidat au moment de l'émission. */
-  candidateName String   @map("candidate_name") @db.VarChar(120)
-  /** Score obtenu sur 100. */
-  examScore     Int      @map("exam_score")
-  /** Nombre de questions du simulateur passé. */
-  examQuestions Int      @map("exam_questions")
-  issuedAt      DateTime @default(now()) @map("issued_at") @db.Timestamptz
-  /** Révoqué par admin (fraude, plainte) — n'affiche plus comme valide. */
+  id            String    @id @default(cuid())
+  userId        Int       @map("user_id")
+  moduleCode    String    @map("module_code") @db.VarChar(10)
+  /**
+   * Module label snapshot (au cas où le catalogue change après émission).
+   */
+  moduleLabel   String    @map("module_label") @db.VarChar(120)
+  /**
+   * Code certif officiel SAP snapshot (ex: C_TS4FI_2601).
+   */
+  certCode      String?   @map("cert_code") @db.VarChar(40)
+  /**
+   * Nom complet du candidat au moment de l'émission.
+   */
+  candidateName String    @map("candidate_name") @db.VarChar(120)
+  /**
+   * Score obtenu sur 100.
+   */
+  examScore     Int       @map("exam_score")
+  /**
+   * Nombre de questions du simulateur passé.
+   */
+  examQuestions Int       @map("exam_questions")
+  issuedAt      DateTime  @default(now()) @map("issued_at") @db.Timestamptz
+  /**
+   * Révoqué par admin (fraude, plainte) — n'affiche plus comme valide.
+   */
   revokedAt     DateTime? @map("revoked_at") @db.Timestamptz
   revokedReason String?   @map("revoked_reason") @db.VarChar(255)
 
@@ -201,14 +245,14 @@ model CompletionCertificate {
 }
 
 model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
   // SHA-256 du token : le clair n'est jamais persisté
-  tokenHash String   @unique @map("token_hash") @db.VarChar(128)
-  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  tokenHash String    @unique @map("token_hash") @db.VarChar(128)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
   usedAt    DateTime? @map("used_at") @db.Timestamptz
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  ipAddress String?  @map("ip_address") @db.VarChar(64)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  ipAddress String?   @map("ip_address") @db.VarChar(64)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -272,15 +316,15 @@ model UserProgress {
 }
 
 model AdminAuditLog {
-  id           Int      @id @default(autoincrement())
-  actorId      Int?     @map("actor_id")
-  actorEmail   String   @map("actor_email") @db.VarChar(255)
-  action       String   @db.VarChar(64)
-  targetType   String?  @map("target_type") @db.VarChar(32)
-  targetId     String?  @map("target_id") @db.VarChar(64)
-  metadata     Json?
-  ipAddress    String?  @map("ip_address") @db.VarChar(64)
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id         Int      @id @default(autoincrement())
+  actorId    Int?     @map("actor_id")
+  actorEmail String   @map("actor_email") @db.VarChar(255)
+  action     String   @db.VarChar(64)
+  targetType String?  @map("target_type") @db.VarChar(32)
+  targetId   String?  @map("target_id") @db.VarChar(64)
+  metadata   Json?
+  ipAddress  String?  @map("ip_address") @db.VarChar(64)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([createdAt])
   @@index([actorId])
@@ -296,4 +340,124 @@ model SiteSetting {
   updatedBy String?  @map("updated_by") @db.VarChar(255)
 
   @@map("site_settings")
+}
+
+/**
+ * Compte d'équipe B2B (offre "Sur devis" de /pricing). Créé manuellement par
+ * un admin plateforme après vente hors-app (pas de paiement in-app) — voir
+ * `logAudit` action "org.create". Un membre "owner" gère ses sièges/invite ses
+ * collègues depuis /team, sans accès individuel aux réponses de quiz des
+ * membres (seuls des agrégats sont exposés, cf. api/team).
+ */
+model Organization {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(150)
+  seatLimit Int      @default(10) @map("seat_limit")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  members OrganizationMember[]
+  invites OrganizationInvite[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             Int      @id @default(autoincrement())
+  organizationId Int      @map("organization_id")
+  // Un user n'appartient qu'à une seule organisation à la fois.
+  userId         Int      @unique @map("user_id")
+  /**
+   * "owner" (gère sièges/invitations) | "member".
+   */
+  role           String   @default("member") @db.VarChar(20)
+  joinedAt       DateTime @default(now()) @map("joined_at") @db.Timestamptz
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("organization_members")
+}
+
+model OrganizationInvite {
+  id             Int       @id @default(autoincrement())
+  organizationId Int       @map("organization_id")
+  email          String    @db.VarChar(255)
+  // Token opaque hashé SHA-256 — même pattern que PasswordResetToken.
+  tokenHash      String    @unique @map("token_hash") @db.VarChar(128)
+  invitedBy      Int       @map("invited_by")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz
+  acceptedAt     DateTime? @map("accepted_at") @db.Timestamptz
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([expiresAt])
+  @@map("organization_invites")
+}
+
+/**
+ * Annonce d'emploi affichée sur /emplois. `source`/`externalId` préparent un
+ * futur connecteur d'import externe (Indeed, LinkedIn, France Travail…) sans
+ * changer le modèle : les annonces saisies à la main ont source="admin".
+ */
+model JobListing {
+  id           Int       @id @default(autoincrement())
+  title        String    @db.VarChar(150)
+  companyName  String?   @map("company_name") @db.VarChar(150)
+  moduleCode   String?   @map("module_code") @db.VarChar(10)
+  /**
+   * "junior" | "confirmed" | "senior".
+   */
+  seniority    String?   @db.VarChar(20)
+  location     String?   @db.VarChar(120)
+  /**
+   * "remote" | "hybrid" | "onsite".
+   */
+  workMode     String?   @map("work_mode") @db.VarChar(20)
+  /**
+   * "cdi" | "cdd" | "freelance".
+   */
+  contractType String?   @map("contract_type") @db.VarChar(20)
+  description  String    @db.Text
+  source       String    @default("admin") @db.VarChar(20)
+  externalId   String?   @map("external_id") @db.VarChar(120)
+  externalUrl  String?   @map("external_url") @db.Text
+  isPublished  Boolean   @default(true) @map("is_published")
+  isFeatured   Boolean   @default(false) @map("is_featured")
+  sortOrder    Int       @default(0) @map("sort_order")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt    DateTime? @map("expires_at") @db.Timestamptz
+
+  applications JobApplication[]
+
+  @@unique([source, externalId])
+  @@index([isPublished, sortOrder])
+  @@map("job_listings")
+}
+
+model JobApplication {
+  id           Int      @id @default(autoincrement())
+  jobListingId Int      @map("job_listing_id")
+  userId       Int      @map("user_id")
+  /**
+   * Snapshot du CV au moment de la candidature (CvData), pas une référence live.
+   */
+  cvSnapshot   Json     @map("cv_snapshot")
+  message      String?  @db.Text
+  /**
+   * "new" | "reviewed" | "contacted" | "rejected".
+   */
+  status       String   @default("new") @db.VarChar(20)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  jobListing JobListing @relation(fields: [jobListingId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([jobListingId, userId])
+  @@index([userId])
+  @@index([jobListingId])
+  @@map("job_applications")
 }
