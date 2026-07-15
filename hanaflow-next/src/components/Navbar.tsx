@@ -214,6 +214,7 @@ export default function Navbar() {
             <span className="mx-2 h-5 w-px bg-gray-200 dark:bg-slate-700 flex-shrink-0" aria-hidden="true" />
 
             <NavItem href="/certifications" label="Certifications" />
+            <NavItem href="/emplois" label="Emplois" />
             <NavItem href="/pricing" label="Tarifs" />
           </nav>
 
@@ -264,6 +265,7 @@ export default function Navbar() {
                       { href: "/certificats",  label: "Mes certificats" },
                       { href: "/profil",       label: "Mon profil" },
                       { href: "/achievements", label: "Achievements" },
+                      { href: "/team",         label: "Mon équipe" },
                     ].map(({ href, label }) => (
                       <Link
                         key={href}
@@ -357,6 +359,7 @@ export default function Navbar() {
             { href: "/",               label: "Accueil",        exact: true },
             { href: "/modules-sap",    label: "Vue modules" },
             { href: "/certifications", label: "Certifications", exact: true },
+            { href: "/emplois",        label: "Emplois" },
             { href: "/pricing",        label: "Tarifs" },
           ].map(({ href, label, exact }) => {
             const isActive = exact ? pathname === href : pathname.startsWith(href);
@@ -429,6 +432,9 @@ export default function Navbar() {
               <>
                 <Link href="/dashboard" className="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-semibold bg-sap-blue text-white hover:bg-sap-blue-dark transition-colors">
                   Dashboard
+                </Link>
+                <Link href="/team" className="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                  Mon équipe
                 </Link>
                 {user?.role === "admin" && (
                   <Link

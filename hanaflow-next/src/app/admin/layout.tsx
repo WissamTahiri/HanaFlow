@@ -22,6 +22,16 @@ const TagIcon = () => (
   </svg>
 );
 
+const BuildingIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="4" y="2" width="16" height="20" rx="1" /><line x1="9" y1="7" x2="9" y2="7.01" /><line x1="15" y1="7" x2="15" y2="7.01" /><line x1="9" y1="12" x2="9" y2="12.01" /><line x1="15" y1="12" x2="15" y2="12.01" /><line x1="9" y1="17" x2="15" y2="17" />
+  </svg>
+);
+const BriefcaseIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+  </svg>
+);
 const ShieldIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -53,10 +63,12 @@ const HeartIcon = () => (
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: <BarChartIcon /> },
   { href: "/admin/users", label: "Utilisateurs", icon: <UsersIcon /> },
+  { href: "/admin/organizations", label: "Organisations", icon: <BuildingIcon /> },
   { href: "/admin/feedback", label: "Feedback", icon: <MessageIcon /> },
   { href: "/admin/nps", label: "NPS", icon: <HeartIcon /> },
   { href: "/admin/testimonials", label: "Témoignages", icon: <StarIcon /> },
   { href: "/admin/promo-codes", label: "Codes Promo", icon: <TagIcon /> },
+  { href: "/admin/jobs", label: "Offres d'emploi", icon: <BriefcaseIcon /> },
   { href: "/admin/audit-log", label: "Journal d'audit", icon: <ShieldIcon /> },
   { href: "/admin/settings", label: "Paramètres", icon: <SettingsIcon /> },
 ];
