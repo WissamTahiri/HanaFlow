@@ -182,6 +182,59 @@ export const templates = {
     text: `Confirme ton email HanaFlow (48h) : ${verifyUrl}`,
   }),
 
+  teamInvite: (orgName: string, inviteUrl: string) => ({
+    subject: sanitizeHeader(`Invitation à rejoindre l'équipe ${orgName} sur HanaFlow`),
+    html: wrap(`
+      <h1 style="font-size:22px;margin:0 0 16px 0;">Tu es invité·e chez ${esc(orgName)} 👋</h1>
+      <p style="line-height:1.6;color:#334155;">
+        Tu as été invité·e à rejoindre l'équipe <strong>${esc(orgName)}</strong> sur HanaFlow —
+        accès Pro complet inclus (modules, simulateurs d'examen, outils IA).
+        Ce lien est valable <strong>7 jours</strong>.
+      </p>
+      <p style="margin-top:24px;">
+        <a href="${esc(inviteUrl)}" style="display:inline-block;padding:12px 20px;background:#2563EB;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;">
+          Rejoindre l'équipe →
+        </a>
+      </p>
+      <p style="font-size:13px;color:#64748B;margin-top:24px;">
+        Si tu ne t'attendais pas à cette invitation, ignore simplement cet email.
+      </p>
+    `),
+    text: `Invitation à rejoindre l'équipe ${orgName} sur HanaFlow (valide 7 jours) : ${inviteUrl}`,
+  }),
+
+  jobApplicationReceived: (name: string, jobTitle: string) => ({
+    subject: sanitizeHeader(`Candidature envoyée : ${jobTitle}`),
+    html: wrap(`
+      <h1 style="font-size:22px;margin:0 0 16px 0;">Candidature envoyée ✅</h1>
+      <p style="line-height:1.6;color:#334155;">
+        Bonjour ${esc(name)}, ta candidature pour <strong>${esc(jobTitle)}</strong> a bien été transmise.
+        Tu peux suivre son statut depuis ton profil.
+      </p>
+      <p style="margin-top:24px;">
+        <a href="https://hanaflow.vercel.app/profil" style="display:inline-block;padding:12px 20px;background:#2563EB;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;">
+          Voir mes candidatures →
+        </a>
+      </p>
+    `),
+    text: `Ta candidature pour ${jobTitle} a bien été transmise. Suis-la sur https://hanaflow.vercel.app/profil`,
+  }),
+
+  adminNewApplication: (info: { candidateName: string; jobTitle: string }) => ({
+    subject: sanitizeHeader(`Nouvelle candidature : ${info.jobTitle}`),
+    html: wrap(`
+      <h1 style="font-size:18px;margin:0 0 16px 0;">Nouvelle candidature</h1>
+      <p style="line-height:1.6;color:#334155;">
+        <strong>${esc(info.candidateName)}</strong> a postulé à <strong>${esc(info.jobTitle)}</strong>.
+      </p>
+      <p style="margin-top:24px;">
+        <a href="https://hanaflow.vercel.app/admin/jobs" style="display:inline-block;padding:10px 16px;background:#2563EB;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">
+          Voir dans l'admin →
+        </a>
+      </p>
+    `),
+  }),
+
   adminNewSignup: (newUser: { name: string; email: string }) => ({
     subject: sanitizeHeader(`Nouveau compte : ${newUser.name}`),
     html: wrap(`

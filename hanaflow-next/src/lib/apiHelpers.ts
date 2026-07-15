@@ -159,6 +159,28 @@ export async function requireProUser(
 }
 
 /**
+ * Gate pour les routes de gestion d'équipe (/api/team/*). Comme isPro,
+ * l'appartenance à une organisation n'est pas dans le JWT (peut changer entre
+ * deux rotations de token) — on requête la DB à chaque appel. Retourne aussi
+ * l'organizationId pour éviter un second aller-retour DB côté appelant.
+ */
+export async function requireOrgOwner(
+  req: NextRequest
+): Promise<{ user: JwtPayload; organizationId: number } | NextResponse> {
+  const user = getAuthUser(req);
+  if (!user) return err("Non authentifié", 401);
+
+  const membership = await prisma.organizationMember.findUnique({
+    where: { userId: user.userId },
+    select: { organizationId: true, role: true },
+  });
+  if (!membership || membership.role !== "owner") {
+    return err("Réservé au propriétaire d'une équipe.", 403);
+  }
+  return { user, organizationId: membership.organizationId };
+}
+
+/**
  * Vérifie le mot de passe de l'admin courant — utilisé comme « step-up auth »
  * pour les opérations destructives (delete, impersonate, reset password, bulk delete).
  * Le mot de passe est passé dans le header `X-Confirm-Password` (jamais dans le body
