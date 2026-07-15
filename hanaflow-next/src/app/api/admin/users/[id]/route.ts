@@ -158,6 +158,21 @@ export async function DELETE(
 
   if (auth.user.userId === userId) return err("Impossible de supprimer son propre compte", 400);
 
+  // Empêche de rendre une organisation orpheline : si ce compte est owner
+  // d'une équipe B2B, la cascade Prisma supprimerait son OrganizationMember
+  // et plus personne ne pourrait gérer l'équipe (requireOrgOwner ne trouve
+  // plus de owner). L'admin doit d'abord transférer/retirer le rôle owner.
+  const ownedOrg = await prisma.organizationMember.findFirst({
+    where: { userId, role: "owner" },
+    select: { organization: { select: { name: true } } },
+  });
+  if (ownedOrg) {
+    return err(
+      `Ce compte est propriétaire de l'organisation "${ownedOrg.organization.name}" — transfère la propriété à un autre membre (POST /api/admin/organizations/{id}/transfer-owner) avant de le supprimer.`,
+      400,
+    );
+  }
+
   // Step-up auth obligatoire pour les suppressions
   const stepUpOk = await verifyAdminPassword(req, auth.user.userId);
   if (!stepUpOk) return err("Re-saisie du mot de passe administrateur requise", 401);
