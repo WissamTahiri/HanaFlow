@@ -1,6 +1,6 @@
 # HanaFlow
 
-Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, HCM, PP et S/4HANA, de zéro à consultant certifié.
+Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, PP et IA générative, de zéro à consultant certifié.
 
 > Le code actif vit dans [`hanaflow-next/`](./hanaflow-next/). Une ancienne implémentation React/Vite + Express est conservée dans `_archive/` pour référence (voir « Historique » plus bas).
 
@@ -16,7 +16,7 @@ Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, HCM, PP et S/
 
 ## Fonctionnalités
 
-- 6 modules SAP avec cours structurés (FI, CO, MM, SD, HCM, PP)
+- 6 modules SAP avec cours structurés (FI, CO, MM, SD, PP, IA générative)
 - Pages S/4HANA, SAP AI Joule, processus métier, roadmap consultant
 - 6 simulateurs d'examens de certification avec corrections détaillées
 - Certificats PDF téléchargeables (`@react-pdf/renderer`)
