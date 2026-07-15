@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+
+/** N'autorise que les chemins internes (`/xxx`) — jamais une URL externe (open redirect). */
+function safeNext(next: string | null): string {
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+}
 
 const EyeIcon = ({ show }: { show: boolean }) => show ? (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -16,8 +21,9 @@ const EyeIcon = ({ show }: { show: boolean }) => show ? (
   </svg>
 );
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const next = safeNext(useSearchParams().get("next"));
   const { login } = useAuth();
 
   const [email, setEmail]           = useState("");
@@ -34,7 +40,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login({ email, password, totpCode: needs2fa ? totpCode : undefined });
-      router.push("/dashboard");
+      router.push(next);
     } catch (err) {
       const e = err as Error & { requires2fa?: boolean };
       if (e.requires2fa) {
@@ -173,7 +179,10 @@ export default function LoginPage() {
             </Link>
             <p className="text-slate-500 dark:text-slate-400">
               Pas encore de compte ?{" "}
-              <Link href="/register" className="font-semibold text-sap-blue dark:text-sap-accent hover:underline">
+              <Link
+                href={next !== "/dashboard" ? `/register?next=${encodeURIComponent(next)}` : "/register"}
+                className="font-semibold text-sap-blue dark:text-sap-accent hover:underline"
+              >
                 Créer un compte gratuit
               </Link>
             </p>
@@ -181,5 +190,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

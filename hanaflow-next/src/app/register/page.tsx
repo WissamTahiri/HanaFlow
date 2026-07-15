@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+
+/** N'autorise que les chemins internes (`/xxx`) — jamais une URL externe (open redirect). */
+function safeNext(next: string | null): string {
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+}
 
 const CheckIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -17,8 +22,9 @@ const perks = [
   "Roadmap personnalisée",
 ];
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const next = safeNext(useSearchParams().get("next"));
   const { register } = useAuth();
 
   const [name, setName]             = useState("");
@@ -33,7 +39,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register({ name, email, password });
-      router.push("/dashboard");
+      router.push(next);
     } catch (err) {
       setError((err as Error).message || "Erreur lors de la création du compte.");
     } finally {
@@ -152,5 +158,13 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
   );
 }
