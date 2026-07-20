@@ -70,12 +70,54 @@ export function getCertForPlan(moduleId: ModuleId, isPro: boolean): any {
 
 /**
  * Renvoie les questions d'examen — Pro uniquement (le caller doit avoir vérifié).
+ *
+ * Usage réservé aux contextes serveur qui ont besoin de la banque complète
+ * (ex: notation dans POST /api/quiz/submit). Ne JAMAIS passer cette valeur en
+ * props à un composant client : `correctIndex` serait sérialisé dans le
+ * payload RSC et donc visible avant même que le candidat réponde à une
+ * question, ce qui permettrait de forger un score d'examen 100% "vérifié
+ * serveur" (le serveur note contre la même clé de correction qu'il vient de
+ * divulguer). Pour l'UI, utiliser `getExamQuestionsForClient`.
  */
 export function getExamQuestions(moduleId: ModuleId) {
   return CERT_MAP[moduleId].exam;
 }
 
+export type ClientExamQuestion = {
+  id?: string | number;
+  question: string;
+  options: string[];
+  explanation: string;
+  chapter: string;
+};
+
+/**
+ * Version des questions d'examen sûre à passer à un Client Component :
+ * `correctIndex` est retiré. Le score reste calculé côté serveur dans
+ * POST /api/quiz/submit à partir de `getExamQuestions` (banque complète,
+ * jamais exposée au client), qui renvoie ensuite la correction par question
+ * une fois la tentative déjà enregistrée en base.
+ */
+export function getExamQuestionsForClient(moduleId: ModuleId): ClientExamQuestion[] {
+  return CERT_MAP[moduleId].exam.map(({ correctIndex: _correctIndex, ...rest }) => rest);
+}
+
 export function getCertMeta(moduleId: ModuleId) {
   const cert = CERT_MAP[moduleId].cert as { shortName: string };
   return { code: certCode(moduleId), shortName: cert.shortName };
+}
+
+export type CanonicalQuestion = { id?: string | number; correctIndex: number };
+
+/**
+ * Renvoie les questions du quiz d'un chapitre (banque officielle), pour
+ * notation côté serveur. Retourne `null` si le module ou le chapitre
+ * n'existe pas.
+ */
+export function getChapterQuiz(moduleId: ModuleId, chapterId: string): CanonicalQuestion[] | null {
+  const cert = CERT_MAP[moduleId].cert as CertShape;
+  const chapter = cert.chapters.find((ch) => (ch as { id?: string }).id === chapterId);
+  if (!chapter) return null;
+  const quiz = (chapter as { quiz?: CanonicalQuestion[] }).quiz;
+  return quiz ?? null;
 }

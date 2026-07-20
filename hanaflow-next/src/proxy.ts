@@ -46,7 +46,10 @@ function buildCsp(nonce: string): string {
     `style-src 'self' 'nonce-${nonce}'${IS_DEV ? " 'unsafe-inline'" : ""} https://fonts.googleapis.com`,
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
-    "connect-src 'self'",
+    // PostHog (analytics) : hôte d'ingestion configuré (NEXT_PUBLIC_POSTHOG_HOST)
+    // + hôte d'assets associé — sans ça, le SDK est bloqué silencieusement par
+    // la CSP et aucun événement ne part jamais.
+    "connect-src 'self' https://us.i.posthog.com https://us-assets.i.posthog.com",
     "object-src 'none'",
     "media-src 'none'",
     "frame-src 'none'",
@@ -105,15 +108,17 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // Skip /api/* (pas de rendu HTML, pas besoin de nonce), assets statiques,
-  // et les prefetches Next (qui ne rendent pas un nouveau document).
+  // Skip /api/* (pas de rendu HTML, pas besoin de nonce) et les assets statiques.
+  //
+  // IMPORTANT : ne PAS exclure les requêtes portant `next-router-prefetch` ou
+  // `purpose: prefetch` ici. Ce sont de simples en-têtes HTTP contrôlables par
+  // n'importe quel client (pas une garantie fournie par Next.js) — un
+  // attaquant peut les forger sur une requête normale pour contourner la
+  // garde d'authentification (redirect /login) et la génération de la CSP
+  // de ce proxy sur les routes protégées (dont /admin).
+  // Cf. GHSA-267c-6grr-h53f / GHSA-26hh-7cqf-hhc6 (middleware/proxy bypass
+  // via segment-prefetch routes).
   matcher: [
-    {
-      source: "/((?!api|_next/static|_next/image|favicon.ico|icons|manifest.json|robots.txt|sitemap.xml|sw.js|workbox-).*)",
-      missing: [
-        { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" },
-      ],
-    },
+    "/((?!api|_next/static|_next/image|favicon.ico|icons|manifest.json|robots.txt|sitemap.xml|sw.js|workbox-).*)",
   ],
 };

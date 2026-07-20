@@ -34,6 +34,10 @@ model User {
   // Vérification d'email à l'inscription. Si null, l'utilisateur n'a pas
   // confirmé son email (accès partiel ou bloqué selon la politique).
   emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
+  // Horodatage de la dernière révocation manuelle de sessions par un admin
+  // (bouton « Révoquer les sessions »). Sert, comme pwdChangedAt, à invalider
+  // les access tokens encore vivants émis avant cette date (cf apiHelpers).
+  sessionsRevokedAt DateTime? @map("sessions_revoked_at") @db.Timestamptz
 
   refreshTokens       RefreshToken[]
   progress            UserProgress[]
@@ -74,6 +78,12 @@ model UserGamification {
    * Compteur de quiz réussis (seuil du badge quiz_pass).
    */
   quizPassCount  Int       @default(0) @map("quiz_pass_count")
+  /**
+   * Plus haut `lessonCount` déjà crédité en XP, par module (JSON {module: count}).
+   * Empêche un client de renvoyer le même événement `lesson_complete` en boucle
+   * pour farmer de l'XP : seul le delta au-dessus du max connu est crédité.
+   */
+  lessonProgress Json      @default("{}") @map("lesson_progress")
   updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

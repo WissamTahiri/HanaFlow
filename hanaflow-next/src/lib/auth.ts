@@ -1,7 +1,28 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+/**
+ * Longueur minimale imposée à JWT_SECRET (utilisé pour signer les access
+ * tokens et les tokens d'impersonation admin en HS256). En dessous de ce
+ * seuil, le secret est trop faible pour résister à une attaque par force
+ * brute hors-ligne si un token venait à fuiter — même politique de
+ * fail-fast que TOTP_ENCRYPTION_KEY dans totpCrypto.ts.
+ */
+const MIN_JWT_SECRET_LENGTH = 32;
+
+function loadJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < MIN_JWT_SECRET_LENGTH) {
+    throw new Error(
+      `JWT_SECRET manquant ou trop court (minimum ${MIN_JWT_SECRET_LENGTH} caractères) — ` +
+        "refus de signer des tokens avec un secret faible. " +
+        "Générer une valeur robuste : `node -e \"console.log(require('crypto').randomBytes(48).toString('hex'))\"`",
+    );
+  }
+  return secret;
+}
+
+const JWT_SECRET = loadJwtSecret();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "1h";
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN ?? "7d";
 const IMPERSONATION_EXPIRES_IN = "15m";
@@ -12,6 +33,8 @@ export interface JwtPayload {
   role: string;
   /** Si présent, ce token est issu d'une impersonation par cet admin */
   impersonatedBy?: { id: number; email: string };
+  /** Ajouté automatiquement par jsonwebtoken (epoch secondes) */
+  iat?: number;
 }
 
 export function signAccessToken(payload: JwtPayload): string {

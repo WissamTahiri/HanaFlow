@@ -37,6 +37,7 @@ type Row = {
   streakBest: number;
   quizPassCount: number;
   lastActivityAt: Date | null;
+  lessonProgress: unknown;
 };
 
 function toState(row: Row): GamificationState & { lastActivityAt: Date | null } {
@@ -48,6 +49,16 @@ function toState(row: Row): GamificationState & { lastActivityAt: Date | null } 
     quizPassCount: row.quizPassCount,
     lastActivityAt: row.lastActivityAt,
   };
+}
+
+/** Extrait un `{module: count}` sûr depuis le JSON stocké en base. */
+function toLessonProgress(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof v === "number" && Number.isFinite(v)) out[k] = v;
+  }
+  return out;
 }
 
 export async function getGamification(userId: number) {
@@ -95,14 +106,14 @@ export async function applyGamificationEvent(userId: number, event: Gamification
 }
 
 async function runGamificationEvent(tx: Tx, userId: number, event: GamificationEvent) {
-  const current = toState(
-    await tx.userGamification.upsert({ where: { userId }, create: { userId }, update: {} }),
-  );
+  const existingRow = await tx.userGamification.upsert({ where: { userId }, create: { userId }, update: {} });
+  const current = toState(existingRow);
   const badges = new Set(current.badges);
   const newBadges: string[] = [];
   let xpDelta = 0;
   let { streakCurrent, streakBest, quizPassCount } = current;
   let lastActivityAt = current.lastActivityAt;
+  const lessonProgress = toLessonProgress(existingRow.lessonProgress);
 
   const award = (id: string) => {
     if (badges.has(id)) return;
@@ -137,8 +148,17 @@ async function runGamificationEvent(tx: Tx, userId: number, event: GamificationE
       break;
     }
     case "lesson_complete": {
-      xpDelta += LESSON_XP;
-      if (event.lessonCount >= 5 && LESSON_BADGE_MODULES.includes(event.module)) {
+      // Anti-farming : on ne crédite que le delta au-dessus du plus haut
+      // lessonCount déjà connu pour ce module. Un client qui rejoue le même
+      // (ou un plus petit) lessonCount ne gagne plus d'XP.
+      const prevCount = lessonProgress[event.module] ?? 0;
+      const newCount = Math.max(prevCount, event.lessonCount);
+      const delta = newCount - prevCount;
+      if (delta > 0) {
+        xpDelta += delta * LESSON_XP;
+        lessonProgress[event.module] = newCount;
+      }
+      if (newCount >= 5 && LESSON_BADGE_MODULES.includes(event.module)) {
         award(`lesson_${event.module}`);
       }
       break;
@@ -175,6 +195,7 @@ async function runGamificationEvent(tx: Tx, userId: number, event: GamificationE
       streakBest,
       quizPassCount,
       lastActivityAt,
+      lessonProgress,
     },
   });
 

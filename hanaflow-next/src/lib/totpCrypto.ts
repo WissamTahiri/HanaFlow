@@ -1,21 +1,35 @@
 import crypto from "crypto";
+import argon2 from "argon2";
 
 /**
  * Chiffrement AES-256-GCM du secret TOTP.
  *
  * Format stocké : `v1:<iv_hex>:<ciphertext_hex>:<tag_hex>`
- * Si TOTP_ENCRYPTION_KEY est absent, l'API se rabat sur du clair (utile en dev,
- * mais journalise un warning au boot). Un secret historique non préfixé est
- * traité comme du clair : decryptTotpSecret() le retourne tel quel, et l'appel
- * suivant à encryptTotpSecret() au prochain enroll/save le passera en chiffré.
+ * Si TOTP_ENCRYPTION_KEY est absent :
+ *  - en production, on fail-fast (throw) au lieu de stocker les secrets TOTP
+ *    en clair — même politique que JWT_SECRET, pour éviter qu'un oubli de
+ *    configuration Vercel (env manquante, preview mal configuré) ne
+ *    contourne silencieusement le 2FA.
+ *  - hors production, l'API se rabat sur du clair (utile en dev), mais
+ *    journalise un warning.
+ * Un secret historique non préfixé est traité comme du clair :
+ * decryptTotpSecret() le retourne tel quel, et l'appel suivant à
+ * encryptTotpSecret() au prochain enroll/save le passera en chiffré.
  */
 
 const KEY_HEX = process.env.TOTP_ENCRYPTION_KEY ?? "";
+const IS_PROD = process.env.NODE_ENV === "production";
 let cachedKey: Buffer | null = null;
 let warned = false;
 
 function getKey(): Buffer | null {
   if (!KEY_HEX) {
+    if (IS_PROD) {
+      throw new Error(
+        "TOTP_ENCRYPTION_KEY manquant en production — refus de stocker les secrets TOTP en clair. " +
+          "Définir une clé hex 32 bytes : `node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"`",
+      );
+    }
     if (!warned) {
       console.warn(
         "[totpCrypto] TOTP_ENCRYPTION_KEY non défini — secrets TOTP stockés en clair. " +
@@ -70,22 +84,25 @@ export function isEncrypted(stored: string): boolean {
 /* ─── Backup codes ──────────────────────────────────────────────────── */
 
 const BACKUP_CODE_COUNT = 10;
-const BACKUP_CODE_BYTES = 5; // 10 chars hex
+const BACKUP_CODE_BYTES = 8; // 16 chars hex (64 bits d'entropie)
 
-function hashBackupCode(code: string): string {
-  return crypto.createHash("sha256").update(code).digest("hex");
+// Hachage identique aux mots de passe (Argon2id, coûteux et salé automatiquement)
+// plutôt qu'un simple SHA-256 : un dump DB seul ne suffit plus à retrouver les
+// codes en clair par force brute GPU.
+async function hashBackupCode(code: string): Promise<string> {
+  return argon2.hash(code, { type: argon2.argon2id });
 }
 
-export function generateBackupCodes(): { plain: string[]; hashed: string[] } {
+export async function generateBackupCodes(): Promise<{ plain: string[]; hashed: string[] }> {
   const plain: string[] = [];
-  const hashed: string[] = [];
   for (let i = 0; i < BACKUP_CODE_COUNT; i++) {
     const raw = crypto.randomBytes(BACKUP_CODE_BYTES).toString("hex");
-    // Format lisible : xxxxx-xxxxx
-    const code = `${raw.slice(0, 5)}-${raw.slice(5)}`;
+    // Format lisible : xxxxxxxx-xxxxxxxx
+    const half = raw.length / 2;
+    const code = `${raw.slice(0, half)}-${raw.slice(half)}`;
     plain.push(code);
-    hashed.push(hashBackupCode(code));
   }
+  const hashed = await Promise.all(plain.map((code) => hashBackupCode(code)));
   return { plain, hashed };
 }
 
@@ -93,16 +110,15 @@ export function generateBackupCodes(): { plain: string[]; hashed: string[] } {
  * Vérifie qu'un code de récupération est dans la liste, et renvoie la liste
  * mise à jour (code consommé retiré). Renvoie null si le code n'existe pas.
  */
-export function consumeBackupCode(
+export async function consumeBackupCode(
   code: string,
   hashed: string[],
-): string[] | null {
+): Promise<string[] | null> {
   const cleaned = code.trim().toLowerCase();
-  const target = hashBackupCode(cleaned);
   let found = false;
   const remaining: string[] = [];
   for (const h of hashed) {
-    if (!found && crypto.timingSafeEqual(Buffer.from(h, "hex"), Buffer.from(target, "hex"))) {
+    if (!found && (await argon2.verify(h, cleaned).catch(() => false))) {
       found = true;
       continue;
     }

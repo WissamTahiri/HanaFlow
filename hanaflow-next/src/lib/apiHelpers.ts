@@ -60,12 +60,19 @@ export function verifyCsrf(req: NextRequest): boolean {
 
 /**
  * Récupère l'IP réelle du client de manière résistante au spoofing.
- * Sur Vercel : `x-real-ip` est posé par le proxy (non-spoofable depuis l'extérieur).
- * Fallback : dernier segment de `x-forwarded-for` (le proxy concatène l'IP réelle à droite).
+ *
+ * IMPORTANT : `x-real-ip` n'est PAS posé par l'edge network Vercel (c'est une
+ * convention nginx/Apache, pas une garantie de la plateforme). Un client peut
+ * envoyer n'importe quelle valeur dans cet en-tête et elle arrive intacte au
+ * route handler — on ne doit donc jamais lui faire confiance pour du
+ * rate-limiting ou de l'audit.
+ *
+ * Seul `x-forwarded-for` est fiable sur Vercel : l'edge network y ajoute
+ * systématiquement l'IP réelle du client en dernière position de la liste
+ * (les valeurs éventuellement fournies par le client sont préservées avant
+ * ce dernier segment, mais ne peuvent pas l'écraser).
  */
 export function getClientIp(req: NextRequest): string {
-  const realIp = req.headers.get("x-real-ip");
-  if (realIp) return realIp.trim();
   const xff = req.headers.get("x-forwarded-for");
   if (xff) {
     const parts = xff.split(",").map((p) => p.trim()).filter(Boolean);
@@ -110,22 +117,56 @@ export function getAuthUser(req: NextRequest): JwtPayload | null {
   }
 }
 
-export function requireAuth(
+/**
+ * Vérifie la fraîcheur d'un access token contre l'état actuel en DB :
+ *  - compte suspendu depuis l'émission du token → rejeté
+ *  - mot de passe changé après l'émission du token (pwdChangedAt > iat) → rejeté
+ *  - rôle en DB différent de celui figé dans le JWT → rejeté (évite qu'un admin
+ *    rétrogradé conserve ses droits jusqu'à expiration du token)
+ *  - sessions révoquées manuellement par un admin après l'émission du token
+ *    (sessionsRevokedAt > iat) → rejeté
+ *
+ * Sans ce check, changer son mot de passe, suspendre/rétrograder un compte ou
+ * révoquer ses sessions ne touchait que les refresh tokens : l'access token
+ * déjà émis (jusqu'à JWT_EXPIRES_IN, 1h par défaut) continuait de passer
+ * requireAuth/requireAdmin.
+ */
+async function checkTokenFreshness(user: JwtPayload): Promise<boolean> {
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.userId },
+    select: { role: true, isSuspended: true, pwdChangedAt: true, sessionsRevokedAt: true },
+  });
+  if (!dbUser) return false;
+  if (dbUser.isSuspended) return false;
+  if (dbUser.role !== user.role) return false;
+  const iat = typeof user.iat === "number" ? user.iat * 1000 : 0;
+  if (dbUser.pwdChangedAt) {
+    if (dbUser.pwdChangedAt.getTime() > iat) return false;
+  }
+  if (dbUser.sessionsRevokedAt) {
+    if (dbUser.sessionsRevokedAt.getTime() > iat) return false;
+  }
+  return true;
+}
+
+export async function requireAuth(
   req: NextRequest
-): { user: JwtPayload } | NextResponse {
+): Promise<{ user: JwtPayload } | NextResponse> {
   const user = getAuthUser(req);
   if (!user) return err("Non authentifié", 401);
+  if (!(await checkTokenFreshness(user))) return err("Session expirée", 401);
   return { user };
 }
 
-export function requireAdmin(
+export async function requireAdmin(
   req: NextRequest
-): { user: JwtPayload } | NextResponse {
+): Promise<{ user: JwtPayload } | NextResponse> {
   const user = getAuthUser(req);
   if (!user) return err("Non authentifié", 401);
   if (user.role !== "admin") return err("Accès refusé", 403);
   // Une session impersonée ne peut pas exécuter d'actions admin
   if (user.impersonatedBy) return err("Action admin interdite en mode impersonation", 403);
+  if (!(await checkTokenFreshness(user))) return err("Session expirée", 401);
   return { user };
 }
 
@@ -144,6 +185,7 @@ export async function requireProUser(
 ): Promise<{ user: JwtPayload } | NextResponse> {
   const user = getAuthUser(req);
   if (!user) return err("Non authentifié", 401);
+  if (!(await checkTokenFreshness(user))) return err("Session expirée", 401);
   if (user.role === "admin") return { user };
 
   const dbUser = await prisma.user.findUnique({
@@ -169,6 +211,7 @@ export async function requireOrgOwner(
 ): Promise<{ user: JwtPayload; organizationId: number } | NextResponse> {
   const user = getAuthUser(req);
   if (!user) return err("Non authentifié", 401);
+  if (!(await checkTokenFreshness(user))) return err("Session expirée", 401);
 
   const membership = await prisma.organizationMember.findUnique({
     where: { userId: user.userId },
@@ -245,8 +288,24 @@ async function redisRateLimit(key: string, maxRequests: number, windowMs: number
   }
 }
 
+// Purge périodique des entrées expirées : sans ça, `rateLimitMap` grossit
+// indéfiniment sur un process long-lived (self-hosted / next start) puisque
+// des clés influencées par l'attaquant (ex: `forgot:email:<email>`) ne sont
+// jamais relues après expiration si l'attaquant ne les réutilise pas.
+const RATE_LIMIT_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+let lastRateLimitCleanup = Date.now();
+
+function cleanupRateLimitMap(now: number): void {
+  if (now - lastRateLimitCleanup < RATE_LIMIT_CLEANUP_INTERVAL_MS) return;
+  lastRateLimitCleanup = now;
+  for (const [key, entry] of rateLimitMap) {
+    if (entry.resetAt < now) rateLimitMap.delete(key);
+  }
+}
+
 function memoryRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
   const now = Date.now();
+  cleanupRateLimitMap(now);
   const entry = rateLimitMap.get(key);
   if (!entry || entry.resetAt < now) {
     rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });

@@ -1,6 +1,14 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { z } from "zod";
 import { NextRequest } from "next/server";
+
+// requireAuth/requireAdmin re-vérifient la fraîcheur du token en DB
+// (role/isSuspended/pwdChangedAt) — on mock prisma pour isoler ces tests.
+const findUniqueMock = vi.fn();
+vi.mock("./prisma", () => ({
+  prisma: { user: { findUnique: (...args: unknown[]) => findUniqueMock(...args) } },
+}));
+
 import {
   validateBody,
   rateLimit,
@@ -13,6 +21,14 @@ import { signAccessToken, signImpersonationToken } from "./auth";
 beforeAll(() => {
   process.env.JWT_SECRET = "test-secret-32chars-minimum-please";
   process.env.JWT_REFRESH_SECRET = "test-refresh-secret-32chars-minimum";
+});
+
+beforeEach(() => {
+  findUniqueMock.mockReset();
+  // Par défaut : token frais (rôle inchangé, pas suspendu, pas de reset password).
+  findUniqueMock.mockImplementation(() =>
+    Promise.resolve({ role: "student", isSuspended: false, pwdChangedAt: null })
+  );
 });
 
 const buildReq = (headers: Record<string, string> = {}) =>
@@ -86,31 +102,62 @@ describe("getAuthUser", () => {
 });
 
 describe("requireAuth", () => {
-  it("returns 401 NextResponse when unauthenticated", () => {
-    const result = requireAuth(buildReq());
+  it("returns 401 NextResponse when unauthenticated", async () => {
+    const result = await requireAuth(buildReq());
     expect("status" in result).toBe(true);
     if ("status" in result) expect(result.status).toBe(401);
   });
 
-  it("returns user on valid token", () => {
+  it("returns user on valid token", async () => {
     const token = signAccessToken({ userId: 7, email: "u@u.com", role: "student" });
     const req = buildReq({ authorization: `Bearer ${token}` });
-    const result = requireAuth(req);
+    const result = await requireAuth(req);
     expect("user" in result).toBe(true);
     if ("user" in result) expect(result.user.userId).toBe(7);
+  });
+
+  it("returns 401 when the account is suspended after token issuance", async () => {
+    findUniqueMock.mockResolvedValue({ role: "student", isSuspended: true, pwdChangedAt: null });
+    const token = signAccessToken({ userId: 7, email: "u@u.com", role: "student" });
+    const req = buildReq({ authorization: `Bearer ${token}` });
+    const result = await requireAuth(req);
+    expect("status" in result).toBe(true);
+    if ("status" in result) expect(result.status).toBe(401);
+  });
+
+  it("returns 401 when the password was changed after token issuance", async () => {
+    findUniqueMock.mockResolvedValue({
+      role: "student",
+      isSuspended: false,
+      pwdChangedAt: new Date(Date.now() + 60_000), // dans le futur relatif à iat
+    });
+    const token = signAccessToken({ userId: 7, email: "u@u.com", role: "student" });
+    const req = buildReq({ authorization: `Bearer ${token}` });
+    const result = await requireAuth(req);
+    expect("status" in result).toBe(true);
+    if ("status" in result) expect(result.status).toBe(401);
+  });
+
+  it("returns 401 when the DB role no longer matches the token role", async () => {
+    findUniqueMock.mockResolvedValue({ role: "admin", isSuspended: false, pwdChangedAt: null });
+    const token = signAccessToken({ userId: 7, email: "u@u.com", role: "student" });
+    const req = buildReq({ authorization: `Bearer ${token}` });
+    const result = await requireAuth(req);
+    expect("status" in result).toBe(true);
+    if ("status" in result) expect(result.status).toBe(401);
   });
 });
 
 describe("requireAdmin", () => {
-  it("returns 403 for a non-admin user", () => {
+  it("returns 403 for a non-admin user", async () => {
     const token = signAccessToken({ userId: 1, email: "u@u.com", role: "student" });
     const req = buildReq({ authorization: `Bearer ${token}` });
-    const result = requireAdmin(req);
+    const result = await requireAdmin(req);
     if ("status" in result) expect(result.status).toBe(403);
     else throw new Error("Expected 403");
   });
 
-  it("returns 403 for an impersonated admin (privilege escalation guard)", () => {
+  it("returns 403 for an impersonated admin (privilege escalation guard)", async () => {
     const token = signImpersonationToken({
       userId: 99,
       email: "target@example.com",
@@ -118,19 +165,29 @@ describe("requireAdmin", () => {
       impersonatedBy: { id: 1, email: "admin@example.com" },
     });
     const req = buildReq({ authorization: `Bearer ${token}` });
-    const result = requireAdmin(req);
+    const result = await requireAdmin(req);
     if ("status" in result) expect(result.status).toBe(403);
     else throw new Error("Expected 403");
   });
 
-  it("returns user for a real admin", () => {
+  it("returns user for a real admin", async () => {
+    findUniqueMock.mockResolvedValue({ role: "admin", isSuspended: false, pwdChangedAt: null });
     const token = signAccessToken({ userId: 1, email: "admin@example.com", role: "admin" });
     const req = buildReq({ authorization: `Bearer ${token}` });
-    const result = requireAdmin(req);
+    const result = await requireAdmin(req);
     expect("user" in result).toBe(true);
     if ("user" in result) {
       expect(result.user.role).toBe("admin");
       expect(result.user.impersonatedBy).toBeUndefined();
     }
+  });
+
+  it("returns 401 for a demoted admin (stale JWT role, DB already downgraded)", async () => {
+    findUniqueMock.mockResolvedValue({ role: "student", isSuspended: false, pwdChangedAt: null });
+    const token = signAccessToken({ userId: 1, email: "admin@example.com", role: "admin" });
+    const req = buildReq({ authorization: `Bearer ${token}` });
+    const result = await requireAdmin(req);
+    expect("status" in result).toBe(true);
+    if ("status" in result) expect(result.status).toBe(401);
   });
 });
