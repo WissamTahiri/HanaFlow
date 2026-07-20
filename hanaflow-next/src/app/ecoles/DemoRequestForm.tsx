@@ -55,55 +55,42 @@ export default function DemoRequestForm() {
     );
   }
 
-  const inputClass =
-    "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sap-blue/40 focus:border-sap-blue";
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid sm:grid-cols-2 gap-4">
         <label className="block">
-          <span className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
-            Votre nom *
-          </span>
-          <input required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="Marie Dupont" />
+          <span className="label">Votre nom *</span>
+          <input required value={name} onChange={(e) => setName(e.target.value)} className="input" placeholder="Marie Dupont" />
         </label>
         <label className="block">
-          <span className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
-            Établissement *
-          </span>
-          <input required value={school} onChange={(e) => setSchool(e.target.value)} className={inputClass} placeholder="IUT de Lyon, ESN…" />
+          <span className="label">Établissement *</span>
+          <input required value={school} onChange={(e) => setSchool(e.target.value)} className="input" placeholder="IUT de Lyon, ESN…" />
         </label>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         <label className="block">
-          <span className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
-            Email professionnel *
-          </span>
+          <span className="label">Email professionnel *</span>
           <input
             required
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={inputClass}
+            className="input"
             placeholder="m.dupont@univ.fr"
           />
         </label>
         <label className="block">
-          <span className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
-            Nombre d&apos;étudiants
-          </span>
-          <input value={students} onChange={(e) => setStudents(e.target.value)} className={inputClass} placeholder="ex : 25" />
+          <span className="label">Nombre d&apos;étudiants</span>
+          <input value={students} onChange={(e) => setStudents(e.target.value)} className="input" placeholder="ex : 25" />
         </label>
       </div>
       <label className="block">
-        <span className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
-          Votre besoin (optionnel)
-        </span>
+        <span className="label">Votre besoin (optionnel)</span>
         <textarea
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className={inputClass}
+          className="input"
           placeholder="Modules visés, calendrier, contraintes…"
         />
       </label>
@@ -112,11 +99,7 @@ export default function DemoRequestForm() {
           Échec de l&apos;envoi — réessayez dans quelques minutes ou écrivez-nous directement par email.
         </p>
       )}
-      <button
-        type="submit"
-        disabled={status === "sending"}
-        className="w-full py-3 rounded-xl bg-sap-blue text-white font-bold text-sm hover:bg-sap-blue-dark transition-colors disabled:opacity-60"
-      >
+      <button type="submit" disabled={status === "sending"} className="btn-primary w-full">
         {status === "sending" ? "Envoi en cours…" : "Envoyer ma demande de démo"}
       </button>
     </form>
