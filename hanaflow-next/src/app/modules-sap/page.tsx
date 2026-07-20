@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/hooks/useProgress";
 import { HANAFLOW_STATS } from "@/config/stats";
+import { certCode } from "@/lib/certCodes";
 
 const ArrowRight = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -151,18 +152,18 @@ export default function ModulesOverview() {
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
             className="text-blue-100 max-w-xl mx-auto text-base mb-10"
           >
-            Les 6 modules fonctionnels clés que tu rencontreras sur les projets SAP.
-            Retrouve la difficulté, les prérequis et le parcours conseillé.
+            Les 6 modules fonctionnels que tu retrouves sur chaque projet S/4HANA — chacun prépare
+            une certification officielle SAP. Difficulté, prérequis et ordre conseillé, en un coup d'œil.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4"
+            className="flex flex-wrap justify-center gap-3"
           >
             {stats.map(({ value, label }) => (
-              <div key={label} className="bg-white/10 backdrop-blur-sm rounded-xl px-5 py-3 min-w-[110px]">
-                <p className="text-xl font-extrabold text-white">{value}</p>
-                <p className="text-[11px] text-blue-200 mt-0.5 leading-snug">{label}</p>
+              <div key={label} className="bg-white/10 backdrop-blur-sm rounded-xl px-5 py-3.5 min-w-[120px] border border-white/10">
+                <p className="text-2xl font-extrabold text-white tabular-nums">{value}</p>
+                <p className="text-[11px] text-blue-200 mt-1 leading-snug">{label}</p>
               </div>
             ))}
           </motion.div>
@@ -187,7 +188,11 @@ export default function ModulesOverview() {
             />
           </div>
 
-          <div className="flex gap-2 flex-wrap">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium sm:ml-1 order-last sm:order-none">
+            {filtered.length} module{filtered.length > 1 ? "s" : ""}
+          </p>
+
+          <div className="flex gap-2 flex-wrap sm:ml-auto">
             {DIFFICULTIES.map((d) => (
               <button
                 key={d}
@@ -232,7 +237,9 @@ export default function ModulesOverview() {
                     href={m.path}
                     data-module={m.slug}
                     className="module-card group flex flex-col h-full bg-white dark:bg-slate-800 rounded-2xl border
-                               border-gray-100 dark:border-slate-700 overflow-hidden relative"
+                               border-gray-100 dark:border-slate-700 overflow-hidden relative
+                               transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-sap-blue/30
+                               dark:hover:border-sap-accent/30"
                   >
                     {visited && (
                       <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1
@@ -241,13 +248,19 @@ export default function ModulesOverview() {
                       </span>
                     )}
 
-                    <div className={`bg-linear-to-r ${m.gradient} px-6 py-5 flex items-center gap-4`}>
-                      <span className="text-3xl font-extrabold text-white/90 font-mono">{m.code}</span>
+                    <div className={`bg-linear-to-r ${m.gradient} px-6 py-5 flex items-center gap-3`}>
+                      <span className="text-3xl font-extrabold text-white/90 font-mono shrink-0">{m.code}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-semibold text-sm leading-tight">{m.title}</p>
-                        <span className="text-white/70 text-[10px] flex items-center gap-1 mt-0.5">
-                          <ClockIcon /> {m.duration}
-                        </span>
+                        <p className="text-white font-semibold text-sm leading-tight truncate">{m.title}</p>
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-1">
+                          <span className="text-white/70 text-[10px] flex items-center gap-1">
+                            <ClockIcon /> {m.duration}
+                          </span>
+                          <span className="text-white/50 text-[10px]" aria-hidden="true">·</span>
+                          <span className="text-[10px] font-semibold text-white/90 font-mono">
+                            Certif. {certCode(m.slug)}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -268,7 +281,7 @@ export default function ModulesOverview() {
                       </div>
 
                       {m.prereqs.length > 0 && (
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
                           Prérequis :{" "}
                           <span className="font-semibold text-slate-500 dark:text-slate-400">
                             {m.prereqs.join(", ")}
@@ -276,13 +289,15 @@ export default function ModulesOverview() {
                         </p>
                       )}
 
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-4 leading-snug">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-4 leading-snug">
                         {m.careers.join(" · ")}
                       </p>
 
-                      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-sap-blue dark:text-sap-accent group-hover:gap-2.5 transition-all">
-                        Voir le module <ArrowRight />
-                      </span>
+                      <div className="flex items-center justify-end pt-3 border-t border-gray-100 dark:border-slate-700">
+                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-sap-blue dark:text-sap-accent group-hover:gap-2.5 transition-all">
+                          Voir le module <ArrowRight />
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 </motion.div>

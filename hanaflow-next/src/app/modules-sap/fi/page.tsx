@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import { motion } from "motion/react";
+import Link from "next/link";
 import FlowDiagram from "@/components/diagrams/FlowDiagram";
 import FiOrgDiagram from "@/components/diagrams/FiOrgDiagram";
 import ModuleLayout from "@/components/ModuleLayout";
+import { certCode } from "@/lib/certCodes";
 
 /* ─────────────────────────────────────────────────────────────
    Icônes SVG inline
@@ -603,6 +605,39 @@ const FiResources = () => (
 );
 
 /* ─────────────────────────────────────────────────────────────
+   Prochaine étape
+───────────────────────────────────────────────────────────── */
+const NextStep = () => (
+  <motion.section
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay: 0.28 }}
+    className="rounded-2xl border border-sap-blue/20 dark:border-sap-accent/30 bg-sap-blue/[0.03] dark:bg-sap-accent/[0.06] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+  >
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-sap-blue dark:text-sap-accent mb-1">
+        Étape suivante du parcours
+      </p>
+      <h2 className="text-base font-bold text-slate-900 dark:text-white">
+        FI acquis ? Passe à MM pour boucler le flux Procure-to-Pay.
+      </h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        FI et MM s&apos;articulent sur la facture fournisseur (MIRO) — comprendre les deux côtés du flux
+        est ce qu&apos;attend un recruteur en entretien.
+      </p>
+    </div>
+    <div className="flex gap-3 flex-shrink-0">
+      <Link href="/certifications/fi/examen" className="btn-outline px-4 py-2.5 text-sm whitespace-nowrap">
+        Examen blanc FI
+      </Link>
+      <Link href="/modules-sap/mm" className="btn-primary px-4 py-2.5 text-sm whitespace-nowrap">
+        Module MM →
+      </Link>
+    </div>
+  </motion.section>
+);
+
+/* ─────────────────────────────────────────────────────────────
    Page principale
 ───────────────────────────────────────────────────────────── */
 const FI = () => (
@@ -612,6 +647,8 @@ const FI = () => (
     description="Maîtrisez la comptabilité externe SAP : grand livre, fournisseurs, clients, immobilisations et clôture financière sur S/4HANA."
     gradient="from-sap-blue-dark via-sap-blue to-blue-500"
     badge="Comptabilité · Clôture · Reporting"
+    stats={["6 concepts clés", "4 T-codes essentiels", "Quiz de 10 questions", `Certification ${certCode("fi")}`]}
+    examHref="/certifications/fi/examen"
   >
     <KeyConcepts />
     <OrgStructure />
@@ -624,6 +661,7 @@ const FI = () => (
     <FiQuiz />
     <FiResources />
     <FaqAccordion />
+    <NextStep />
   </ModuleLayout>
 );
 

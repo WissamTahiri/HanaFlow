@@ -13,6 +13,10 @@ interface ModuleLayoutProps {
   description: string;
   gradient: string;
   badge?: string;
+  /** Lien vers l'examen blanc du module (ex. "/certifications/fi/examen"). */
+  examHref?: string;
+  /** Chiffres de preuve affichés sous le hero (ex. "6 concepts", "80 questions d'examen"). */
+  stats?: string[];
   children: React.ReactNode;
 }
 
@@ -22,6 +26,8 @@ const ModuleLayout = ({
   description,
   gradient,
   badge,
+  examHref,
+  stats,
   children,
 }: ModuleLayoutProps) => {
   const tutorCode = TUTOR_MODULES.find((c) => c === code.toLowerCase());
@@ -59,6 +65,26 @@ const ModuleLayout = ({
           <p className="text-base sm:text-lg text-white/80 max-w-2xl leading-relaxed">
             {description}
           </p>
+
+          {(stats?.length || examHref) && (
+            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+              {stats?.map((s) => (
+                <span key={s} className="text-sm text-white/70 flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-white/50" aria-hidden="true" />
+                  {s}
+                </span>
+              ))}
+              {examHref && (
+                <Link
+                  href={examHref}
+                  className="inline-flex items-center gap-1.5 bg-white text-sap-blue-dark text-sm font-semibold
+                             px-4 py-2 rounded-xl hover:bg-blue-50 transition-colors"
+                >
+                  Passer l&apos;examen blanc
+                </Link>
+              )}
+            </div>
+          )}
         </motion.div>
       </div>
     </div>
