@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import certCatalog from "@/data/cert-catalog.json";
@@ -28,12 +29,28 @@ const certifications = ["fi", "co", "mm", "sd", "ai", "pp"].map((id) => {
     duration: m.durationMin,
     chapters: m.chapters,
     passingScore: m.passingScore,
+    priceEur: m.priceEur,
+    targetRoles: m.targetRoles,
     available: true,
     path: `/certifications/${id}`,
   };
 });
 
+const lastVerifiedLabel = new Date(certCatalog.lastVerified).toLocaleDateString("fr-FR", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+const FAQ_ITEMS = [
+  { q: "Dois-je refaire la formation sur le site de SAP ?", a: "Non. Les cours officiels SAP ne sont pas obligatoires. Vous passez l'examen directement sur SAP Certification Hub après votre préparation sur HanaFlow." },
+  { q: "Quel est le format de l'examen officiel ?", a: "Selon la certification : 60 à 80 questions, 120 à 180 minutes, seuil de réussite entre 64 % et 76 % (le détail exact est sur la fiche de chaque certification et la page Comparer). L'examen se passe en ligne (proctored) ou dans un centre de test agréé." },
+  { q: "Combien coûte l'examen ?", a: "Un voucher d'examen SAP coûte environ 500 à 535 €. Il vous donne accès à une tentative. En cas d'échec, un 2ème voucher peut être acheté." },
+];
+
 export default function CertificationsPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
   return (
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Hero */}
@@ -44,10 +61,11 @@ export default function CertificationsPage() {
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 border border-white/30">Certifications SAP</span>
               <span className="text-xs text-white/70">Format examen officiel</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">Préparez votre certification SAP</h1>
-            <p className="text-base sm:text-lg text-white/80 max-w-2xl mb-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">Préparez votre certification SAP</h1>
+            <p className="text-base sm:text-lg text-white/80 max-w-2xl mb-3 leading-relaxed">
               Des parcours de formation structurés, des quiz par chapitre et un simulateur d'examen complet — pour passer votre certification SAP en confiance.
             </p>
+            <p className="text-xs text-white/50 mb-8">Référentiels d'examen vérifiés le {lastVerifiedLabel}</p>
             <div className="grid sm:grid-cols-3 gap-4">
               {[
                 { step: "1", title: "Étudiez les chapitres", desc: "Contenu aligné sur le périmètre officiel de l'examen" },
@@ -86,13 +104,16 @@ export default function CertificationsPage() {
           </div>
 
           {/* Grille de certifications */}
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Certifications disponibles</h2>
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Certifications disponibles</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">6 modules S/4HANA Cloud, contenu et quiz alignés sur le périmètre officiel de chaque examen.</p>
+          </div>
           <div className="grid sm:grid-cols-2 gap-5">
             {certifications.map((cert, i) => (
               <motion.div key={cert.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: i * 0.08 }}>
                 {cert.available ? (
-                  <Link href={cert.path} className="block group">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-shadow">
+                  <Link href={cert.path} className="block group rounded-2xl">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-blue-200 dark:hover:border-slate-600 group-focus-visible:shadow-lg group-focus-visible:-translate-y-0.5 group-focus-visible:border-blue-200 dark:group-focus-visible:border-slate-600">
                       <div className={`bg-linear-to-r ${cert.color} p-5 text-white`}>
                         <div className="flex items-start justify-between mb-3">
                           <span className="text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full">{cert.module}</span>
@@ -116,9 +137,17 @@ export default function CertificationsPage() {
                             <p className="text-xs text-slate-500 dark:text-slate-400">chapitres</p>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-slate-500 dark:text-slate-400">Niveau {cert.level} · Seuil de réussite : {cert.passingScore}&nbsp;%</span>
-                          <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 group-hover:underline">Commencer →</span>
+                        {cert.targetRoles && cert.targetRoles.length > 0 && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                            <span className="font-semibold text-slate-600 dark:text-slate-300">Pour qui ·</span> {cert.targetRoles.join(", ")}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-700">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Examen ≈ {cert.priceEur}&nbsp;€</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Niveau {cert.level} · Seuil : {cert.passingScore}&nbsp;%</p>
+                          </div>
+                          <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 group-hover:underline whitespace-nowrap">Commencer →</span>
                         </div>
                       </div>
                     </div>
@@ -159,17 +188,29 @@ export default function CertificationsPage() {
           {/* FAQ rapide */}
           <div className="mt-10 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <h3 className="font-bold text-slate-900 dark:text-white mb-4">Questions fréquentes</h3>
-            <div className="space-y-4">
-              {[
-                { q: "Dois-je refaire la formation sur le site de SAP ?", a: "Non. Les cours officiels SAP ne sont pas obligatoires. Vous passez l'examen directement sur SAP Certification Hub après votre préparation sur HanaFlow." },
-                { q: "Quel est le format de l'examen officiel ?", a: "Selon la certification : 60 à 80 questions, 120 à 180 minutes, seuil de réussite entre 64 % et 76 % (le détail exact est sur la fiche de chaque certification et la page Comparer). L'examen se passe en ligne (proctored) ou dans un centre de test agréé." },
-                { q: "Combien coûte l'examen ?", a: "Un voucher d'examen SAP coûte environ 500€. Il vous donne accès à une tentative. En cas d'échec, un 2ème voucher peut être acheté." },
-              ].map((item, i) => (
-                <div key={i} className="border-b border-gray-100 dark:border-slate-700 last:border-0 pb-4 last:pb-0">
-                  <p className="font-medium text-sm text-slate-900 dark:text-white mb-1">{item.q}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{item.a}</p>
-                </div>
-              ))}
+            <div className="divide-y divide-gray-100 dark:divide-slate-700">
+              {FAQ_ITEMS.map((item, i) => {
+                const open = openFaq === i;
+                return (
+                  <div key={i} className="py-1">
+                    <button
+                      onClick={() => setOpenFaq(open ? null : i)}
+                      aria-expanded={open}
+                      className="w-full flex items-center justify-between gap-4 py-3 text-left"
+                    >
+                      <span className="font-medium text-sm text-slate-900 dark:text-white">{item.q}</span>
+                      <span className={`flex-shrink-0 h-6 w-6 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 transition-transform duration-200 ${open ? "rotate-45" : ""}`}>
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </span>
+                    </button>
+                    {open && (
+                      <p className="text-sm text-slate-600 dark:text-slate-400 pb-4 leading-relaxed max-w-2xl">{item.a}</p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

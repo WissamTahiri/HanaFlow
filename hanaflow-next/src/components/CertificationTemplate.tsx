@@ -29,11 +29,13 @@ interface Chapter { id: string; number?: number; title: string; weight?: number;
 interface Certification { id: string; code?: string; name?: string; title?: string; shortName?: string; level?: string; examDuration?: number; examQuestions?: number; questions?: number; simulatorQuestions?: number; passingScore?: number; officialLink?: string; color: string; chapters: Chapter[]; }
 
 // ── QuizBlock ─────────────────────────────────────────────────────────────────
-function QuizBlock({ quiz, onComplete }: { quiz: QuizQuestion[]; onComplete?: (score: number, total: number) => void }) {
+type QuizAnswer = { questionId: string; selectedIndex: number | null; correct: boolean };
+
+function QuizBlock({ quiz, passingScore, onComplete }: { quiz: QuizQuestion[]; passingScore: number; onComplete?: (score: number, total: number, answers: { questionId: string; selectedIndex: number | null }[]) => void }) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const [answers, setAnswers] = useState<{ questionId: string; correct: boolean }[]>([]);
+  const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [done, setDone] = useState(false);
   const [score, setScore] = useState(0);
 
@@ -45,7 +47,7 @@ function QuizBlock({ quiz, onComplete }: { quiz: QuizQuestion[]; onComplete?: (s
     if (selected === null) return;
     const correct = selected === q.correctIndex;
     setShowResult(true);
-    setAnswers((prev) => [...prev, { questionId: q.id ?? String(current), correct }]);
+    setAnswers((prev) => [...prev, { questionId: q.id ?? String(current), selectedIndex: selected, correct }]);
   };
 
   const handleNext = () => {
@@ -54,22 +56,35 @@ function QuizBlock({ quiz, onComplete }: { quiz: QuizQuestion[]; onComplete?: (s
       setSelected(null);
       setShowResult(false);
     } else {
-      const finalScore = answers.filter((a) => a.correct).length + (selected === q.correctIndex ? 1 : 0);
+      // `answers` peut ne pas encore contenir la réponse de la dernière
+      // question (setAnswers de handleConfirm) selon le timing de rendu :
+      // on la (re)construit explicitement pour ne rien perdre.
+      const finalAnswers = [
+        ...answers.filter((a) => a.questionId !== (q.id ?? String(current))),
+        { questionId: q.id ?? String(current), selectedIndex: selected, correct: selected === q.correctIndex },
+      ];
+      const finalScore = finalAnswers.filter((a) => a.correct).length;
       setScore(finalScore);
       setDone(true);
-      if (onComplete) onComplete(finalScore, quiz.length);
+      if (onComplete) {
+        onComplete(
+          finalScore,
+          quiz.length,
+          finalAnswers.map(({ questionId, selectedIndex }) => ({ questionId, selectedIndex })),
+        );
+      }
     }
   };
 
   if (done) {
     const pct = Math.round((score / quiz.length) * 100);
-    const passed = pct >= 65;
+    const passed = pct >= passingScore;
     return (
       <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
         className={`rounded-2xl p-6 text-center border-2 ${passed ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20" : "border-amber-400 bg-amber-50 dark:bg-amber-900/20"}`}>
         <div className={`text-4xl font-black mb-2 ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-amber-500"}`}>{score}/{quiz.length}</div>
         <p className={`text-lg font-bold ${passed ? "text-emerald-700 dark:text-emerald-300" : "text-amber-600 dark:text-amber-400"}`}>{passed ? "✓ Chapitre maîtrisé !" : "À retravailler"}</p>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Score : {pct}% {passed ? "— Seuil de réussite atteint (65%)" : "— Seuil de réussite : 65%"}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Score : {pct}% {passed ? `— Seuil de réussite atteint (${passingScore}%)` : `— Seuil de réussite : ${passingScore}%`}</p>
         <button onClick={() => { setCurrent(0); setSelected(null); setShowResult(false); setAnswers([]); setDone(false); setScore(0); }}
           className="mt-4 px-4 py-2 bg-sap-blue text-white rounded-xl text-sm font-semibold hover:bg-sap-blue-dark transition-colors">
           Recommencer le quiz
@@ -138,9 +153,9 @@ function QuizBlock({ quiz, onComplete }: { quiz: QuizQuestion[]; onComplete?: (s
 function LessonContent({ lesson }: { lesson: Lesson }) {
   return (
     <div className="space-y-6">
-      <div className="prose prose-slate dark:prose-invert max-w-none">
+      <div className="prose prose-slate dark:prose-invert max-w-none space-y-4">
         {(Array.isArray(lesson.content) ? lesson.content : [lesson.content]).map((para, i) => (
-          <p key={i} className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm">{para}</p>
+          <p key={i} className="text-slate-700 dark:text-slate-300 leading-7 text-[15px] max-w-[68ch]">{para}</p>
         ))}
       </div>
       {lesson.keyConcepts && lesson.keyConcepts.length > 0 && (
@@ -236,6 +251,9 @@ export default function CertificationTemplate({ certification, moduleId, examPat
   const completedCount = [...completedLessons].length;
   const progressPct = Math.round((completedCount / totalLessons) * 100);
 
+  const premiumChapters = cert.chapters.filter((ch) => ch.isPremium);
+  const premiumWeightSum = premiumChapters.reduce((acc, ch) => acc + (ch.weight ?? 0), 0);
+
   const handleChapterSelect = (ch: Chapter) => {
     if (!canAccess(ch.isPremium)) { setShowUpgradeModal(true); return; }
     setActiveChapter(ch.id);
@@ -295,8 +313,8 @@ export default function CertificationTemplate({ certification, moduleId, examPat
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
                 <p className="text-xs font-mono text-white/60 mb-1">{cert.code ?? ""}</p>
-                <h1 className="text-2xl sm:text-3xl font-extrabold mb-2">{cert.shortName ?? cert.title}</h1>
-                <div className="flex flex-wrap gap-3 text-sm">
+                <h1 className="text-2xl sm:text-3xl font-extrabold mb-2 tracking-tight">{cert.shortName ?? cert.title}</h1>
+                <div className="flex flex-wrap gap-2 text-sm">
                   <span className="bg-white/20 px-3 py-1 rounded-full">{cert.examQuestions ?? cert.questions} questions</span>
                   <span className="bg-white/20 px-3 py-1 rounded-full">{cert.examDuration ?? "180"} min</span>
                   <span className="bg-white/20 px-3 py-1 rounded-full">Seuil : {cert.passingScore}%</span>
@@ -317,7 +335,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
 
             {!isPro && isAuthenticated && (
               <div className="mt-4 bg-white/10 border border-white/20 rounded-xl p-3 flex items-center justify-between gap-3">
-                <p className="text-sm text-white/90"><span className="font-semibold">Plan gratuit :</span> Chapitre 1 débloqué. Passez au Pro pour tout accéder.</p>
+                <p className="text-sm text-white/90"><span className="font-semibold">Plan gratuit :</span> {premiumChapters.length > 0 ? `${premiumChapters.length} chapitre${premiumChapters.length > 1 ? "s" : ""} Pro${premiumWeightSum > 0 ? ` (${premiumWeightSum}% du contenu de l'examen)` : ""} à débloquer.` : "Chapitre 1 débloqué. Passez au Pro pour tout accéder."}</p>
                 <button onClick={handleUpgrade} className="flex-shrink-0 px-4 py-1.5 bg-white text-sap-blue rounded-xl text-xs font-bold hover:bg-white/90 transition-colors">Activer Pro (gratuit)</button>
               </div>
             )}
@@ -347,14 +365,18 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                       const chapterLessonsCompleted = ch.lessons.filter((l) => completedLessons.has(l.id)).length;
                       return (
                         <button key={ch.id} onClick={() => handleChapterSelect(ch)}
-                          className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors ${isActive ? "bg-sap-blue/10 dark:bg-sap-blue/20" : "hover:bg-gray-50 dark:hover:bg-slate-700/50"}`}>
+                          className={`w-full text-left px-4 py-3 flex items-start gap-3 border-l-2 transition-colors ${isActive ? "bg-sap-blue/10 dark:bg-sap-blue/20 border-sap-blue" : "border-transparent hover:bg-gray-50 dark:hover:bg-slate-700/50"}`}>
                           <div className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold ${isActive ? "bg-sap-blue text-white" : accessible ? "bg-gray-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" : "bg-gray-100 dark:bg-slate-700 text-slate-400"}`}>
                             {accessible ? (ch.number ?? "·") : <LockIcon />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={`text-xs font-semibold leading-tight ${isActive ? "text-sap-blue dark:text-sap-accent" : accessible ? "text-slate-800 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}`}>{ch.title}</p>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-slate-400 dark:text-slate-500">{chapterLessonsCompleted}/{ch.lessons.length} leçons</span>
+                              {accessible ? (
+                                <span className="text-xs text-slate-400 dark:text-slate-500">{chapterLessonsCompleted}/{ch.lessons.length} leçons</span>
+                              ) : (
+                                <span className="text-xs text-slate-400 dark:text-slate-500">{ch.weight ? `${ch.weight}% de l'examen` : "Verrouillé"}</span>
+                              )}
                               {ch.isPremium && !accessible && (
                                 <span className="text-xs bg-sap-blue/10 text-sap-blue dark:text-sap-accent px-1.5 py-0.5 rounded font-semibold">Pro</span>
                               )}
@@ -417,7 +439,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                         ) : showQuiz ? (
                           <motion.div key="quiz" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-5">Quiz — {chapter.title}</h3>
-                            <QuizBlock quiz={chapter.quiz ?? []} onComplete={(s, t) => submitQuizAttempt({ module: moduleId, kind: "quiz", chapterId: chapter.id, scorePct: Math.round((s / t) * 100), questionsTotal: t })} />
+                            <QuizBlock quiz={chapter.quiz ?? []} passingScore={cert.passingScore ?? 65} onComplete={(s, t, ans) => submitQuizAttempt({ module: moduleId, kind: "quiz", chapterId: chapter.id, scorePct: Math.round((s / t) * 100), questionsTotal: t, answers: ans })} />
                           </motion.div>
                         ) : null}
                       </AnimatePresence>
@@ -438,9 +460,14 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                         <span className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${ch.id === activeChapter ? "bg-sap-blue text-white" : "bg-gray-100 dark:bg-slate-700 text-slate-500"}`}>
                           {accessible ? (ch.number ?? "·") : <LockIcon />}
                         </span>
-                        <span className={`text-sm font-medium ${ch.id === activeChapter ? "text-sap-blue dark:text-sap-accent" : accessible ? "text-slate-800 dark:text-slate-200" : "text-slate-400"}`}>{ch.title}</span>
+                        <span className="min-w-0 flex-1">
+                          <span className={`block text-sm font-medium ${ch.id === activeChapter ? "text-sap-blue dark:text-sap-accent" : accessible ? "text-slate-800 dark:text-slate-200" : "text-slate-400"}`}>{ch.title}</span>
+                          {!accessible && ch.weight ? (
+                            <span className="block text-xs text-slate-400 dark:text-slate-500 mt-0.5">{ch.weight}% de l'examen</span>
+                          ) : null}
+                        </span>
                         {ch.isPremium && !accessible && (
-                          <span className="ml-auto text-xs bg-sap-blue/10 text-sap-blue px-2 py-0.5 rounded font-semibold">Pro</span>
+                          <span className="ml-auto flex-shrink-0 text-xs bg-sap-blue/10 text-sap-blue px-2 py-0.5 rounded font-semibold">Pro</span>
                         )}
                       </button>
                     );
