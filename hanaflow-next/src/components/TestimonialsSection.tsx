@@ -70,7 +70,7 @@ export default function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
-              className={`card p-6 flex flex-col ${t.isFeatured ? "ring-2 ring-sap-blue/30" : ""}`}
+              className="card p-6 flex flex-col"
             >
               {t.rating && (
                 <div className="flex gap-0.5 mb-3" aria-label={`${t.rating} sur 5 étoiles`}>

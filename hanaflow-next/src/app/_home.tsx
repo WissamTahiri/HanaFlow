@@ -99,9 +99,9 @@ const steps = [
 ];
 
 const features = [
-  { icon: <GraduationIcon />, title: "Cours structurés", desc: "Contenus pédagogiques par module SAP, du concept à la pratique." },
-  { icon: <AwardIcon />,      title: "Certifications", desc: "Simulateurs d'examens avec corrections détaillées et certificats PDF." },
-  { icon: <ZapIcon />,        title: "Gamification", desc: "Badges, XP et niveaux pour rester motivé tout au long de ton parcours." },
+  { icon: <GraduationIcon />, title: "Le « pourquoi », pas juste le T-code", desc: "Chaque notion relie la logique métier au paramétrage SAP, pour comprendre au lieu de mémoriser." },
+  { icon: <AwardIcon />,      title: "Corrections détaillées", desc: "Chaque question ratée est expliquée — pas juste « faux », mais pourquoi et ce qu'il fallait comprendre." },
+  { icon: <ZapIcon />,        title: "Progression sauvegardée à vie", desc: "Reprends un module là où tu l'as laissé, sur n'importe quel appareil, sans rien reperdre." },
   { icon: <MapIcon />,        title: "Roadmap consultant", desc: "Chemin balisé pour devenir consultant SAP junior en partant de zéro." },
 ];
 
@@ -246,30 +246,35 @@ export default function Home({ userCount = null }: { userCount?: number | null }
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-4">
-            {steps.map((s, i) => (
-              <motion.div
-                key={s.num}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="relative card p-7 hover:shadow-medium transition-all duration-200"
-              >
-                {/* Ligne de connexion entre les étapes (desktop) */}
-                {i < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 -right-3 w-6 h-0.5 bg-linear-to-r from-sap-blue/30 to-transparent" aria-hidden />
-                )}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="h-12 w-12 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue flex items-center justify-center">
+          {/* Timeline horizontale continue — se distingue volontairement des
+              grilles de cartes "Pourquoi HanaFlow" et "Suite carrière IA" */}
+          <div className="relative">
+            <div
+              className="hidden lg:block absolute top-6 left-[12.5%] right-[12.5%] h-0.5 bg-linear-to-r from-sap-blue/15 via-sap-blue/40 to-sap-blue/15"
+              aria-hidden
+            />
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              {steps.map((s, i) => (
+                <motion.div
+                  key={s.num}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className="relative flex flex-col items-center text-center"
+                >
+                  <div className="relative z-10 h-12 w-12 rounded-full bg-sap-blue text-white flex items-center justify-center font-bold text-sm shadow-soft ring-4 ring-white dark:ring-slate-900 mb-4">
+                    {s.num}
+                  </div>
+                  <div className="h-10 w-10 rounded-lg bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue flex items-center justify-center mb-3">
                     {s.icon}
                   </div>
-                  <span className="text-xs font-bold text-sap-blue/40 tracking-widest">{s.num}</span>
-                </div>
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{s.title}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{s.desc}</p>
-              </motion.div>
-            ))}
+                  <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{s.title}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{s.desc}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -387,13 +392,13 @@ export default function Home({ userCount = null }: { userCount?: number | null }
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
             <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-sap-blue mb-3">
-              Pourquoi HanaFlow
+              Ce qui nous distingue
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-3 text-balance">
-              Tout ce dont tu as besoin, dans un seul endroit
+              Ce qui change vraiment ta façon d&apos;apprendre
             </h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-              Une plateforme pensée pour aller vite et apprendre efficacement.
+              Pas qu&apos;un catalogue de cours de plus — une méthode pensée pour que ça reste.
             </p>
           </div>
 
@@ -430,35 +435,86 @@ export default function Home({ userCount = null }: { userCount?: number | null }
             </h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
               Tuteur conversationnel, CV optimisé ATS, entretien blanc noté, et des offres SAP
-              où postuler directement — propulsés par IA.
+              où postuler directement — propulsés par IA.{" "}
+              <span className="text-slate-400 dark:text-slate-500">
+                Le Tuteur est utilisable dès maintenant sans compte Pro ; les trois autres
+                outils sont débloqués tant que dure la phase de lancement.
+              </span>
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {careerTools.map((c, i) => (
-              <motion.div
-                key={c.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-              >
-                <Link href={c.href} className="card p-6 h-full flex flex-col hover:shadow-soft transition-all duration-200">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="h-12 w-12 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue dark:text-sap-accent flex items-center justify-center">
+          {/* Grille asymétrique : l'outil gratuit prend le pas visuellement
+              sur les 3 outils Pro, pour orienter les non-Pro vers ce qui est
+              accessible immédiatement. */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-3 gap-5">
+            {careerTools.map((c, i) => {
+              const isFree = i === 0;
+              return (
+                <motion.div
+                  key={c.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className={isFree ? "lg:col-span-2 lg:row-span-3" : ""}
+                >
+                  <Link
+                    href={c.href}
+                    className={
+                      isFree
+                        ? "card p-8 h-full flex flex-col justify-center hover:shadow-soft transition-all duration-200"
+                        : "card p-5 h-full flex flex-row items-start gap-4 hover:shadow-soft transition-all duration-200"
+                    }
+                  >
+                    <div
+                      className={
+                        isFree
+                          ? "h-14 w-14 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue dark:text-sap-accent flex items-center justify-center mb-5"
+                          : "h-10 w-10 shrink-0 rounded-xl bg-sap-blue/10 dark:bg-sap-blue/20 text-sap-blue dark:text-sap-accent flex items-center justify-center"
+                      }
+                    >
                       {c.icon}
                     </div>
-                    {c.pro && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase tracking-wider">
-                        Pro
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-2">{c.title}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{c.desc}</p>
-                </Link>
-              </motion.div>
-            ))}
+                    <div className={isFree ? "" : "min-w-0"}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className={isFree ? "font-bold text-xl text-slate-900 dark:text-white" : "font-bold text-slate-900 dark:text-white"}>
+                          {c.title}
+                        </h3>
+                        {isFree ? (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 uppercase tracking-wider">
+                            Gratuit
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase tracking-wider">
+                            Pro
+                          </span>
+                        )}
+                      </div>
+                      <p className={isFree ? "text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-md" : "text-sm text-slate-500 dark:text-slate-400 leading-relaxed"}>
+                        {c.desc}
+                      </p>
+                      {isFree && (
+                        <div className="mt-6 flex flex-wrap gap-2 max-w-md">
+                          {[
+                            "Différence entre FI et CO ?",
+                            "À quoi sert le T-code ME21N ?",
+                            "Explique le cycle order-to-cash",
+                            "Comment structurer un plan comptable ?",
+                          ].map((q) => (
+                            <span
+                              key={q}
+                              className="bg-sap-blue/10 text-sap-blue dark:bg-sap-blue/20 dark:text-sap-accent rounded-full px-3 py-1 text-xs"
+                            >
+                              {q}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
