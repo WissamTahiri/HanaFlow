@@ -15,7 +15,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await params;
@@ -53,7 +53,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await params;

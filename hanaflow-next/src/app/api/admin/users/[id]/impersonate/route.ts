@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, ok, err, verifyAdminPassword } from "@/lib/apiHelpers";
+import { requireAdmin, ok, err, verifyAdminPassword, rateLimit } from "@/lib/apiHelpers";
 import { signImpersonationToken } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 
@@ -8,7 +8,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await params;
@@ -19,7 +19,12 @@ export async function POST(
     return err("Inutile : vous êtes déjà connecté en tant que vous-même", 400);
   }
 
-  // Step-up auth obligatoire avant impersonation
+  // Step-up auth obligatoire avant impersonation. Rate-limité comme /2fa/disable
+  // pour empêcher un access token admin volé de brute-forcer le mot de passe
+  // via X-Confirm-Password.
+  if (!(await rateLimit(`admin-stepup:${auth.user.userId}`, 5, 15 * 60 * 1000))) {
+    return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
+  }
   const stepUpOk = await verifyAdminPassword(req, auth.user.userId);
   if (!stepUpOk) return err("Re-saisie du mot de passe administrateur requise", 401);
 

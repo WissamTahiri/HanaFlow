@@ -15,7 +15,7 @@ const schema = z.object({
  * (voir garde dans admin/users/[id] DELETE).
  */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await ctx.params;

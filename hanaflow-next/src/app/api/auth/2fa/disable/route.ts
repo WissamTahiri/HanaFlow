@@ -16,7 +16,7 @@ const schema = z.object({
  * récupération) — empêche qu'un access token volé suffise à désactiver la 2FA.
  */
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   if (!(await rateLimit(`2fa-disable:${auth.user.userId}`, 5, 15 * 60 * 1000))) {
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         ? (user.totpBackupCodes as string[])
         : null;
       if (!stored) return err("Code 2FA invalide", 400);
-      const remaining = consumeBackupCode(validated.data.code, stored);
+      const remaining = await consumeBackupCode(validated.data.code, stored);
       if (!remaining) return err("Code 2FA invalide", 400);
       backupCodeUsed = true;
       // (on désactive juste après, donc inutile de persister `remaining`)

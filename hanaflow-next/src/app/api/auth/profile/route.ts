@@ -18,7 +18,7 @@ import {
   hashToken,
   getRefreshTokenExpiry,
 } from "@/lib/auth";
-import { verifyTotp } from "@/lib/totp";
+import { verifyTotpWithStep } from "@/lib/totp";
 import { decryptTotpSecret } from "@/lib/totpCrypto";
 
 /**
@@ -51,13 +51,17 @@ export async function PATCH(req: NextRequest) {
     return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
   }
 
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const body = await req.json().catch(() => null);
   const validated = validateBody(profileSchema, body);
   if (!validated.success) return err(validated.error, 400);
   const { data } = validated;
+
+  // Step TOTP consommé lors de la vérification 2FA ci-dessous, à persister
+  // avec la mise à jour du mot de passe pour bloquer le replay du même code.
+  let totpStepConsumed: number | null = null;
 
   // Pour changer le mot de passe → on exige le mot de passe actuel
   // (et le code 2FA si activé). Pas de bypass via token volé.
@@ -68,7 +72,7 @@ export async function PATCH(req: NextRequest) {
 
     const current = await prisma.user.findUnique({
       where: { id: auth.user.userId },
-      select: { passwordHash: true, totpEnabled: true, totpSecret: true },
+      select: { passwordHash: true, totpEnabled: true, totpSecret: true, totpLastStep: true },
     });
     if (!current) return err("Utilisateur introuvable", 404);
 
@@ -81,9 +85,15 @@ export async function PATCH(req: NextRequest) {
 
     if (current.totpEnabled && current.totpSecret) {
       const plainSecret = decryptTotpSecret(current.totpSecret);
-      if (!data.totpCode || !verifyTotp(data.totpCode, plainSecret)) {
+      const step = data.totpCode ? verifyTotpWithStep(data.totpCode, plainSecret) : null;
+      if (step === null) {
         return err("Code 2FA invalide", 401);
       }
+      // Anti-replay : refuser un step déjà consommé (cf. login, 2fa/disable, backup-codes)
+      if (current.totpLastStep !== null && step <= current.totpLastStep) {
+        return err("Code 2FA déjà utilisé. Attendez 30 secondes.", 401);
+      }
+      totpStepConsumed = step;
     }
 
     // Refus si le nouveau pwd est connu compromis
@@ -96,13 +106,21 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
-  const updates: { name?: string; passwordHash?: string; pwdChangedAt?: Date } = {};
+  const updates: {
+    name?: string;
+    passwordHash?: string;
+    pwdChangedAt?: Date;
+    totpLastStep?: number;
+  } = {};
   if (data.name) updates.name = data.name;
   if (data.password) {
     updates.passwordHash = await argon2.hash(data.password, { type: argon2.argon2id });
     // Horodate le changement — invalide les access tokens émis avant (cf.
     // reset-password, qui fait de même). Cohérence du champ `pwdChangedAt`.
     updates.pwdChangedAt = new Date();
+    // Anti-replay 2FA : persiste le step consommé pour rejeter toute réutilisation
+    // du même code TOTP (cf. login, 2fa/disable, backup-codes).
+    if (totpStepConsumed !== null) updates.totpLastStep = totpStepConsumed;
   }
 
   const user = await prisma.user.update({

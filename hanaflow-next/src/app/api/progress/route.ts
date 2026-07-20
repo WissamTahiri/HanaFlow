@@ -5,7 +5,7 @@ import { requireAuth, ok, err } from "@/lib/apiHelpers";
 const VALID_MODULES = ["fi", "co", "mm", "sd", "pp", "ai"];
 
 export async function GET(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const progress = await prisma.userProgress.findMany({
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const body = await req.json().catch(() => null);

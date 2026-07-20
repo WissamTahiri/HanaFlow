@@ -20,10 +20,12 @@ import certCatalog from "@/data/cert-catalog.json";
  * Idempotent par (userId, moduleCode) — passer plusieurs fois ne crée pas
  * de doublon, mais conserve le MEILLEUR score historique du candidat.
  *
- * Note sécurité : le score vient du client (le simulateur tourne côté
- * navigateur). Pour la V1 on accepte ça — le candidat n'a aucun intérêt
- * à se fausser un score sur SON propre cert. Pour la prod scale, on
- * passera la notation côté serveur (cf. roadmap technique).
+ * Note sécurité : `examScore`/`examQuestions` dans le body ne sont utilisés
+ * que pour le message d'erreur "score insuffisant" avant d'aller chercher la
+ * tentative en base. Le score réellement certifié (`certifiedScore` plus
+ * bas) vient TOUJOURS du `quizAttempt` le plus récent en DB, dont le score
+ * est lui-même calculé côté serveur par POST /api/quiz/submit à partir de la
+ * banque de questions officielle — jamais du payload client.
  */
 
 const inputSchema = z.object({
@@ -33,7 +35,7 @@ const inputSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const ip = getClientIp(req);

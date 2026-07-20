@@ -8,7 +8,7 @@ import { requireAuth, ok } from "@/lib/apiHelpers";
  * Renvoie aussi le meilleur score par module × kind (pour les pages module).
  */
 export async function GET(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const { searchParams } = new URL(req.url);

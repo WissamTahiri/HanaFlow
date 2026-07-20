@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     return err("Les codes promo sont temporairement désactivés.", 403);
   }
 
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   // Anti-brute-force des codes promo : 8 tentatives / IP / 15 min,

@@ -8,7 +8,7 @@ import { issueEmailVerification } from "@/lib/emailVerification";
  * No-op si déjà vérifié (on renvoie quand même 200 pour éviter l'énumération de statut).
  */
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   // Anti-spam : 3 emails / heure / user

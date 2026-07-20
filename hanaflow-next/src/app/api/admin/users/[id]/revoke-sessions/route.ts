@@ -7,7 +7,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await params;
@@ -15,7 +15,16 @@ export async function POST(
   if (isNaN(userId)) return err("ID invalide", 400);
 
   try {
-    const result = await prisma.refreshToken.deleteMany({ where: { userId } });
+    const [result] = await prisma.$transaction([
+      prisma.refreshToken.deleteMany({ where: { userId } }),
+      // Invalide aussi les access tokens JWT déjà émis (voir checkTokenFreshness
+      // dans apiHelpers) : supprimer les refresh tokens seuls ne coupe que le
+      // renouvellement futur, pas l'access token en cours de validité.
+      prisma.user.update({
+        where: { id: userId },
+        data: { sessionsRevokedAt: new Date() },
+      }),
+    ]);
 
     await logAudit({
       actor: auth.user,

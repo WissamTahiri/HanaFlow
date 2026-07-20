@@ -9,7 +9,7 @@ import { requireAuth, ok } from "@/lib/apiHelpers";
  * plus récent au plus ancien.
  */
 export async function GET(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const certs = await prisma.completionCertificate.findMany({

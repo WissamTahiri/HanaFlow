@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err } from "@/lib/apiHelpers";
 
 export async function GET(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const user = await prisma.user.findUnique({

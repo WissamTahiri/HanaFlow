@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import argon2 from "argon2";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, ok, err, validateBody, verifyAdminPassword } from "@/lib/apiHelpers";
+import { requireAdmin, ok, err, validateBody, verifyAdminPassword, rateLimit } from "@/lib/apiHelpers";
 import { logAudit } from "@/lib/audit";
 import { sendEmail, templates } from "@/lib/email";
 
@@ -18,7 +18,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await params;
@@ -58,7 +58,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await params;
@@ -89,6 +89,11 @@ export async function PATCH(
   // que l'admin reconfirme son propre mot de passe (header X-Confirm-Password).
   const requiresStepUp = Boolean(password) || rest.role !== undefined;
   if (requiresStepUp) {
+    // Rate-limité comme /2fa/disable : empêche un access token admin volé de
+    // brute-forcer le mot de passe via X-Confirm-Password.
+    if (!(await rateLimit(`admin-stepup:${auth.user.userId}`, 5, 15 * 60 * 1000))) {
+      return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
+    }
     const ok = await verifyAdminPassword(req, auth.user.userId);
     if (!ok) return err("Re-saisie du mot de passe administrateur requise", 401);
   }
@@ -149,7 +154,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await params;
@@ -173,7 +178,12 @@ export async function DELETE(
     );
   }
 
-  // Step-up auth obligatoire pour les suppressions
+  // Step-up auth obligatoire pour les suppressions. Rate-limité comme /2fa/disable
+  // pour empêcher un access token admin volé de brute-forcer le mot de passe
+  // via X-Confirm-Password.
+  if (!(await rateLimit(`admin-stepup:${auth.user.userId}`, 5, 15 * 60 * 1000))) {
+    return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
+  }
   const stepUpOk = await verifyAdminPassword(req, auth.user.userId);
   if (!stepUpOk) return err("Re-saisie du mot de passe administrateur requise", 401);
 

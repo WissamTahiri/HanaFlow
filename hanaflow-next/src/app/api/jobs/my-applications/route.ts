@@ -5,7 +5,7 @@ import { requireAuth, ok } from "@/lib/apiHelpers";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const applications = await prisma.jobApplication.findMany({

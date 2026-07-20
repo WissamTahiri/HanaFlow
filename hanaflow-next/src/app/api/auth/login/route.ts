@@ -17,6 +17,13 @@ import {
 import { verifyTotpWithStep } from "@/lib/totp";
 import { decryptTotpSecret, consumeBackupCode } from "@/lib/totpCrypto";
 
+// Hash Argon2id "factice" (mot de passe aléatoire fixe) utilisé pour vérifier
+// un mot de passe même quand l'utilisateur n'existe pas, afin que le temps de
+// réponse soit comparable dans les deux cas (mitigation timing side-channel /
+// énumération de comptes par mesure de latence).
+const DUMMY_PASSWORD_HASH =
+  "$argon2id$v=19$m=65536,t=3,p=4$imqhnu3hAnY7rW5pvmuzXA$U/KVwhs+9V4hnjXOtF/q+M6nSoGmaHBrkfGw2KjJKYA";
+
 const loginSchema = z.object({
   email: z
     .string()
@@ -45,7 +52,12 @@ export async function POST(req: NextRequest) {
   }
 
   const user = await prisma.user.findUnique({ where: { email: data.email } });
-  const validPassword = user && (await argon2.verify(user.passwordHash, data.password));
+  // On vérifie toujours un hash Argon2id (celui de l'utilisateur, ou un hash
+  // factice si l'email n'existe pas) pour que le temps de calcul soit le même
+  // dans les deux cas — évite l'énumération de comptes par mesure de latence.
+  const validPassword = await argon2
+    .verify(user?.passwordHash ?? DUMMY_PASSWORD_HASH, data.password)
+    .catch(() => false);
 
   // Même message pour email inexistant et mauvais mot de passe (anti-énumération)
   if (!user || !validPassword) {
@@ -86,7 +98,7 @@ export async function POST(req: NextRequest) {
       const storedCodes = Array.isArray(user.totpBackupCodes)
         ? (user.totpBackupCodes as string[])
         : null;
-      const remaining = storedCodes ? consumeBackupCode(data.totpCode, storedCodes) : null;
+      const remaining = storedCodes ? await consumeBackupCode(data.totpCode, storedCodes) : null;
       if (!remaining) {
         return NextResponse.json(
           { message: "Identifiants invalides", requires2fa: true },

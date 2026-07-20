@@ -18,7 +18,7 @@ const escapeCsv = (value: unknown): string => {
 };
 
 export async function GET(req: NextRequest) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   try {

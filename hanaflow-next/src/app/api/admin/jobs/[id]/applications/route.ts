@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, err, ok } from "@/lib/apiHelpers";
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const { id } = await ctx.params;

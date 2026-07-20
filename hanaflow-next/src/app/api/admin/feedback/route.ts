@@ -9,7 +9,7 @@ import { requireAdmin, ok } from "@/lib/apiHelpers";
  * Query params : status (new/read/archived/all), page (1-based), pageSize.
  */
 export async function GET(req: NextRequest) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const url = new URL(req.url);

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, ok, err, validateBody, verifyAdminPassword } from "@/lib/apiHelpers";
+import { requireAdmin, ok, err, validateBody, verifyAdminPassword, rateLimit } from "@/lib/apiHelpers";
 import { logAudit } from "@/lib/audit";
 
 const bulkSchema = z.object({
@@ -10,7 +10,7 @@ const bulkSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const body = await req.json().catch(() => null);
@@ -21,6 +21,11 @@ export async function POST(req: NextRequest) {
 
   // Step-up auth obligatoire pour TOUTE action bulk : même `pro`/`unpro` peuvent
   // affecter des centaines de comptes en un appel (fraude/abus si admin compromis).
+  // Rate-limité comme /2fa/disable pour empêcher un access token admin volé de
+  // brute-forcer le mot de passe via X-Confirm-Password.
+  if (!(await rateLimit(`admin-stepup:${auth.user.userId}`, 5, 15 * 60 * 1000))) {
+    return err("Trop de tentatives, réessaie dans 15 minutes.", 429);
+  }
   const stepUpOk = await verifyAdminPassword(req, auth.user.userId);
   if (!stepUpOk) return err("Re-saisie du mot de passe administrateur requise", 401);
 
@@ -44,9 +49,25 @@ export async function POST(req: NextRequest) {
     skippedAdmins = before - filtered.length;
   }
 
+  // Pour delete uniquement : exclure les propriétaires d'organisation B2B, sinon
+  // la cascade Prisma supprime leur OrganizationMember et l'organisation devient
+  // orpheline (requireOrgOwner ne trouve plus de owner) — même garde-fou que
+  // DELETE /api/admin/users/[id] ligne ~165.
+  let skippedOrgOwners = 0;
+  if (action === "delete" && filtered.length > 0) {
+    const ownerMatches = (await prisma.organizationMember.findMany({
+      where: { userId: { in: filtered }, role: "owner" },
+      select: { userId: true },
+    })) as Array<{ userId: number }>;
+    const ownerIdSet = new Set(ownerMatches.map((m) => m.userId));
+    const before = filtered.length;
+    filtered = filtered.filter((id) => !ownerIdSet.has(id));
+    skippedOrgOwners = before - filtered.length;
+  }
+
   if (filtered.length === 0) {
     return err(
-      "Aucun utilisateur valide (vous ne pouvez pas vous inclure ni cibler un autre administrateur via une action destructive en masse)",
+      "Aucun utilisateur valide (vous ne pouvez pas vous inclure, cibler un autre administrateur via une action destructive en masse, ni supprimer un propriétaire d'organisation sans transfert préalable)",
       400,
     );
   }
@@ -77,11 +98,11 @@ export async function POST(req: NextRequest) {
     await logAudit({
       actor: auth.user,
       action: action === "delete" ? "user.delete" : "user.update",
-      metadata: { bulk: true, action, userIds: filtered, affected, skippedSelf, skippedAdmins },
+      metadata: { bulk: true, action, userIds: filtered, affected, skippedSelf, skippedAdmins, skippedOrgOwners },
       req,
     });
 
-    return ok({ affected, action, skippedSelf, skippedAdmins });
+    return ok({ affected, action, skippedSelf, skippedAdmins, skippedOrgOwners });
   } catch (e) {
     console.error("[admin/users/bulk]", e);
     return err("Erreur serveur", 500);

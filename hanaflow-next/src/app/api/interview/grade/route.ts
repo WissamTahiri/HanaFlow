@@ -33,10 +33,10 @@ const inputSchema = z.object({
     .array(
       z.object({
         id: z.number().int().min(1),
-        question: z.string().min(5),
+        question: z.string().min(5).max(500),
         difficulty: z.enum(["easy", "medium", "hard"]),
         focus: z.string().min(1).max(120),
-        idealAnswer: z.string().min(10),
+        idealAnswer: z.string().min(10).max(2000),
         answer: z.string().max(4000),
       }),
     )

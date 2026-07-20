@@ -12,7 +12,7 @@ import { requireAdmin, ok } from "@/lib/apiHelpers";
  *  - 20 derniers commentaires non-vides
  */
 export async function GET(req: NextRequest) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const allResponses = await prisma.nPSResponse.findMany({

@@ -23,7 +23,7 @@ const inputSchema = z.discriminatedUnion("type", [
 ]);
 
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   if (!(await rateLimit(`gamification:${auth.user.userId}`, 120, 60 * 60 * 1000))) {

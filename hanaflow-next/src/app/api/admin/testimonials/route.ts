@@ -21,7 +21,7 @@ const createSchema = z.object({
  * POST /api/admin/testimonials — crée un témoignage.
  */
 export async function GET(req: NextRequest) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const items = await prisma.testimonial.findMany({
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = requireAdmin(req);
+  const auth = await requireAdmin(req);
   if ("status" in auth) return auth;
 
   const body = await req.json().catch(() => null);

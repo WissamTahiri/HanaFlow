@@ -64,7 +64,7 @@ const roadmapResponseSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   // Rate-limit doublé : user + IP.

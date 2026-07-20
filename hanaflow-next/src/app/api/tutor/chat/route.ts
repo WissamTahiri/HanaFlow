@@ -91,7 +91,7 @@ async function loadModuleContext(
 const MAX_OUTPUT_TOKENS = 1500;
 
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const ip = getClientIp(req);

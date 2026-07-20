@@ -15,7 +15,7 @@ const schema = z.object({
  * à l'utilisateur — on ne stocke que leur hash).
  */
 export async function POST(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   if (!(await rateLimit(`2fa-enroll:${auth.user.userId}`, 8, 10 * 60 * 1000))) {
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       return err("Code invalide. Vérifiez votre app d'authentification.", 400);
     }
 
-    const { plain, hashed } = generateBackupCodes();
+    const { plain, hashed } = await generateBackupCodes();
 
     await prisma.user.update({
       where: { id: user.id },

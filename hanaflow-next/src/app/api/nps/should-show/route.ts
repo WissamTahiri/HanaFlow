@@ -15,7 +15,7 @@ const COOLDOWN_DAYS = 90;
 const MIN_USAGE_DAYS = 7;
 
 export async function GET(req: NextRequest) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if ("status" in auth) return auth;
 
   const user = await prisma.user.findUnique({
