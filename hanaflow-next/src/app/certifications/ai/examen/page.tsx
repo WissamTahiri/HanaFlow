@@ -1,7 +1,7 @@
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
 import ProPaywall from "@/components/ProPaywall";
 import { getServerUser } from "@/lib/serverAuth";
-import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
+import { getCertMeta, getExamQuestionsForClient } from "@/lib/certAccess";
 
 export default async function AIExamPage() {
   const user = await getServerUser();
@@ -11,7 +11,7 @@ export default async function AIExamPage() {
 
   return (
     <ExamSimulatorTemplate
-      questions={getExamQuestions("ai")}
+      questions={getExamQuestionsForClient("ai")}
       certInfo={getCertMeta("ai")}
       moduleId="ai"
       certPath="/certifications/ai"

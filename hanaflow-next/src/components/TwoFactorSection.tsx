@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
-type Phase = "idle" | "enrolling" | "verifying" | "disabling" | "showing-codes" | "regenerating";
+type Phase = "idle" | "confirm-enroll" | "enrolling" | "verifying" | "disabling" | "showing-codes" | "regenerating";
 
 export default function TwoFactorSection() {
   const { user, token } = useAuth();
@@ -48,17 +48,20 @@ export default function TwoFactorSection() {
   };
 
   const startEnroll = async () => {
+    if (password.length === 0) return;
     setBusy(true); setError(""); setInfo("");
     try {
       const r = await fetch("/api/auth/2fa/enroll", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         credentials: "include",
+        body: JSON.stringify({ currentPassword: password }),
       });
       const d = await r.json();
       if (!r.ok) { setError(d.message ?? "Erreur"); return; }
       setSecret(d.secret);
       setQrDataUrl(d.qrDataUrl);
+      setPassword("");
       setPhase("enrolling");
     } catch {
       setError("Erreur réseau");
@@ -163,7 +166,7 @@ export default function TwoFactorSection() {
         <div className="space-y-3">
           {!isEnabled ? (
             <button
-              onClick={startEnroll}
+              onClick={() => setPhase("confirm-enroll")}
               disabled={busy}
               className="px-4 py-2 rounded-lg bg-sap-blue text-white text-sm font-semibold hover:bg-sap-blue-dark transition-colors disabled:opacity-40"
             >
@@ -197,6 +200,40 @@ export default function TwoFactorSection() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {phase === "confirm-enroll" && (
+        <div className="space-y-3 max-w-sm">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
+            Pour activer la 2FA, confirme d&apos;abord ton mot de passe.
+          </p>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Mot de passe</label>
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
+              autoFocus
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={startEnroll}
+              disabled={busy || password.length === 0}
+              className="px-4 py-2 rounded-lg bg-sap-blue text-white text-sm font-semibold hover:bg-sap-blue-dark transition-colors disabled:opacity-40"
+            >
+              {busy ? "…" : "Continuer"}
+            </button>
+            <button
+              onClick={reset}
+              className="px-4 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              Annuler
+            </button>
+          </div>
         </div>
       )}
 

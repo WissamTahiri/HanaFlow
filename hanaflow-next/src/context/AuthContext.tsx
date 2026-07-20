@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import type { User } from "@/types";
+import { identifyUser, trackEvent } from "@/lib/analytics";
 
 const API_URL = process.env.NEXT_PUBLIC_APP_URL
   ? `${process.env.NEXT_PUBLIC_APP_URL}/api`
@@ -74,32 +75,9 @@ export const useAuth = () => {
   return ctx;
 };
 
-// État admin sauvegardé pendant une impersonation. Persisté en sessionStorage
-// (pas localStorage) : moins d'exposition et nettoyé à la fermeture de l'onglet.
-const ADMIN_BACKUP_KEY = "hf_admin_backup";
 interface AdminBackup {
   token: string;
   user: User;
-}
-
-function readAdminBackup(): AdminBackup | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = sessionStorage.getItem(ADMIN_BACKUP_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as AdminBackup;
-  } catch {
-    return null;
-  }
-}
-
-function writeAdminBackup(backup: AdminBackup | null) {
-  if (typeof window === "undefined") return;
-  if (backup === null) {
-    sessionStorage.removeItem(ADMIN_BACKUP_KEY);
-    return;
-  }
-  sessionStorage.setItem(ADMIN_BACKUP_KEY, JSON.stringify(backup));
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -111,6 +89,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [impersonatedBy, setImpersonatedBy] = useState<ImpersonationInfo | null>(null);
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const refreshPromiseRef = useRef<Promise<boolean> | null>(null);
+  // État admin sauvegardé pendant une impersonation. En mémoire UNIQUEMENT
+  // (jamais sessionStorage/localStorage : résistance XSS, cf. getToken ci-dessus).
+  // Si perdu (ex. rechargement de page pendant l'impersonation), stopImpersonation()
+  // retombe sur un silent refresh via le cookie httpOnly de l'admin, resté intact
+  // puisqu'aucun refresh n'est déclenché pendant l'impersonation (skipRefresh: true).
+  const adminBackupRef = useRef<AdminBackup | null>(null);
 
   const setToken = (value: string | null) => {
     tokenRef.current = value;
@@ -141,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const clearSession = () => {
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
-    writeAdminBackup(null);
+    adminBackupRef.current = null;
     setToken(null);
     setUser(null);
     setImpersonatedBy(null);
@@ -226,6 +210,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Erreur lors de l'inscription");
     setSession(data.token, data.user);
+    identifyUser(data.user.id);
+    trackEvent("signup_completed");
     return data.user;
   };
 
@@ -244,9 +230,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     impersonatedBy: ImpersonationInfo;
   }) => {
     if (typeof window === "undefined") return;
-    // Sauvegarder le contexte admin courant en sessionStorage
+    // Sauvegarder le contexte admin courant en mémoire (jamais persisté)
     if (tokenRef.current && user) {
-      writeAdminBackup({ token: tokenRef.current, user });
+      adminBackupRef.current = { token: tokenRef.current, user };
     }
     setImpersonatedBy(by);
     // Pas de refresh auto pendant l'impersonation : le token a une durée fixe de 15 min
@@ -255,14 +241,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const stopImpersonation = async () => {
     if (typeof window === "undefined") return;
-    const backup = readAdminBackup();
+    const backup = adminBackupRef.current;
     if (backup) {
-      writeAdminBackup(null);
+      adminBackupRef.current = null;
       setImpersonatedBy(null);
       setSession(backup.token, backup.user);
       return;
     }
-    // Si pas de backup admin (perte de session storage), fallback sur refresh
+    // Si pas de backup admin (ex. rechargement de page pendant l'impersonation), fallback sur refresh
     setImpersonatedBy(null);
     const refreshed = await silentRefresh();
     if (!refreshed) clearSession();

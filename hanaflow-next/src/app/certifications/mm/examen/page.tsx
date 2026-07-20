@@ -1,7 +1,7 @@
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
 import ProPaywall from "@/components/ProPaywall";
 import { getServerUser } from "@/lib/serverAuth";
-import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
+import { getCertMeta, getExamQuestionsForClient } from "@/lib/certAccess";
 
 export default async function MMExamPage() {
   const user = await getServerUser();
@@ -11,7 +11,7 @@ export default async function MMExamPage() {
 
   return (
     <ExamSimulatorTemplate
-      questions={getExamQuestions("mm")}
+      questions={getExamQuestionsForClient("mm")}
       certInfo={getCertMeta("mm")}
       moduleId="mm"
       certPath="/certifications/mm"

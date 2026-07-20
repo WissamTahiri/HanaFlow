@@ -1,7 +1,7 @@
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
 import ProPaywall from "@/components/ProPaywall";
 import { getServerUser } from "@/lib/serverAuth";
-import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
+import { getCertMeta, getExamQuestionsForClient } from "@/lib/certAccess";
 
 export default async function PPExamPage() {
   const user = await getServerUser();
@@ -11,7 +11,7 @@ export default async function PPExamPage() {
 
   return (
     <ExamSimulatorTemplate
-      questions={getExamQuestions("pp")}
+      questions={getExamQuestionsForClient("pp")}
       certInfo={getCertMeta("pp")}
       moduleId="pp"
       certPath="/certifications/pp"

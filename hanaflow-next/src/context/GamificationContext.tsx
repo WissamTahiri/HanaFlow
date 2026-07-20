@@ -35,10 +35,29 @@ type QuizSubmission = {
   module: string;
   kind: "quiz" | "exam";
   chapterId?: string;
-  /** Score en pourcentage 0-100. */
+  /** Score en pourcentage 0-100 — utilisé uniquement pour le fallback local (visiteur anonyme). */
   scorePct: number;
   questionsTotal: number;
+  /**
+   * Réponses soumises (questionId + index sélectionné), envoyées au serveur
+   * qui recalcule le score à partir de la banque de questions officielle —
+   * le score déclaré côté client n'est jamais utilisé pour l'enregistrement.
+   */
+  answers: { questionId: string; selectedIndex: number | null }[];
 };
+
+/**
+ * Résultat renvoyé par le serveur après notation. `correctAnswers` (clé de
+ * correction par questionId) n'est disponible qu'APRÈS enregistrement de la
+ * tentative — jamais avant — pour ne pas permettre à un candidat de lire les
+ * bonnes réponses avant de répondre. Utilisé par l'écran de révision du
+ * simulateur d'examen.
+ */
+type QuizGradeResult = {
+  score: number;
+  questionsTotal: number;
+  correctAnswers?: Record<string, number>;
+} | null;
 
 interface GamificationContextValue {
   xp: number;
@@ -47,8 +66,8 @@ interface GamificationContextValue {
   onLogin: () => void;
   onModuleVisit: (visitedCount: number) => void;
   onLessonComplete: (module: string, lessonCount: number) => void;
-  /** Enregistre la tentative (DB si connecté) + XP/badges. */
-  submitQuizAttempt: (s: QuizSubmission) => void;
+  /** Enregistre la tentative (DB si connecté) + XP/badges. Renvoie la notation serveur. */
+  submitQuizAttempt: (s: QuizSubmission) => Promise<QuizGradeResult>;
   onProActivated: () => void;
   notification: { badge: Badge; ts: number } | null;
   dismissNotification: () => void;
@@ -195,12 +214,25 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     if (lessonCount >= 5) localAward(`lesson_${module}`);
   }, [sendEvent, localAward, localAddXP]);
 
-  const submitQuizAttempt = useCallback(({ module, kind, chapterId, scorePct, questionsTotal }: QuizSubmission) => {
-    const sent = sendEvent(
-      { moduleCode: module, kind, chapterId, score: scorePct, questionsTotal },
-      "/api/quiz/submit",
-    );
-    if (sent) return;
+  const submitQuizAttempt = useCallback(async ({ module, kind, chapterId, scorePct, answers }: QuizSubmission): Promise<QuizGradeResult> => {
+    if (tokenRef.current) {
+      try {
+        const res = await authFetch("/api/quiz/submit", {
+          method: "POST",
+          body: JSON.stringify({ moduleCode: module, kind, chapterId, answers }),
+        });
+        if (!res.ok) {
+          console.warn(`[gamification] échec d'enregistrement (${res.status}) sur /api/quiz/submit`);
+          return null;
+        }
+        const data = await res.json();
+        applyServerState(data.gamification, data.newBadges);
+        return { score: data.score, questionsTotal: data.questionsTotal, correctAnswers: data.correctAnswers };
+      } catch (e) {
+        console.warn("[gamification] réseau KO sur /api/quiz/submit", e);
+        return null;
+      }
+    }
     // Anonyme : XP local, pas d'historique de tentative possible.
     if (kind === "quiz") {
       localAddXP(quizXp(scorePct));
@@ -219,7 +251,8 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
       localAward(`exam_${module}`);
       if (passed) localAward("exam_pass");
     }
-  }, [sendEvent, localAward, localAddXP]);
+    return null;
+  }, [authFetch, applyServerState, localAward, localAddXP]);
 
   const onProActivated = useCallback(() => {
     if (sendEvent({ type: "pro_activated" })) return;

@@ -7,6 +7,7 @@ import { useSubscription } from "@/context/SubscriptionContext";
 import { useGamification } from "@/context/GamificationContext";
 import { useAuth } from "@/context/AuthContext";
 import CertificateDownloadButton from "@/components/CertificateDownloadButton";
+import { trackEvent } from "@/lib/analytics";
 
 const EXAM_DURATION = 90 * 60;
 
@@ -16,11 +17,16 @@ function formatTime(seconds: number) {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
+// Pas de `correctIndex` ici : ces questions viennent du Server Component
+// via `getExamQuestionsForClient` (lib/certAccess.ts), qui retire la clé de
+// correction du payload RSC. La notation est faite côté serveur dans
+// POST /api/quiz/submit ; la correction par question (`correctAnswers`,
+// cf. props ci-dessous) n'est connue du client qu'APRÈS que la tentative a
+// été enregistrée en base.
 interface ExamQuestion {
   id?: string | number;
   question: string;
   options: string[];
-  correctIndex: number;
   explanation: string;
   chapter: string;
 }
@@ -70,16 +76,24 @@ function StartScreen({ onStart, questions, certInfo, certPath }: { onStart: () =
   );
 }
 
-function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, moduleId }: {
+function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, moduleId, correctAnswers }: {
   answers: (number | null)[];
   questions: ExamQuestion[];
   timeUsed: number;
   certInfo: CertInfo;
   certPath: string;
   moduleId: string;
+  /**
+   * Corrigé par questionId — connu du client seulement APRÈS que la tentative
+   * a été notée côté serveur (POST /api/quiz/submit). Le score affiché ici
+   * est dérivé de cette correction, jamais du score déclaré par le serveur
+   * en pourcentage brut, pour rester cohérent avec l'affichage "X/N".
+   */
+  correctAnswers: Record<string, number>;
 }) {
   const { user } = useAuth();
-  const score = answers.filter((a, i) => a === questions[i].correctIndex).length;
+  const getCorrectIndex = (q: ExamQuestion, i: number) => correctAnswers[String(q.id ?? i)];
+  const score = questions.filter((q, i) => answers[i] === getCorrectIndex(q, i)).length;
   const pct = Math.round((score / questions.length) * 100);
   const passed = pct >= 65;
 
@@ -87,7 +101,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
   questions.forEach((q, i) => {
     if (!byChapter[q.chapter]) byChapter[q.chapter] = { total: 0, correct: 0 };
     byChapter[q.chapter].total++;
-    if (answers[i] === q.correctIndex) byChapter[q.chapter].correct++;
+    if (answers[i] === getCorrectIndex(q, i)) byChapter[q.chapter].correct++;
   });
 
   const [reviewMode, setReviewMode] = useState(false);
@@ -96,6 +110,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
   if (reviewMode) {
     const q = questions[reviewIndex];
     const userAnswer = answers[reviewIndex];
+    const correctIdx = getCorrectIndex(q, reviewIndex);
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto">
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
@@ -108,14 +123,14 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
           <div className="space-y-2 mb-4">
             {q.options.map((opt, idx) => {
               let cls = "w-full text-left px-4 py-3 rounded-xl border text-sm ";
-              if (idx === q.correctIndex) cls += "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold";
-              else if (idx === userAnswer && idx !== q.correctIndex) cls += "border-red-400 bg-red-50 dark:bg-red-900/30 text-red-600";
+              if (idx === correctIdx) cls += "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold";
+              else if (idx === userAnswer && idx !== correctIdx) cls += "border-red-400 bg-red-50 dark:bg-red-900/30 text-red-600";
               else cls += "border-gray-200 dark:border-slate-600 text-slate-500 dark:text-slate-500";
               return (
                 <div key={idx} className={cls}>
                   <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span>{opt}
-                  {idx === q.correctIndex && <span className="ml-2 text-emerald-500">✓ Bonne réponse</span>}
-                  {idx === userAnswer && idx !== q.correctIndex && <span className="ml-2 text-red-500">✗ Votre réponse</span>}
+                  {idx === correctIdx && <span className="ml-2 text-emerald-500">✓ Bonne réponse</span>}
+                  {idx === userAnswer && idx !== correctIdx && <span className="ml-2 text-red-500">✗ Votre réponse</span>}
                 </div>
               );
             })}
@@ -217,7 +232,27 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
   const [timeLeft, setTimeLeft] = useState(EXAM_DURATION);
   const [timeUsed, setTimeUsed] = useState(0);
   const [flagged, setFlagged] = useState<Set<number>>(new Set());
+  // Corrigé renvoyé par le serveur après notation (POST /api/quiz/submit) —
+  // `correctIndex` n'existe nulle part côté client avant ce moment.
+  const [correctAnswers, setCorrectAnswers] = useState<Record<string, number>>({});
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const answersRef = useRef(answers);
+  useEffect(() => { answersRef.current = answers; }, [answers]);
+
+  // Soumet les réponses au serveur pour notation, puis affiche les résultats
+  // renvoyés (jamais recalculés localement).
+  const finishExam = useCallback(async () => {
+    const ans = answersRef.current;
+    const result = await submitQuizAttempt({
+      module: moduleId,
+      kind: "exam",
+      scorePct: 0, // ignoré côté serveur pour un user connecté (toujours le cas ici, page Pro-only)
+      questionsTotal: questions.length,
+      answers: questions.map((q, i) => ({ questionId: String(q.id ?? i), selectedIndex: ans[i] })),
+    });
+    setCorrectAnswers(result?.correctAnswers ?? {});
+    setPhase("results");
+  }, [moduleId, submitQuizAttempt, questions]);
 
   // Hooks DOIVENT être appelés inconditionnellement avant tout early-return.
   const startTimer = useCallback(() => {
@@ -225,19 +260,14 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
       setTimeLeft((t) => {
         if (t <= 1) {
           if (timerRef.current) clearInterval(timerRef.current);
-          setAnswers((ans) => {
-            const score = ans.filter((a, i) => a === questions[i].correctIndex).length;
-            submitQuizAttempt({ module: moduleId, kind: "exam", scorePct: Math.round((score / questions.length) * 100), questionsTotal: questions.length });
-            return ans;
-          });
-          setPhase("results");
+          void finishExam();
           return 0;
         }
         return t - 1;
       });
       setTimeUsed((u) => u + 1);
     }, 1000);
-  }, [moduleId, submitQuizAttempt, questions]);
+  }, [finishExam]);
 
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
@@ -260,7 +290,11 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
     );
   }
 
-  const handleStart = () => { setPhase("exam"); startTimer(); };
+  const handleStart = () => {
+    trackEvent("exam_started", { module: moduleId });
+    setPhase("exam");
+    startTimer();
+  };
 
   const handleAnswer = (idx: number) => {
     setAnswers((prev) => { const next = [...prev]; next[currentQ] = idx; return next; });
@@ -268,10 +302,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
 
   const handleSubmit = () => {
     if (timerRef.current) clearInterval(timerRef.current);
-    const score = answers.filter((a, i) => a === questions[i].correctIndex).length;
-    const pct = Math.round((score / questions.length) * 100);
-    submitQuizAttempt({ module: moduleId, kind: "exam", scorePct: pct, questionsTotal: questions.length });
-    setPhase("results");
+    void finishExam();
   };
 
   const toggleFlag = () => {
@@ -370,7 +401,15 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
         )}
 
         {phase === "results" && (
-          <ResultsScreen answers={answers} questions={questions} timeUsed={timeUsed} certInfo={certInfo} certPath={certPath} moduleId={moduleId} />
+          <ResultsScreen
+            answers={answers}
+            questions={questions}
+            timeUsed={timeUsed}
+            certInfo={certInfo}
+            certPath={certPath}
+            moduleId={moduleId}
+            correctAnswers={correctAnswers}
+          />
         )}
       </div>
     </div>

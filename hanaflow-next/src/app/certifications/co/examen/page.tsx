@@ -1,7 +1,7 @@
 import ExamSimulatorTemplate from "@/components/ExamSimulatorTemplate";
 import ProPaywall from "@/components/ProPaywall";
 import { getServerUser } from "@/lib/serverAuth";
-import { getCertMeta, getExamQuestions } from "@/lib/certAccess";
+import { getCertMeta, getExamQuestionsForClient } from "@/lib/certAccess";
 
 export default async function COExamPage() {
   const user = await getServerUser();
@@ -11,7 +11,7 @@ export default async function COExamPage() {
 
   return (
     <ExamSimulatorTemplate
-      questions={getExamQuestions("co")}
+      questions={getExamQuestionsForClient("co")}
       certInfo={getCertMeta("co")}
       moduleId="co"
       certPath="/certifications/co"
