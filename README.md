@@ -9,21 +9,27 @@ Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, PP et IA gén
 - **Framework** : Next.js 16 (App Router, TypeScript)
 - **UI** : React 19, Tailwind CSS v4, motion/react
 - **Base de données** : Neon PostgreSQL + Prisma ORM
-- **Auth** : JWT (access + refresh httpOnly), Argon2id, TOTP 2FA optionnel
+- **Auth** : JWT (access + refresh httpOnly, vérification de fraîcheur du token), Argon2id, TOTP 2FA optionnel
+- **IA** : Groq (`openai/gpt-oss-120b`) — tuteur SAP, CV builder ATS, mock interview noté, roadmap personnalisée
+- **Analytics** : PostHog (config minimale — pas d'autocapture, pas de cookie, voir `/confidentialite`)
 - **Email** : Resend (fallback console si non configuré)
-- **PWA** : `next-pwa` (installable mobile)
+- **PWA** : Serwist (installable mobile)
 - **Déploiement** : Vercel (région `cdg1`)
 
 ## Fonctionnalités
 
 - 6 modules SAP avec cours structurés (FI, CO, MM, SD, PP, IA générative)
 - Pages S/4HANA, SAP AI Joule, processus métier, roadmap consultant
-- 6 simulateurs d'examens de certification avec corrections détaillées
-- Certificats PDF téléchargeables (`@react-pdf/renderer`)
-- Gamification : XP, badges, niveaux 1–10
+- 6 simulateurs d'examens de certification, notés côté serveur, avec corrections détaillées
+- Certificats PDF téléchargeables et vérifiables publiquement (`@react-pdf/renderer`)
+- Flashcards à répétition espacée (SM-2)
+- Suite carrière IA : tuteur SAP conversationnel, CV builder ATS, mock interview noté, roadmap personnalisée
+- Passerelle emploi : annonces SAP, candidature en un clic avec le CV généré par l'IA
+- Offre équipe B2B : comptes d'organisation, sièges, invitations, dashboard de progression agrégé
+- Gamification : XP, badges, niveaux 1–10 (source de vérité serveur)
 - Dashboard personnalisé avec progression
 - Plan Pro activable par codes promo
-- Panel admin : utilisateurs (bulk, export, impersonation, revoke sessions), codes promo, audit log, paramètres site, analytics
+- Panel admin : utilisateurs (bulk, export, impersonation, revoke sessions), organisations, offres d'emploi, codes promo, audit log, feedback, NPS, témoignages, paramètres site, analytics
 - Mode maintenance & bannière site pilotables depuis l'admin
 - 2FA TOTP optionnel pour les comptes
 - Dark mode avec persistance + anti-flash
