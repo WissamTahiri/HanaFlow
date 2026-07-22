@@ -51,19 +51,40 @@ const FEATURES_ROADMAP = [
   "Facturation établissement (TVA, mandat administratif)",
 ];
 
+const ClipboardIcon = () => (
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+  </svg>
+);
+const ClockIcon = () => (
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+const RocketIcon = () => (
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a15.3 15.3 0 00-4 10c0 2 .5 3.5 1 5l3-1.5 3 1.5c.5-1.5 1-3 1-5a15.3 15.3 0 00-4-10z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 16.5c-1.5.5-2.5 1.5-3 4 2.5-.5 3.5-1.5 4-3M15 16.5c1.5.5 2.5 1.5 3 4-2.5-.5-3.5-1.5-4-3" />
+    <circle cx="12" cy="9" r="1.5" />
+  </svg>
+);
+
 const STEPS = [
   {
     n: "1",
+    icon: ClipboardIcon,
     title: "Vous décrivez votre besoin",
     desc: "Nombre d'étudiants, modules ciblés, durée du programme — via le formulaire ci-dessous ou un échange direct.",
   },
   {
     n: "2",
+    icon: ClockIcon,
     title: "Nous chiffrons sous 48h",
     desc: "Devis avec palier dégressif selon la taille de la promotion, sans engagement à la démonstration.",
   },
   {
     n: "3",
+    icon: RocketIcon,
     title: "Vos étudiants sont opérationnels",
     desc: "Comptes provisionnés, accès immédiat aux 6 modules, suivi de leur progression pendant tout le programme.",
   },
@@ -179,29 +200,42 @@ export default async function EcolesPage() {
       </section>
 
       {/* Comment ça marche */}
-      <section id="comment-ca-marche" className="py-16 sm:py-20 bg-white dark:bg-slate-900 border-y border-gray-100 dark:border-slate-800">
+      <section id="comment-ca-marche" className="py-16 sm:py-20 bg-sap-gray-light dark:bg-slate-950/40 border-y border-gray-100 dark:border-slate-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 max-w-2xl mx-auto">
+          <div className="text-center mb-14 max-w-2xl mx-auto">
             <p className="text-xs font-bold uppercase tracking-wider text-sap-blue mb-2">Le processus</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
               Comment ça marche
             </h2>
           </div>
-          <div className="grid sm:grid-cols-3 gap-8 sm:gap-6">
-            {STEPS.map((s, i) => (
-              <div key={s.title} className="relative">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sap-blue text-white font-bold text-sm">
-                    {s.n}
-                  </span>
-                  {i < STEPS.length - 1 && (
-                    <span className="hidden sm:block h-px flex-1 bg-gray-200 dark:bg-slate-700" aria-hidden />
-                  )}
+
+          <div className="relative grid sm:grid-cols-3 gap-6">
+            {/* Ligne de progression reliant les 3 étapes (desktop uniquement) */}
+            <div
+              className="hidden sm:block absolute top-8 left-[calc(100%/6)] right-[calc(100%/6)] h-px bg-gradient-to-r from-sap-blue/70 via-sap-blue/40 to-sap-blue/70"
+              aria-hidden
+            />
+
+            {STEPS.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.title}
+                  className="relative card p-6 pt-7 hover:border-sap-blue/30 hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sap-blue text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)]">
+                      <Icon />
+                      <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-sap-blue/30 text-[10px] font-extrabold text-sap-blue tabular-nums">
+                        {s.n}
+                      </span>
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-1.5">{s.title}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{s.desc}</p>
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1.5">{s.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -238,7 +272,7 @@ export default async function EcolesPage() {
             ))}
           </ul>
 
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
             Sur la feuille de route
           </p>
           <ul className="divide-y divide-gray-100 dark:divide-slate-700 rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-50/60 dark:bg-slate-800/30">
