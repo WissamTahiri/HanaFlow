@@ -835,10 +835,10 @@ function CvPreviewMock() {
       </p>
 
       <div className="rounded-xl border border-gray-100 dark:border-slate-700 p-4 mt-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500 mb-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400 mb-3">
           Avant / après réécriture
         </p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 line-through leading-relaxed mb-2">
+        <p className="text-xs text-slate-500 dark:text-slate-400 line-through leading-relaxed mb-2">
           &laquo; J&apos;ai géré la clôture comptable mensuelle pour plusieurs clients. &raquo;
         </p>
         <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">

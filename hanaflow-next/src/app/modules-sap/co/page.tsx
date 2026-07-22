@@ -198,7 +198,7 @@ const CoQuiz = () => {
                 if (!submitted) cls += selected ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium" : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-emerald-400/60 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10";
                 else if (isCorrect) cls += "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium";
                 else if (selected) cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
-                else cls += "border-gray-100 dark:border-slate-700 text-slate-400 dark:text-slate-500";
+                else cls += "border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
                 return <button key={idx} type="button" disabled={submitted} onClick={() => !submitted && setAnswers((p) => ({ ...p, [q.id]: idx }))} className={cls}>{opt}</button>;
               })}
             </div>

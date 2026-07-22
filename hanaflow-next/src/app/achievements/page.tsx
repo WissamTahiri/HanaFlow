@@ -102,7 +102,7 @@ function AchievementsContent() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="font-bold text-slate-900 dark:text-white">{cat}</h2>
-                <span className="text-xs text-slate-400 dark:text-slate-500">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   {catBadges.filter((b) => earnedBadges.includes(b.id)).length}/{catBadges.length}
                 </span>
               </div>
@@ -145,12 +145,12 @@ function AchievementsContent() {
                     {lvl.level}
                   </span>
                   <div className="flex-1">
-                    <p className={`text-sm font-semibold ${isCurrentLevel ? "text-amber-700 dark:text-amber-400" : isReached ? "text-slate-800 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}`}>
+                    <p className={`text-sm font-semibold ${isCurrentLevel ? "text-amber-700 dark:text-amber-400" : isReached ? "text-slate-800 dark:text-slate-200" : "text-slate-500 dark:text-slate-400"}`}>
                       {lvl.name}
                       {isCurrentLevel && <span className="ml-2 text-xs bg-amber-500 text-white px-1.5 py-0.5 rounded-full">Actuel</span>}
                     </p>
                   </div>
-                  <span className="text-xs text-slate-400 dark:text-slate-500">{lvl.minXP.toLocaleString()} XP</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">{lvl.minXP.toLocaleString()} XP</span>
                 </div>
               );
             })}

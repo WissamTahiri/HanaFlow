@@ -153,7 +153,7 @@ function RegisterForm() {
           </p>
         </div>
 
-        <p className="mt-4 text-center text-xs text-slate-400 dark:text-slate-500">
+        <p className="mt-4 text-center text-xs text-slate-500 dark:text-slate-400">
           En créant un compte, tu acceptes nos conditions d&apos;utilisation.
         </p>
       </div>

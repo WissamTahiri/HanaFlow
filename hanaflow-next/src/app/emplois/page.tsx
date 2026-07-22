@@ -172,7 +172,7 @@ export default function EmploisPage() {
         ) : (
           <>
             {featuredCount > 0 && (
-              <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-3 px-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3 px-1">
                 {jobs.length} offre{jobs.length > 1 ? "s" : ""} · {featuredCount} à la une
               </p>
             )}
@@ -211,7 +211,7 @@ export default function EmploisPage() {
                             {CONTRACT_LABELS[j.contractType] ?? j.contractType}
                           </span>
                         )}
-                        <span className="text-xs text-slate-400 dark:text-slate-500">{timeAgo(j.createdAt)}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">{timeAgo(j.createdAt)}</span>
                       </div>
                     </div>
                     {j.moduleCode && (
@@ -257,7 +257,7 @@ function EmptyState({ hasActiveFilters, onReset }: { hasActiveFilters: boolean; 
       </div>
 
       <div className="mt-8 pt-10 border-t border-gray-100 dark:border-slate-800">
-        <h2 className="text-center text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-8">
+        <h2 className="text-center text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-8">
           Comment ça marche
         </h2>
         <div className="grid sm:grid-cols-3 gap-6">

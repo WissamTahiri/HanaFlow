@@ -216,7 +216,7 @@ export default function PricingPage() {
                     <span
                       className={
                         launchFree
-                          ? "text-xl font-bold text-slate-400 dark:text-slate-500 line-through mb-0.5"
+                          ? "text-xl font-bold text-slate-500 dark:text-slate-400 line-through mb-0.5"
                           : "text-4xl font-black text-slate-900 dark:text-white"
                       }
                     >
@@ -234,11 +234,11 @@ export default function PricingPage() {
                 {/* CTA */}
                 {plan.id === "free" ? (
                   isPro ? (
-                    <div className="w-full py-2.5 text-center text-sm font-semibold rounded-xl bg-gray-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 mb-5 cursor-default">
+                    <div className="w-full py-2.5 text-center text-sm font-semibold rounded-xl bg-gray-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 mb-5 cursor-default">
                       Inclus dans votre offre Pro
                     </div>
                   ) : isAuthenticated ? (
-                    <div className="w-full py-2.5 text-center text-sm font-semibold rounded-xl bg-gray-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 mb-5 cursor-default">
+                    <div className="w-full py-2.5 text-center text-sm font-semibold rounded-xl bg-gray-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 mb-5 cursor-default">
                       Plan actuel
                     </div>
                   ) : (
@@ -271,7 +271,7 @@ export default function PricingPage() {
                 {/* Features */}
                 <ul className="space-y-2.5 flex-1">
                   {plan.features.map((f, j) => (
-                    <li key={j} className={`flex items-start gap-2 text-sm ${f.included ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}`}>
+                    <li key={j} className={`flex items-start gap-2 text-sm ${f.included ? "text-slate-700 dark:text-slate-200" : "text-slate-500 dark:text-slate-400"}`}>
                       {f.included
                         ? <span className="text-emerald-500 mt-0.5"><CheckIcon /></span>
                         : <span className="mt-0.5"><CrossIcon /></span>

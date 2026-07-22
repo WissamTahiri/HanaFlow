@@ -436,7 +436,7 @@ export default function Home({ userCount = null }: { userCount?: number | null }
             <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
               Tuteur conversationnel, CV optimisé ATS, entretien blanc noté, et des offres SAP
               où postuler directement — propulsés par IA.{" "}
-              <span className="text-slate-400 dark:text-slate-500">
+              <span className="text-slate-500 dark:text-slate-400">
                 Le Tuteur est utilisable dès maintenant sans compte Pro ; les trois autres
                 outils sont débloqués tant que dure la phase de lancement.
               </span>

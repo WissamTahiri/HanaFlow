@@ -602,7 +602,7 @@ function InterviewPreview() {
         <span className="shrink-0 h-6 w-6 rounded-md bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400">
           <LockDotIcon />
         </span>
-        <span className="text-xs text-slate-400 dark:text-slate-500 blur-[2px]">
+        <span className="text-xs text-slate-500 dark:text-slate-400 blur-[2px]">
           Question 2 sur 6 · verrouillée
         </span>
       </div>

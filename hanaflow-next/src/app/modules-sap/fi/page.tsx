@@ -526,7 +526,7 @@ const FiQuiz = () => {
                 } else if (selected) {
                   cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
                 } else {
-                  cls += "border-gray-100 dark:border-slate-700 text-slate-400 dark:text-slate-500";
+                  cls += "border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
                 }
                 return (
                   <button key={idx} type="button" disabled={submitted} onClick={() => !submitted && setAnswers((p) => ({ ...p, [q.id]: idx }))} className={cls}>

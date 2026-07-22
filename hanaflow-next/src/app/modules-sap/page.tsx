@@ -347,7 +347,7 @@ export default function ModulesOverview() {
           </div>
 
           {!isAuthenticated && (
-            <p className="mt-5 text-xs text-slate-400 dark:text-slate-500">
+            <p className="mt-5 text-xs text-slate-500 dark:text-slate-400">
               <Link href="/register" className="text-sap-blue dark:text-sap-accent hover:underline font-medium">
                 Crée un compte gratuit
               </Link>{" "}

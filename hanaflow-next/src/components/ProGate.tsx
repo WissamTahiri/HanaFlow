@@ -206,7 +206,7 @@ function Paywall({
               `preview`, comme /emplois/[id]), pas de panneau vide à côté. */}
           {preview && (
             <div className="hidden lg:flex flex-col bg-gray-50 dark:bg-slate-900/40 border-l border-gray-100 dark:border-slate-700 p-8 sm:p-10">
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-3">
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-3">
                 Aperçu du résultat
               </span>
               <div className="flex-1 flex flex-col justify-start">{preview}</div>

@@ -298,7 +298,7 @@ function DashboardContent() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-400 dark:text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Aucun badge pour l&apos;instant — commence à explorer !
               </p>
             )}

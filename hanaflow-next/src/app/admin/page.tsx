@@ -59,7 +59,7 @@ function TimelineChart({ data }: { data: { day: string; count: number }[] }) {
 
 function ModuleHeatmap({ modules }: { modules: { module: string; visits: number }[] }) {
   if (modules.length === 0) {
-    return <p className="text-sm text-slate-400 dark:text-slate-500">Aucune visite enregistrée pour l&apos;instant.</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-400">Aucune visite enregistrée pour l&apos;instant.</p>;
   }
   const max = Math.max(...modules.map((m) => m.visits));
   return (

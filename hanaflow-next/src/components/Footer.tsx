@@ -146,10 +146,10 @@ export default function Footer() {
             ))}
           </nav>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-slate-400 dark:text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               © {new Date().getFullYear()} HanaFlow — Par Wissam Tahiri.
             </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Plateforme éducative SAP · Non affilié à SAP SE
             </p>
           </div>

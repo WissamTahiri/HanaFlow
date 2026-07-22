@@ -140,7 +140,7 @@ export default function Navbar() {
                                 shadow-[0_8px_40px_rgba(0,0,0,0.10)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.35)]
                                 p-4 grid grid-cols-2 gap-1 z-50">
                   <div className="col-span-2 px-2 pb-3 mb-1 border-b border-gray-100 dark:border-slate-800">
-                    <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.12em]">
+                    <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.12em]">
                       Modules SAP ERP
                     </p>
                   </div>

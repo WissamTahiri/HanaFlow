@@ -370,12 +370,12 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                             {accessible ? (ch.number ?? "·") : <LockIcon />}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-xs font-semibold leading-tight ${isActive ? "text-sap-blue dark:text-sap-accent" : accessible ? "text-slate-800 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}`}>{ch.title}</p>
+                            <p className={`text-xs font-semibold leading-tight ${isActive ? "text-sap-blue dark:text-sap-accent" : accessible ? "text-slate-800 dark:text-slate-200" : "text-slate-500 dark:text-slate-400"}`}>{ch.title}</p>
                             <div className="flex items-center gap-2 mt-1">
                               {accessible ? (
-                                <span className="text-xs text-slate-400 dark:text-slate-500">{chapterLessonsCompleted}/{ch.lessons.length} leçons</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400">{chapterLessonsCompleted}/{ch.lessons.length} leçons</span>
                               ) : (
-                                <span className="text-xs text-slate-400 dark:text-slate-500">{ch.weight ? `${ch.weight}% de l'examen` : "Verrouillé"}</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400">{ch.weight ? `${ch.weight}% de l'examen` : "Verrouillé"}</span>
                               )}
                               {ch.isPremium && !accessible && (
                                 <span className="text-xs bg-sap-blue/10 text-sap-blue dark:text-sap-accent px-1.5 py-0.5 rounded font-semibold">Pro</span>
@@ -406,7 +406,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                   <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Chapitre {chapter.number ?? ""}{ chapter.weight ? ` · ${chapter.weight}% de l'examen` : ""}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Chapitre {chapter.number ?? ""}{ chapter.weight ? ` · ${chapter.weight}% de l'examen` : ""}</p>
                         <h2 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">{chapter.title}</h2>
                       </div>
                     </div>
@@ -463,7 +463,7 @@ export default function CertificationTemplate({ certification, moduleId, examPat
                         <span className="min-w-0 flex-1">
                           <span className={`block text-sm font-medium ${ch.id === activeChapter ? "text-sap-blue dark:text-sap-accent" : accessible ? "text-slate-800 dark:text-slate-200" : "text-slate-400"}`}>{ch.title}</span>
                           {!accessible && ch.weight ? (
-                            <span className="block text-xs text-slate-400 dark:text-slate-500 mt-0.5">{ch.weight}% de l'examen</span>
+                            <span className="block text-xs text-slate-500 dark:text-slate-400 mt-0.5">{ch.weight}% de l'examen</span>
                           ) : null}
                         </span>
                         {ch.isPremium && !accessible && (
