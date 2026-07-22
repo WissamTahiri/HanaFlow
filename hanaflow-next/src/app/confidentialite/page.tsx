@@ -96,8 +96,24 @@ export default function Confidentialite() {
       </p>
 
       <h2>7. Cookies</h2>
-      <p>HanaFlow utilise uniquement des cookies strictement nécessaires au fonctionnement du service (token de session, refresh token httpOnly). Conformément à l&apos;article 82 de la loi Informatique et Libertés, ces cookies ne nécessitent pas de consentement.</p>
-      <p>Aucun cookie publicitaire, de tracking ni d&apos;analytics tiers n&apos;est utilisé.</p>
+      <p>HanaFlow utilise des cookies strictement nécessaires au fonctionnement du service (token de session, refresh token httpOnly). Conformément à l&apos;article 82 de la loi Informatique et Libertés, ces cookies ne nécessitent pas de consentement.</p>
+      <p>Aucun cookie publicitaire n&apos;est utilisé, et vos données ne sont jamais partagées avec des régies publicitaires ou revendues à des tiers.</p>
+
+      <h2>7bis. Mesure d&apos;audience</h2>
+      <p>
+        HanaFlow utilise <strong>PostHog</strong> pour mesurer l&apos;usage de la plateforme (pages visitées,
+        actions clés comme l&apos;inscription, le démarrage d&apos;un module ou d&apos;un examen, l&apos;obtention
+        d&apos;un certificat). Cette mesure est configurée de façon minimale :
+      </p>
+      <ul>
+        <li>Aucun cookie ni stockage local n&apos;est posé par cet outil — l&apos;identifiant de session ne survit pas au rechargement de la page pour un visiteur non connecté.</li>
+        <li>Aucune capture automatique des clics, du défilement ou de la saisie (« autocapture ») : seuls les événements listés ci-dessus sont envoyés.</li>
+        <li>Aucun enregistrement de session ni carte de chaleur.</li>
+        <li>Aucune donnée n&apos;est partagée avec des tiers à des fins publicitaires.</li>
+      </ul>
+      <p>
+        Vous pouvez désactiver ce suivi en activant « Ne pas me suivre » (Do Not Track) dans votre navigateur.
+      </p>
 
       <h2>8. Sécurité</h2>
       <p>HanaFlow met en œuvre les mesures de sécurité suivantes :</p>

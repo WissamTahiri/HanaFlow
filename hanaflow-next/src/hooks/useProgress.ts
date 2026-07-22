@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 
 export const SAP_MODULES = [
   { slug: "fi",  label: "FI — Finance",             path: "/modules-sap/fi",  color: "bg-blue-500"   },
@@ -49,9 +50,11 @@ export const useProgress = () => {
         credentials: "include",
         body: JSON.stringify({ module: moduleSlug }),
       });
-      setProgress((prev) =>
-        prev.includes(moduleSlug) ? prev : [...prev, moduleSlug]
-      );
+      setProgress((prev) => {
+        if (prev.includes(moduleSlug)) return prev;
+        trackEvent("module_started", { module: moduleSlug });
+        return [...prev, moduleSlug];
+      });
     } catch { /* silencieux */ }
   }, [isAuthenticated, token]);
 

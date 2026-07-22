@@ -4,6 +4,7 @@ import { useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import CertificateDocument from "./CertificateDocument";
 import { useAuth } from "@/context/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 
 interface Props {
   userName: string;
@@ -65,6 +66,8 @@ export default function CertificateDownloadButton({ userName, moduleCode, score,
         certCode: string | null;
         issuedAt: string;
       };
+
+      trackEvent("certificate_issued", { module: moduleCode });
 
       // URL absolue de vérification publique.
       const origin = typeof window !== "undefined" ? window.location.origin : "";
