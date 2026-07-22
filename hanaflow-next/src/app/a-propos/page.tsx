@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import PageLayout from "@/components/PageLayout";
 import { HANAFLOW_STATS, QUESTIONS_TOTAL } from "@/config/stats";
+import { CONTACT } from "@/config/contact";
 
 const BookIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -41,6 +42,16 @@ const BriefcaseIcon = () => (
     <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
   </svg>
 );
+const LinkedInIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.11 20.45H3.56V9h3.55v11.45z"/>
+  </svg>
+);
+const GitHubIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2C6.48 2 2 6.58 2 12.19c0 4.49 2.87 8.29 6.84 9.63.5.1.68-.22.68-.49 0-.24-.01-1.02-.01-1.85-2.78.61-3.37-1.21-3.37-1.21-.45-1.17-1.11-1.48-1.11-1.48-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.55 2.34 1.1 2.91.84.09-.66.35-1.1.63-1.36-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.73 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.02 10.02 0 0 0 22 12.19C22 6.58 17.52 2 12 2z"/>
+  </svg>
+);
 
 const projectStats = [
   { value: `${HANAFLOW_STATS.modules}`, label: "modules SAP complets" },
@@ -50,13 +61,13 @@ const projectStats = [
 ];
 
 const sapCoverage = [
-  { code: "FI", label: "Financial Accounting", color: "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30" },
-  { code: "CO", label: "Controlling", color: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30" },
-  { code: "MM", label: "Materials Management", color: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30" },
-  { code: "SD", label: "Sales & Distribution", color: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30" },
-  { code: "PP", label: "Production Planning", color: "bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/30" },
-  { code: "AI", label: "Generative AI Developer (C_AIG)", color: "bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/30" },
-  { code: "S/4HANA", label: "ERP nouvelle génération", color: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30" },
+  { code: "FI", label: "Financial Accounting", color: "bg-sap-blue/10 text-sap-blue dark:text-blue-300 border-sap-blue/20" },
+  { code: "CO", label: "Controlling", color: "bg-sap-accent/10 text-sap-accent-dark dark:text-blue-300 border-sap-accent/20" },
+  { code: "MM", label: "Materials Management", color: "bg-sap-blue/10 text-sap-blue dark:text-blue-300 border-sap-blue/20" },
+  { code: "SD", label: "Sales & Distribution", color: "bg-sap-accent/10 text-sap-accent-dark dark:text-blue-300 border-sap-accent/20" },
+  { code: "PP", label: "Production Planning", color: "bg-sap-blue/10 text-sap-blue dark:text-blue-300 border-sap-blue/20" },
+  { code: "AI", label: "Generative AI Developer (C_AIG)", color: "bg-sap-accent/10 text-sap-accent-dark dark:text-blue-300 border-sap-accent/20" },
+  { code: "S/4HANA", label: "ERP nouvelle génération", color: "bg-sap-blue/10 text-sap-blue dark:text-blue-300 border-sap-blue/20" },
 ];
 
 const techStack = [
@@ -70,12 +81,15 @@ const techStack = [
   { label: "Vercel" },
 ];
 
-const faqItems = [
+const faqItems: { q: string; a: React.ReactNode }[] = [
   { q: "HanaFlow remplace-t-il les formations officielles SAP ?", a: "Non. HanaFlow est un complément pédagogique — il structure et vulgarise les concepts SAP pour aider à comprendre le \"pourquoi\" avant de plonger dans les formations officielles (SAP Learning Hub, S4F12, etc.). L'idéal est d'utiliser les deux en parallèle." },
   { q: "À qui s'adresse HanaFlow ?", a: "À toute personne qui souhaite comprendre l'écosystème SAP S/4HANA : étudiants en informatique, personnes en reconversion, consultants juniors, key users ou tout profil curieux des métiers ERP. Le contenu est conçu pour être accessible, même sans background SAP." },
   { q: "Le contenu est-il à jour avec S/4HANA 2024 ?", a: "Oui — les pages couvrent les concepts S/4HANA actuels : Universal Journal (ACDOCA), SAP Fiori, Joule (IA générative), MRP Live, RISE with SAP et la méthodologie SAP Activate. Le contenu est régulièrement revu et enrichi." },
   { q: "Puis-je passer la certification officielle après HanaFlow ?", a: "HanaFlow vous prépare aux certifications SAP Associate (C_TS4FI, C_TS4CO, C_TS452, C_TS460, C_TS422, C_AIG). Vous passez ensuite l'examen officiel directement sur SAP Training & Certification Hub, payant et indépendant d'HanaFlow." },
-  { q: "Comment contacter HanaFlow ?", a: "Via la page contact ou par e-mail. Nous répondons aux demandes (support, partenariat école, RGPD) sous 48 heures ouvrées." },
+  {
+    q: "En quoi HanaFlow diffère d'un MOOC classique ?",
+    a: "Pas de vidéos à visionner en passif : chaque module combine leçons courtes, quiz immédiats et simulateurs d'examen calqués sur le format réel des certifications SAP. L'objectif n'est pas de \"suivre un cours\" mais de mesurer sa progression module par module, avec des scénarios métier concrets plutôt que des slides théoriques.",
+  },
 ];
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -91,19 +105,37 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 const FaqAccordion = () => {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <Section title="FAQ">
+    <Section title="Questions fréquentes">
       <div className="space-y-3">
-        {faqItems.map((item, i) => (
-          <div key={i} className="border border-sap-blue/15 rounded-2xl overflow-hidden">
-            <button type="button" onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center justify-between px-4 py-3 text-left text-sm font-semibold hover:bg-sap-blue/5 dark:hover:bg-sap-blue/10 transition-colors">
-              <span>{item.q}</span>
-              <span className="ml-2 text-sap-blue text-base">{open === i ? "−" : "+"}</span>
-            </button>
-            {open === i && (
-              <div className="px-4 pb-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{item.a}</div>
-            )}
-          </div>
-        ))}
+        {faqItems.map((item, i) => {
+          const isOpen = open === i;
+          return (
+            <div key={item.q} className="border border-sap-blue/15 rounded-2xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setOpen(isOpen ? null : i)}
+                aria-expanded={isOpen}
+                className="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left text-sm font-semibold hover:bg-sap-blue/5 dark:hover:bg-sap-blue/10 transition-colors"
+              >
+                <span>{item.q}</span>
+                <span
+                  className="shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-sap-blue/10 text-sap-blue text-sm transition-transform duration-200"
+                  style={{ transform: isOpen ? "rotate(45deg)" : "rotate(0deg)" }}
+                >
+                  +
+                </span>
+              </button>
+              <div
+                className="grid transition-[grid-template-rows] duration-200 ease-out"
+                style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+              >
+                <div className="overflow-hidden">
+                  <div className="px-4 pb-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{item.a}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </Section>
   );
@@ -122,7 +154,10 @@ export default function AboutPage() {
       <Section title="HanaFlow en chiffres">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           {projectStats.map((s) => (
-            <div key={s.label} className="text-center rounded-2xl border border-sap-blue/15 p-4 bg-gray-50 dark:bg-slate-800">
+            <div
+              key={s.label}
+              className="card-interactive cursor-default text-center border-sap-blue/15 p-4 bg-gray-50 dark:bg-slate-800 hover:border-sap-blue/30"
+            >
               <p className="text-3xl font-extrabold text-sap-blue mb-1">{s.value}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug">{s.label}</p>
             </div>
@@ -146,7 +181,10 @@ export default function AboutPage() {
             { title: "Roadmaps personnalisées", desc: "Parcours par profil (Finance, Supply, Sales, Tech) avec étapes concrètes.", icon: <MapIcon /> },
             { title: "Débouchés métier", desc: "Rôles consultant, compétences recherchées et sens donné à chaque module.", icon: <BriefcaseIcon /> },
           ].map((item) => (
-            <div key={item.title} className="rounded-2xl border border-sap-blue/15 p-4 bg-gray-50 dark:bg-slate-800">
+            <div
+              key={item.title}
+              className="card-interactive cursor-default border-sap-blue/15 p-4 bg-gray-50 dark:bg-slate-800 hover:border-sap-blue/30"
+            >
               <div className="h-9 w-9 rounded-xl bg-sap-blue/10 text-sap-blue dark:text-blue-300 flex items-center justify-center mb-3">{item.icon}</div>
               <p className="text-sm font-semibold mb-1">{item.title}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
@@ -188,6 +226,45 @@ export default function AboutPage() {
         <p className="text-xs text-slate-500 dark:text-slate-400">
           Application Next.js entièrement serverless déployée sur <span className="font-semibold">Vercel</span>, base de données <span className="font-semibold">PostgreSQL</span> hébergée chez <span className="font-semibold">Neon</span> (région Europe).
         </p>
+      </Section>
+
+      {/* Qui est derrière HanaFlow */}
+      <Section title="Qui est derrière HanaFlow">
+        <div className="flex flex-col sm:flex-row gap-6 sm:items-start">
+          <div className="shrink-0 h-16 w-16 rounded-full bg-sap-dark text-white flex items-center justify-center text-lg font-extrabold ring-4 ring-sap-blue/15 shadow-soft">
+            WT
+          </div>
+          <div className="space-y-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p>
+              HanaFlow est conçu et développé par <span className="font-semibold text-slate-900 dark:text-white">Wissam Tahiri</span>,
+              éditeur indépendant du projet. Pas d&apos;équipe marketing ni de levée de fonds : une plateforme construite pour
+              résoudre un problème concret — la documentation SAP officielle est dense, coûteuse et rarement pensée pour
+              l&apos;auto-formation.
+            </p>
+            <p>
+              Le contenu (leçons, quiz, simulateurs d&apos;examen) est écrit, vérifié et maintenu directement à partir des
+              référentiels de certification SAP, avec un seul objectif : que le contenu reste exact et à jour.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <a
+                href={CONTACT.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-sap-blue hover:underline"
+              >
+                <LinkedInIcon /> LinkedIn
+              </a>
+              <a
+                href={CONTACT.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-sap-blue hover:underline"
+              >
+                <GitHubIcon /> GitHub
+              </a>
+            </div>
+          </div>
+        </div>
       </Section>
 
       <FaqAccordion />
