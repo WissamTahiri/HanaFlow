@@ -500,18 +500,74 @@ function RoadmapResult({ roadmap, onReset }: { roadmap: Roadmap; onReset: () => 
   );
 }
 
+function CompassIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+    </svg>
+  );
+}
+
+function RoadmapPreview() {
+  const rows = [
+    { code: "FI", label: "Financial Accounting", weeks: "3 sem." },
+    { code: "CO", label: "Controlling", weeks: "2 sem." },
+    { code: "MM", label: "Sourcing & Procurement", weeks: "2 sem." },
+  ];
+  return (
+    <div>
+      <div className="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-5 shadow-sm">
+        <p className="text-[11px] text-slate-400 mb-1">Ta roadmap personnalisée</p>
+        <p className="text-sm font-bold text-slate-900 dark:text-white mb-4">
+          Parcours reconversion vers consultant SAP junior
+        </p>
+        <ol className="space-y-2.5">
+          {rows.map((r, i) => (
+            <li key={r.code} className="flex items-center gap-3">
+              <span className="shrink-0 h-8 w-8 rounded-lg bg-sap-blue text-white text-[11px] font-extrabold flex items-center justify-center">
+                {r.code}
+              </span>
+              <span className="flex-1 min-w-0 text-xs text-slate-700 dark:text-slate-300 truncate">
+                Étape {i + 1} · {r.label}
+              </span>
+              <span className="shrink-0 text-[11px] font-mono text-slate-400">{r.weeks}</span>
+            </li>
+          ))}
+          <li className="flex items-center gap-3 opacity-40">
+            <span className="shrink-0 h-8 w-8 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600" />
+            <span className="flex-1 text-xs text-slate-400">+ 2 modules ordonnés selon ton objectif</span>
+          </li>
+        </ol>
+      </div>
+      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-5">
+        Répond à 5 questions sur ton niveau et ton temps disponible : l&apos;IA t&apos;ordonne les modules,
+        pose des deadlines réalistes et te dit précisément par quoi commencer aujourd&apos;hui.
+      </p>
+
+      <div className="inline-flex items-center gap-2 mt-4 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400">
+        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+        Basé sur les parcours déjà générés
+      </div>
+    </div>
+  );
+}
+
 export default function RoadmapPersonnaliseePage() {
   return (
     <ProGate
       requirePro={false}
       featureName="Roadmap IA personnalisée"
-      featureDescription="L'IA construit ton parcours SAP semaine par semaine selon ton niveau, ton objectif et ton temps disponible — gratuit avec un compte."
+      featureDescription="Réponds à 5 questions, l'IA construit ton parcours SAP semaine par semaine — modules ordonnés, deadlines réalistes, jalons concrets."
+      meta={["5 questions", "~15 secondes", "Gratuit avec un compte"]}
+      icon={<CompassIcon />}
       perks={[
         "Plan d'étude semaine par semaine adapté à ton profil",
         "Ordre des modules optimisé selon ton objectif métier",
         "Jalons concrets : quiz, simulateurs, certification visée",
         "Gratuit — il suffit d'un compte HanaFlow",
       ]}
+      preview={<RoadmapPreview />}
     >
       <RoadmapPersoContent />
     </ProGate>

@@ -552,11 +552,80 @@ function EntretienContent() {
   );
 }
 
+function MicIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="9" y="2" width="6" height="12" rx="3" />
+      <path d="M5 10a7 7 0 0 0 14 0" />
+      <line x1="12" y1="19" x2="12" y2="22" />
+    </svg>
+  );
+}
+
+function InterviewPreview() {
+  return (
+    <div>
+      <div className="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-5 shadow-sm">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+            Intermédiaire
+          </span>
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+            Clôture mensuelle
+          </span>
+        </div>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white leading-relaxed mb-4">
+          « Le compte de résultat ne s&apos;équilibre pas après la clôture. Comment tu diagnostiques le problème ? »
+        </p>
+        <div className="h-16 rounded-lg border border-dashed border-gray-300 dark:border-slate-600 flex items-center px-3">
+          <span className="text-xs text-slate-400 italic">Ta réponse…</span>
+        </div>
+      </div>
+      <div className="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-5 shadow-sm mt-4 flex items-center gap-4">
+        <div className="shrink-0 h-14 w-14 rounded-xl bg-linear-to-br from-sap-blue-dark to-sap-blue text-white flex flex-col items-center justify-center">
+          <span className="text-lg font-extrabold leading-none">78</span>
+          <span className="text-[8px] uppercase tracking-wider text-white/70">/100</span>
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-bold text-slate-900 dark:text-white">Note B · À reconfirmer</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+            Bonne logique de diagnostic, T-code manquant sur la vérification FBL3N.
+          </p>
+        </div>
+      </div>
+      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-5">
+        6 questions, une réponse écrite, et un recruteur IA qui note comme un vrai jury — grade, verdict
+        d&apos;embauche et correction détaillée à la clé.
+      </p>
+
+      <div className="rounded-xl border border-gray-100 dark:border-slate-700 p-4 mt-4 flex items-center gap-3 opacity-50 select-none">
+        <span className="shrink-0 h-6 w-6 rounded-md bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400">
+          <LockDotIcon />
+        </span>
+        <span className="text-xs text-slate-400 dark:text-slate-500 blur-[2px]">
+          Question 2 sur 6 · verrouillée
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function LockDotIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
 export default function EntretienPage() {
   return (
     <ProGate
         featureName="Mock Interview SAP IA"
         featureDescription="Un recruteur IA te pose 6 questions adaptées à ton module et ta séniorité, puis te score sur 100 avec feedback détaillé par question."
+        meta={["6 questions", "Score /100", "3 par heure"]}
+        icon={<MicIcon />}
         perks={[
           "Questions générées par IA selon module + séniorité (junior / confirmé / senior)",
           "3 styles d'entretien : technique pur, cas client, ou mixte",
@@ -564,6 +633,7 @@ export default function EntretienPage() {
           "Feedback question par question avec réponse modèle pour réviser",
           "3 entretiens par heure (free tier IA)",
         ]}
+        preview={<InterviewPreview />}
       >
       <EntretienContent />
     </ProGate>

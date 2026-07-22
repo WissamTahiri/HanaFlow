@@ -791,11 +791,73 @@ function SkillRow({ label, items }: { label: string; items: string[] }) {
   );
 }
 
+function DocIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="8" y1="13" x2="16" y2="13" />
+      <line x1="8" y1="17" x2="13" y2="17" />
+    </svg>
+  );
+}
+
+function CvPreviewMock() {
+  return (
+    <div>
+      <div className="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-5 shadow-sm">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="shrink-0 h-14 w-14 rounded-xl bg-linear-to-br from-sap-blue-dark to-sap-blue text-white flex flex-col items-center justify-center">
+            <span className="text-lg font-extrabold leading-none">92</span>
+            <span className="text-[8px] uppercase tracking-wider text-white/70">/100</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-900 dark:text-white">Score ATS · Excellent</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Optimisé pour « Consultant SAP FI senior »</p>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <p className="h-2 w-4/5 rounded-full bg-gray-100 dark:bg-slate-700" />
+          <p className="h-2 w-full rounded-full bg-gray-100 dark:bg-slate-700" />
+          <p className="h-2 w-3/5 rounded-full bg-gray-100 dark:bg-slate-700" />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {["ACDOCA", "FB50", "S/4HANA", "Fit-to-Standard"].map((t) => (
+            <span key={t} className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-sap-blue/10 text-sap-blue dark:bg-sap-blue/20 dark:text-sap-accent">
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-5">
+        Tu décris ton parcours en langage courant. L&apos;IA le réécrit en bullets quantifiés, ajoute les
+        T-codes officiels et te donne un score ATS avec les correctifs précis pour passer à 90+.
+      </p>
+
+      <div className="rounded-xl border border-gray-100 dark:border-slate-700 p-4 mt-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500 mb-3">
+          Avant / après réécriture
+        </p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 line-through leading-relaxed mb-2">
+          &laquo; J&apos;ai géré la clôture comptable mensuelle pour plusieurs clients. &raquo;
+        </p>
+        <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
+          &laquo; Piloté la clôture mensuelle (
+          <span className="font-mono text-sap-blue dark:text-sap-accent">FB50, F.05</span>) pour 6 clients,
+          réduisant le délai de bouclage de 5 à 2 jours. &raquo;
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function CvBuilderPage() {
   return (
     <ProGate
         featureName="CV Builder ATS SAP"
         featureDescription="L'IA réécrit ton CV avec action verbs, T-codes officiels et structure JD-friendly pour passer les filtres ATS (Taleo, Workday, iCIMS) des ESN et clients finaux."
+        meta={["5 étapes", "Score ATS /100", "PDF prêt à l'envoi"]}
+        icon={<DocIcon />}
         perks={[
           "Wizard 5 étapes : identité, expériences, formation, skills, langues",
           "Optimisation IA : action verbs, quantification, vocabulaire SAP officiel",
@@ -803,6 +865,7 @@ export default function CvBuilderPage() {
           "Score ATS /100 + conseils précis pour passer à 90+",
           "PDF text-based téléchargeable (lisible par tous les ATS)",
         ]}
+        preview={<CvPreviewMock />}
       >
       <CvBuilderContent />
     </ProGate>
