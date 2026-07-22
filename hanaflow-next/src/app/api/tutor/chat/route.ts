@@ -51,18 +51,22 @@ async function loadModuleContext(
   const cert = moduleData[`${moduleCode}Certification`];
   if (!cert) return "";
 
-  // Sérialise une version compacte du module (titres, concepts clés, T-codes).
-  // On évite de tout passer (les `content` peuvent être longs) — on garde
-  // l'arborescence et les concepts, le tuteur peut développer ensuite.
+  // Sérialise une version compacte du module. Envoyer le détail complet
+  // (concepts + T-codes) de TOUS les chapitres à chaque message coûte ~7000
+  // tokens rien qu'en contexte (mesuré sur FI) — assez pour saturer le quota
+  // Groq (tokens/minute) dès le 2e message d'une même conversation. On ne
+  // détaille donc que le chapitre demandé (chapterId) ; les autres restent en
+  // titres seuls. Sans chapterId, tous les chapitres restent en résumé — le
+  // tuteur peut orienter l'apprenant vers le bon chapitre sans en réciter
+  // tout le contenu.
   type Chapter = {
     id: string;
     title: string;
     lessons?: { id: string; title: string; keyConcepts?: { term: string; definition: string }[]; tcodes?: { code: string; description: string }[] }[];
   };
   const chapters = (cert.chapters as Chapter[]).map((ch) => {
-    if (chapterId && ch.id !== chapterId) {
-      // Si chapter spécifique demandé, on ne retient que ses leçons en détail.
-      return { id: ch.id, title: ch.title, lessonsSummary: ch.lessons?.length ?? 0 };
+    if (ch.id !== chapterId) {
+      return { id: ch.id, title: ch.title, lessonsSummary: ch.lessons?.map((l) => l.title) ?? [] };
     }
     return {
       id: ch.id,
