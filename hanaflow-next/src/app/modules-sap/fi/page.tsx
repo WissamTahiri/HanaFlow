@@ -31,37 +31,37 @@ const KEY_CONCEPTS = [
   {
     code: "GL",
     label: "General Ledger",
-    description: "Le grand livre centralise toutes les écritures financières. En S/4HANA, il repose sur l'Universal Journal (ACDOCA) — une table unique FI + CO.",
+    description: "Le grand livre centralise toutes les écritures financières de l'entreprise. En S/4HANA, il s'appuie sur l'Universal Journal (table ACDOCA), qui réunit en une seule ligne les attributs FI (compte, société) et CO (centre de coûts, centre de profit, segment) — fini la réconciliation permanente entre les deux univers qui occupait des journées entières en ECC.",
     color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400",
   },
   {
     code: "AP",
     label: "Accounts Payable",
-    description: "Comptabilité fournisseurs : enregistrement des factures, gestion des échéances, paiements et relances. Étroitement lié à MM pour les achats.",
+    description: "Comptabilité fournisseurs : enregistrement des factures (FB60, ou MIRO quand il y a une commande d'achat), gestion des échéances, paiement en masse via le run F110, suivi des relances. Étroitement lié à MM pour tout flux qui passe par une commande d'achat.",
     color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-400",
   },
   {
     code: "AR",
     label: "Accounts Receivable",
-    description: "Comptabilité clients : factures de vente, suivi des encaissements, limites de crédit. Intégré à SD pour tout le flux Order-to-Cash.",
+    description: "Comptabilité clients : facturation (FB70 en direct, ou automatique via SD), encaissement, lettrage des paiements contre les factures ouvertes, gestion du risque crédit et, en cas de retard, déclenchement du programme de relance (F150). Intégré à SD pour tout le flux Order-to-Cash.",
     color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400",
   },
   {
     code: "AA",
     label: "Asset Accounting",
-    description: "Suivi complet des immobilisations : acquisition, mise en service, calcul des amortissements, cession. Impact direct sur les comptes GL.",
+    description: "Suivi complet du cycle de vie des immobilisations : acquisition, mise en service, calcul et comptabilisation de l'amortissement (AFAB), transfert, mise au rebut. Depuis S/4HANA, les valeurs planifiées sont recalculées en continu à chaque mouvement sur l'actif — le run de clôture se contente de les poster, il ne les recalcule plus à la volée.",
     color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400",
   },
   {
     code: "P2P",
     label: "Procure-to-Pay",
-    description: "Commande → Réception → Facture (MIRO) → Paiement. Chaque étape génère une écriture FI qui alimente le grand livre et les comptes fournisseurs.",
+    description: "Demande d'achat → commande → réception → facture (MIRO) → paiement (F110). Chaque étape logistique dans MM génère côté FI une écriture qui alimente le grand livre, le compte fournisseur et le compte de régularisation GR/IR (Goods Receipt / Invoice Receipt).",
     color: "bg-sap-blue/5 dark:bg-sap-blue/10 border-sap-blue/20 dark:border-sap-blue/30 text-sap-blue dark:text-sap-accent",
   },
   {
     code: "O2C",
     label: "Order-to-Cash",
-    description: "Commande client → Livraison → Facturation SD → Encaissement. La facturation crée automatiquement un document FI avec TVA, revenus et poste client.",
+    description: "Commande client → livraison avec sortie de stock (PGI) → facturation SD → écriture FI automatique. La facturation crée en une seule fois le poste client, la TVA collectée et le compte de revenus, sans ressaisie côté comptabilité.",
     color: "bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-400",
   },
 ];
@@ -74,7 +74,7 @@ const KeyConcepts = () => (
     className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6"
   >
     <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Concepts clés</h2>
-    <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les 6 notions fondamentales à maîtriser avant toute mission FI.</p>
+    <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les 6 notions fondamentales à maîtriser avant toute mission FI — elles reviennent dans quasiment tous les entretiens techniques et dans l'examen de certification.</p>
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {KEY_CONCEPTS.map((c) => (
         <div key={c.code} className={`rounded-xl border p-4 ${c.color.split(" ").filter((cls: string) => cls.startsWith("border")).join(" ")} bg-white dark:bg-slate-800`}>
@@ -83,6 +83,74 @@ const KeyConcepts = () => (
           </div>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">{c.label}</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{c.description}</p>
+        </div>
+      ))}
+    </div>
+  </motion.section>
+);
+
+/* ─────────────────────────────────────────────────────────────
+   Sous-modules réels de FI
+───────────────────────────────────────────────────────────── */
+const FI_SUBMODULES = [
+  {
+    code: "FI-GL",
+    label: "General Ledger Accounting",
+    tcode: "FB50 · FAGLL03",
+    desc: "Le cœur du module : toutes les écritures manuelles, automatiques et issues des sous-grands livres (AP, AR, AA) y convergent — c'est la table ACDOCA côté S/4HANA. Un consultant FI-GL configure le plan de comptes, les variantes d'exercice, le document splitting et les comptes de régularisation.",
+  },
+  {
+    code: "FI-AP",
+    label: "Accounts Payable",
+    tcode: "FB60 · F110",
+    desc: "Gère ce que l'entreprise doit à ses fournisseurs : réception et vérification des factures, blocage pour litige de prix ou de quantité, paiement en masse via le run F110, relances sur les comptes fournisseurs en position débitrice. Dépend de MM pour tout flux avec commande d'achat.",
+  },
+  {
+    code: "FI-AR",
+    label: "Accounts Receivable",
+    tcode: "FB70 · F150",
+    desc: "Gère ce que les clients doivent à l'entreprise : facturation, encaissement, lettrage, gestion du risque crédit, relance (F150). Dépend de SD pour les ventes facturées via le flux Order-to-Cash, mais permet aussi la facturation directe hors flux commercial.",
+  },
+  {
+    code: "FI-AA",
+    label: "Asset Accounting",
+    tcode: "AW01N · AFAB",
+    desc: "Pilote le cycle de vie des immobilisations : classes d'actifs, plans d'amortissement par juridiction (comptabilité en parallèle), acquisition, cession, inventaire physique. Le run de dépréciation (AFAB) poste des valeurs déjà calculées en continu — il ne recalcule plus rien au moment de la clôture.",
+  },
+  {
+    code: "FI-BL",
+    label: "Bank Accounting & Cash Management",
+    tcode: "FF67 · BAM",
+    desc: "Gère les comptes bancaires et leur rapprochement : saisie ou import des relevés bancaires (FF67, relevé électronique), rapprochement automatique des paiements, prévision de trésorerie. Depuis S/4HANA, les comptes bancaires sont des données maître pilotées dans Bank Account Management (BAM), et non plus un simple paramétrage technique réservé à l'équipe IT.",
+  },
+  {
+    code: "FI-TV",
+    label: "Travel Management",
+    tcode: "PR05",
+    desc: "Gère les notes de frais et le remboursement des déplacements professionnels : demande de voyage, frais engagés, validation managériale, versement au salarié. Techniquement, le salarié est traité comme un fournisseur (compte créé depuis les données RH) pour que FI puisse le payer comme n'importe quel tiers.",
+  },
+];
+
+const SubModules = () => (
+  <motion.section
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay: 0.03 }}
+    className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6"
+  >
+    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Les sous-modules réels de FI</h2>
+    <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
+      Six blocs fonctionnels composent FI dans la documentation officielle SAP. Voici ce que chacun fait concrètement, au-delà des grandes lignes vues plus haut.
+    </p>
+    <div className="grid sm:grid-cols-2 gap-4">
+      {FI_SUBMODULES.map((m) => (
+        <div key={m.code} className="rounded-xl border border-gray-100 dark:border-slate-700 p-4 bg-gray-50 dark:bg-slate-700/50">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-bold text-sap-blue dark:text-sap-accent">{m.code}</span>
+            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{m.tcode}</span>
+          </div>
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">{m.label}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{m.desc}</p>
         </div>
       ))}
     </div>
@@ -101,17 +169,19 @@ const OrgStructure = () => (
   >
     <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Structure d'organisation FI</h2>
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
-      Avant toute configuration, le consultant FI cartographie la structure financière du client.
+      Avant toute configuration, le consultant FI cartographie la structure financière du client — ces six éléments déterminent presque tout le reste du paramétrage.
     </p>
     <div className="mb-5">
       <FiOrgDiagram />
     </div>
-    <div className="grid sm:grid-cols-2 gap-4">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {[
-        { term: "Company Code", def: "Entité légale pour laquelle on produit bilan et compte de résultat." },
-        { term: "Chart of Accounts", def: "Plan de comptes (commun ou spécifique) qui structure tous les comptes GL." },
-        { term: "Fiscal Year Variant", def: "Définition de l'exercice comptable : périodes, calendrier, durée." },
-        { term: "Posting Period Variant", def: "Contrôle de l'ouverture et fermeture des périodes comptables." },
+        { term: "Company Code", def: "Entité légale pour laquelle on produit bilan et compte de résultat. Un groupe international compte souvent une Company Code par filiale ou par pays." },
+        { term: "Chart of Accounts", def: "Plan de comptes (commun ou spécifique) qui structure tous les comptes GL. Plusieurs sociétés peuvent partager le même plan opérationnel tout en gardant un plan de comptes de groupe pour la consolidation." },
+        { term: "Fiscal Year Variant", def: "Définition de l'exercice comptable : nombre de périodes, calendrier civil ou décalé, périodes spéciales de clôture." },
+        { term: "Posting Period Variant", def: "Contrôle de l'ouverture et de la fermeture des périodes comptables (OB52) — verrou indispensable pour empêcher une écriture dans un exercice déjà clôturé." },
+        { term: "Segment", def: "Dimension de reporting externe dérivée du centre de profit. Elle permet de produire un bilan et un compte de résultat par ligne d'activité, pas seulement par société." },
+        { term: "Ledger Group", def: "Regroupe un ou plusieurs ledgers partageant les mêmes principes comptables (ledger de base en normes locales, ledgers non-leading pour l'IFRS ou le US GAAP) — base technique de la comptabilité en parallèle." },
       ].map(({ term, def }) => (
         <div key={term} className="flex gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-700">
           <div className="w-2 h-2 rounded-full bg-sap-blue mt-2 flex-shrink-0" />
@@ -122,6 +192,9 @@ const OrgStructure = () => (
         </div>
       ))}
     </div>
+    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mt-5">
+      Un principe transverse mérite d&apos;être compris avant toute configuration : le <strong>document splitting</strong> (scission de document). Activé par défaut en S/4HANA, il force chaque document comptable à être équilibré non seulement au niveau de la société, mais aussi au niveau des caractéristiques choisies — typiquement le centre de profit et le segment. Concrètement, une facture fournisseur qui touche deux centres de profit est automatiquement scindée en autant de lignes équilibrées qu&apos;il y a de centres de profit concernés, sans que le comptable n&apos;ait à le faire à la main. C&apos;est ce mécanisme qui rend possible un bilan par centre de profit ou par segment, exigé par les normes IFRS pour les groupes qui pilotent plusieurs lignes d&apos;activité.
+    </p>
   </motion.section>
 );
 
@@ -495,10 +568,11 @@ const FI = () => (
     description="Maîtrisez la comptabilité externe SAP : grand livre, fournisseurs, clients, immobilisations et clôture financière sur S/4HANA."
     gradient="from-sap-blue-dark via-sap-blue to-blue-500"
     badge="Comptabilité · Clôture · Reporting"
-    stats={["6 concepts clés", "4 T-codes essentiels", `Certification ${certCode("fi")}`]}
+    stats={["~30 min de lecture", "6 concepts clés", "6 sous-modules", `Certification ${certCode("fi")}`]}
     examHref="/certifications/fi/examen"
   >
     <KeyConcepts />
+    <SubModules />
     <OrgStructure />
     <Processes />
     <Integration />
