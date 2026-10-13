@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/hooks/useProgress";
@@ -58,6 +58,11 @@ function ProfileContent() {
   const { visitedCount, totalModules } = useProgress();
   const { isPro } = useSubscription();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const subscriptionRef = useRef<HTMLDivElement>(null);
+  const promoInputRef = useRef<HTMLInputElement>(null);
+  const [highlightPromo, setHighlightPromo] = useState(false);
 
   const [name, setName]                       = useState(user?.name || "");
   const [password, setPassword]               = useState("");
@@ -73,6 +78,16 @@ function ProfileContent() {
   const [promoCode, setPromoCode]     = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoMsg, setPromoMsg]       = useState<{ text: string; ok: boolean } | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("upgrade") !== "1" || isPro) return;
+    setHighlightPromo(true);
+    const timeout = setTimeout(() => {
+      subscriptionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      promoInputRef.current?.focus();
+    }, 150);
+    return () => clearTimeout(timeout);
+  }, [searchParams, isPro]);
 
   const redeemPromo = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -397,7 +412,7 @@ function ProfileContent() {
         </div>
 
         {/* Plan & abonnement */}
-        <div className={`rounded-2xl border shadow-card p-6
+        <div ref={subscriptionRef} className={`rounded-2xl border shadow-card p-6
                          ${isPro
                            ? "bg-linear-to-br from-amber-50 to-amber-50 border-amber-200 dark:from-amber-900/10 dark:to-amber-900/10 dark:border-amber-700/40"
                            : "bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700"
@@ -446,10 +461,13 @@ function ProfileContent() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
-                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Tu as un code promo ?</p>
+              <div className={`mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 ${highlightPromo ? "rounded-xl -mx-2 px-2 ring-2 ring-amber-400/60" : ""}`}>
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                  {highlightPromo ? "👉 Entre ton code promo ci-dessous pour activer le Plan Pro." : "Tu as un code promo ?"}
+                </p>
                 <form onSubmit={redeemPromo} className="flex gap-2">
                   <input
+                    ref={promoInputRef}
                     type="text"
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
