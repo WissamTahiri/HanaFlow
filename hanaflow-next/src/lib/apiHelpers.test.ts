@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import { z } from "zod";
 import { NextRequest } from "next/server";
 
@@ -61,8 +61,15 @@ describe("validateBody", () => {
 });
 
 describe("rateLimit", () => {
+  // Horloge figée : la fenêtre glissante de rateLimit lit Date.now(), donc un
+  // test lent (CI chargée, exécution parallèle) peut dépasser windowMs et
+  // faire passer une requête qui devrait être bloquée (flaky sans ça).
   beforeEach(() => {
-    // Use unique keys to avoid cross-test pollution
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("allows the first request and increments counter", async () => {
