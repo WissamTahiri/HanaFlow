@@ -40,119 +40,101 @@ const platform = [
   { href: "/certifications/comparer", label: "Comparer les certifications" },
 ];
 
+const about = [
+  { href: "/a-propos",    label: "Le projet" },
+  { href: "/ecoles",      label: "Pour les écoles" },
+  { href: "/entreprises", label: "Pour les entreprises" },
+  { href: "/contact",     label: "Contact" },
+  { href: "/register",    label: "S'inscrire gratuitement" },
+  { href: "/login",       label: "Se connecter" },
+];
+
+const legal = [
+  { href: "/cgu",              label: "CGU" },
+  { href: "/confidentialite",  label: "Confidentialité" },
+  { href: "/mentions-legales", label: "Mentions légales" },
+  { href: "/contact",          label: "Contact" },
+];
+
+function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-5">{title}</h3>
+      <ul className="space-y-3.5">
+        {links.map(({ href, label }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              className="text-sm text-slate-500 dark:text-slate-400 hover:text-sap-blue dark:hover:text-sap-accent transition-colors"
+            >
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function Footer() {
   return (
-    <footer className="bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+    <footer className="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+      <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-20">
 
-          {/* Branding */}
-          <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="h-8 w-8 rounded-xl bg-linear-to-br from-sap-blue to-sap-blue-dark
-                              flex items-center justify-center text-[11px] font-bold text-white">
+        {/* Marque + accroche */}
+        <div className="flex flex-col gap-8 pb-12 border-b border-slate-100 dark:border-slate-800 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-sap-blue-dark text-[11px] font-semibold text-white">
                 HF
-              </div>
-              <span className="text-base font-bold text-slate-900 dark:text-white">HanaFlow</span>
+              </span>
+              <span className="text-base font-semibold text-slate-900 dark:text-white">HanaFlow</span>
             </Link>
-            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-              Master SAP Learning Platform — la référence pour apprendre SAP S/4HANA et se préparer à une carrière de consultant.
+            <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-slate-500 dark:text-slate-400">
+              Apprendre SAP S/4HANA, préparer ses certifications et construire une carrière de consultant.
             </p>
-            <div className="flex items-center gap-3">
-              <a href="https://www.linkedin.com/in/wissam-tahiri-730a47326" target="_blank" rel="noreferrer"
-                 aria-label="LinkedIn de Wissam Tahiri"
-                 className="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800
-                            text-slate-500 hover:bg-sap-blue hover:text-white transition-all duration-150">
-                <LinkedInIcon />
-              </a>
-              <a href="https://github.com/WissamTahiri" target="_blank" rel="noreferrer"
-                 aria-label="GitHub de Wissam Tahiri"
-                 className="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800
-                            text-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-150">
-                <GitHubIcon />
-              </a>
-              <a href={`mailto:${CONTACT.email}`} aria-label="Envoyer un email"
-                 className="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800
-                            text-slate-500 hover:bg-sap-blue hover:text-white transition-all duration-150">
-                <MailIcon />
-              </a>
-            </div>
           </div>
-
-          {/* Plateforme */}
-          <div>
-            <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">Plateforme</h3>
-            <ul className="space-y-2.5">
-              {platform.map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className="text-sm text-slate-500 dark:text-slate-400 hover:text-sap-blue dark:hover:text-sap-accent transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Modules SAP */}
-          <div>
-            <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">Modules SAP</h3>
-            <ul className="space-y-2.5">
-              {courses.map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className="text-sm text-slate-500 dark:text-slate-400 hover:text-sap-blue dark:hover:text-sap-accent transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* À propos */}
-          <div>
-            <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">À propos</h3>
-            <ul className="space-y-2.5">
-              {[
-                { href: "/a-propos", label: "Le projet" },
-                { href: "/ecoles",   label: "Pour les écoles & entreprises" },
-                { href: "/contact",  label: "Contact" },
-                { href: "/register", label: "S'inscrire gratuitement" },
-                { href: "/login",    label: "Se connecter" },
-              ].map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className="text-sm text-slate-500 dark:text-slate-400 hover:text-sap-blue dark:hover:text-sap-accent transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="flex items-center gap-5">
+            <a href={CONTACT.linkedin} target="_blank" rel="noreferrer"
+               aria-label="LinkedIn de Wissam Tahiri"
+               className="text-slate-400 hover:text-sap-blue dark:text-slate-500 dark:hover:text-sap-accent transition-colors">
+              <LinkedInIcon />
+            </a>
+            <a href={CONTACT.github} target="_blank" rel="noreferrer"
+               aria-label="GitHub de Wissam Tahiri"
+               className="text-slate-400 hover:text-sap-blue dark:text-slate-500 dark:hover:text-sap-accent transition-colors">
+              <GitHubIcon />
+            </a>
+            <a href={`mailto:${CONTACT.email}`} aria-label="Envoyer un email"
+               className="text-slate-400 hover:text-sap-blue dark:text-slate-500 dark:hover:text-sap-accent transition-colors">
+              <MailIcon />
+            </a>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col gap-4">
-          <nav aria-label="Liens légaux" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-            {[
-              { href: "/cgu",              label: "CGU" },
-              { href: "/confidentialite",  label: "Confidentialité" },
-              { href: "/mentions-legales", label: "Mentions légales" },
-              { href: "/contact",          label: "Contact" },
-            ].map(({ href, label }) => (
+        {/* Colonnes de navigation */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-12 py-14 sm:grid-cols-3">
+          <FooterColumn title="Plateforme" links={platform} />
+          <FooterColumn title="Modules SAP" links={courses} />
+          <FooterColumn title="À propos" links={about} />
+        </div>
+
+        {/* Bas de page */}
+        <div className="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-slate-500 dark:text-slate-400 order-2 sm:order-1">
+            © {new Date().getFullYear()} HanaFlow — Par Wissam Tahiri · Non affilié à SAP SE
+          </p>
+          <nav aria-label="Liens légaux" className="order-1 sm:order-2 flex flex-wrap items-center gap-x-5 gap-y-2">
+            {legal.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className="text-xs text-slate-500 dark:text-slate-400 hover:text-sap-blue transition-colors"
+                className="text-xs text-slate-500 dark:text-slate-400 hover:text-sap-blue dark:hover:text-sap-accent transition-colors"
               >
                 {label}
               </Link>
             ))}
           </nav>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              © {new Date().getFullYear()} HanaFlow — Par Wissam Tahiri.
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Plateforme éducative SAP · Non affilié à SAP SE
-            </p>
-          </div>
         </div>
       </div>
     </footer>
