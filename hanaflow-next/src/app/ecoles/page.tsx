@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HANAFLOW_STATS } from "@/config/stats";
 import { prisma } from "@/lib/prisma";
-import DemoRequestForm from "./DemoRequestForm";
+import DemoRequestForm from "@/components/DemoRequestForm";
 
 // Même seuil que la home : en dessous, un compteur d'inscrits dessert plus
 // qu'il ne rassure un public B2B qui évalue la traction de la plateforme.
@@ -15,9 +15,9 @@ const CheckIcon = () => (
 );
 
 export const metadata: Metadata = {
-  title: "Pour les écoles et entreprises",
+  title: "Pour les écoles et universités",
   description:
-    "Formez vos étudiants ou consultants SAP avec HanaFlow : 6 modules S/4HANA, simulateurs d'examen, certificats vérifiables en ligne. Offre écoles et entreprises sur devis.",
+    "Formez vos étudiants SAP avec HanaFlow : 6 modules S/4HANA en français, simulateurs d'examen au format officiel, certificats vérifiables en ligne. Offre établissement sur devis.",
 };
 
 const PROBLEMS = [
@@ -129,7 +129,7 @@ export default async function EcolesPage() {
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid md:grid-cols-[3fr_2fr] gap-10 md:gap-8 items-center">
           <div>
             <span className="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold mb-5 tracking-wide">
-              Écoles · Universités · Entreprises
+              Écoles · Universités
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 text-balance leading-tight">
               Formez vos étudiants SAP avec une plateforme clé en main
@@ -152,6 +152,12 @@ export default async function EcolesPage() {
                 Voir comment ça marche
               </a>
             </div>
+            <p className="mt-6 text-sm text-white/60">
+              Vous formez des consultants en entreprise plutôt que des étudiants ?{" "}
+              <Link href="/entreprises" className="text-white underline hover:no-underline">
+                Découvrez notre offre entreprises →
+              </Link>
+            </p>
           </div>
           <dl className="grid grid-cols-3 md:grid-cols-1 gap-4 md:gap-6 md:border-l md:border-white/15 md:pl-8 border-t md:border-t-0 border-white/15 pt-8 md:pt-0">
             <div>
@@ -345,7 +351,7 @@ export default async function EcolesPage() {
             </Link>
             .
           </p>
-          <DemoRequestForm />
+          <DemoRequestForm segment="ecole" />
         </div>
       </section>
     </div>

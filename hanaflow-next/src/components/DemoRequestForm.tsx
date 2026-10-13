@@ -3,14 +3,61 @@
 import { useState } from "react";
 
 /**
- * Formulaire de demande de démo écoles/entreprises.
+ * Formulaire de demande de démo — partagé entre /ecoles et /entreprises,
+ * avec un vocabulaire adapté à chaque public via `segment`.
  * Réutilise POST /api/feedback (auth optionnelle, rate-limité, inbox admin) :
- * la demande arrive dans /admin/feedback avec le contexte "/ecoles".
+ * la demande arrive dans /admin/feedback avec un contexte "/ecoles" ou
+ * "/entreprises" (l'API n'a pas de champ dédié "type" — on l'encode dans
+ * `context`, qui est juste un texte libre côté modèle Feedback).
  */
-export default function DemoRequestForm() {
+type Segment = "ecole" | "entreprise";
+
+const COPY: Record<
+  Segment,
+  {
+    context: string;
+    requestLabel: string;
+    orgLabel: string;
+    orgPlaceholder: string;
+    emailPlaceholder: string;
+    countLabel: string;
+    countPlaceholder: string;
+    countFieldLabel: string;
+    messagePlaceholder: string;
+    submitLabel: string;
+  }
+> = {
+  ecole: {
+    context: "/ecoles — demande de démo",
+    requestLabel: "Demande de démo établissement",
+    orgLabel: "Établissement *",
+    orgPlaceholder: "IUT de Lyon, ESN…",
+    emailPlaceholder: "m.dupont@univ.fr",
+    countLabel: "étudiants",
+    countPlaceholder: "ex : 25",
+    countFieldLabel: "Nombre d'étudiants",
+    messagePlaceholder: "Modules visés, calendrier, contraintes…",
+    submitLabel: "Envoyer ma demande de démo",
+  },
+  entreprise: {
+    context: "/entreprises — demande de devis",
+    requestLabel: "Demande de devis entreprise",
+    orgLabel: "Entreprise *",
+    orgPlaceholder: "Nom de la société",
+    emailPlaceholder: "m.dupont@entreprise.com",
+    countLabel: "consultants",
+    countPlaceholder: "ex : 8",
+    countFieldLabel: "Nombre de consultants à former",
+    messagePlaceholder: "Modules visés, calendrier, équipe concernée…",
+    submitLabel: "Envoyer ma demande de devis",
+  },
+};
+
+export default function DemoRequestForm({ segment = "ecole" }: { segment?: Segment }) {
+  const copy = COPY[segment];
   const [name, setName] = useState("");
-  const [school, setSchool] = useState("");
-  const [students, setStudents] = useState("");
+  const [org, setOrg] = useState("");
+  const [count, setCount] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -23,12 +70,12 @@ export default function DemoRequestForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          context: "/ecoles — demande de démo",
+          context: copy.context,
           improveWhat: [
-            `Demande de démo établissement`,
+            copy.requestLabel,
             `Nom : ${name}`,
-            `Établissement : ${school}`,
-            `Nombre d'étudiants : ${students || "non précisé"}`,
+            `${copy.orgLabel.replace(" *", "")} : ${org}`,
+            `${copy.countFieldLabel} : ${count || "non précisé"}`,
             message ? `Message : ${message}` : null,
           ]
             .filter(Boolean)
@@ -63,8 +110,8 @@ export default function DemoRequestForm() {
           <input required value={name} onChange={(e) => setName(e.target.value)} className="input" placeholder="Marie Dupont" />
         </label>
         <label className="block">
-          <span className="label">Établissement *</span>
-          <input required value={school} onChange={(e) => setSchool(e.target.value)} className="input" placeholder="IUT de Lyon, ESN…" />
+          <span className="label">{copy.orgLabel}</span>
+          <input required value={org} onChange={(e) => setOrg(e.target.value)} className="input" placeholder={copy.orgPlaceholder} />
         </label>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
@@ -76,12 +123,12 @@ export default function DemoRequestForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="input"
-            placeholder="m.dupont@univ.fr"
+            placeholder={copy.emailPlaceholder}
           />
         </label>
         <label className="block">
-          <span className="label">Nombre d&apos;étudiants</span>
-          <input value={students} onChange={(e) => setStudents(e.target.value)} className="input" placeholder="ex : 25" />
+          <span className="label">Nombre de {copy.countLabel}</span>
+          <input value={count} onChange={(e) => setCount(e.target.value)} className="input" placeholder={copy.countPlaceholder} />
         </label>
       </div>
       <label className="block">
@@ -91,7 +138,7 @@ export default function DemoRequestForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           className="input"
-          placeholder="Modules visés, calendrier, contraintes…"
+          placeholder={copy.messagePlaceholder}
         />
       </label>
       {status === "error" && (
@@ -100,7 +147,7 @@ export default function DemoRequestForm() {
         </p>
       )}
       <button type="submit" disabled={status === "sending"} className="btn-primary w-full">
-        {status === "sending" ? "Envoi en cours…" : "Envoyer ma demande de démo"}
+        {status === "sending" ? "Envoi en cours…" : copy.submitLabel}
       </button>
     </form>
   );
