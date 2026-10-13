@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
@@ -12,6 +13,20 @@ import { prisma } from "@/lib/prisma";
  */
 
 export const dynamic = "force-dynamic";
+
+// Titre/description volontairement génériques (jamais de nom/email de
+// candidat — PII sur une page publique indexable). Comme toutes les pages
+// partageraient le même titre générique, on les exclut de l'indexation pour
+// éviter du contenu dupliqué aux yeux de Google (pas de valeur SEO par ID
+// individuel, cf. sitemap.ts).
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Vérifier un certificat HanaFlow",
+    description:
+      "Vérifie l'authenticité d'un certificat de formation SAP délivré par HanaFlow à partir de son identifiant.",
+    robots: { index: false, follow: true },
+  };
+}
 
 type VerifyResult =
   | { valid: true; cert: CertData }
