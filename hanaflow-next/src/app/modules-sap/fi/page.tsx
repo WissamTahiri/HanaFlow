@@ -413,158 +413,6 @@ const FaqAccordion = () => {
 
 
 /* ─────────────────────────────────────────────────────────────
-   Quiz interactif
-───────────────────────────────────────────────────────────── */
-const QUIZ_QUESTIONS = [
-  {
-    id: 1,
-    question: "Quel objet représente une entité légale pour laquelle on produit un bilan et un compte de résultat ?",
-    options: ["Controlling Area", "Company Code", "Profit Center"],
-    answer: 1,
-    explanation: "Le Company Code est l'unité légale de base pour les états financiers dans SAP FI.",
-  },
-  {
-    id: 2,
-    question: "Dans un processus P2P standard (MIRO), quels comptes FI sont généralement impactés ?",
-    options: ["Compte client et compte de revenus", "Compte fournisseur et compte de charges/stock", "Compte d'immobilisation et compte d'amortissement"],
-    answer: 1,
-    explanation: "La facture fournisseur impacte le compte fournisseur (AP) et un compte de charges ou de stock selon la nature de l'achat.",
-  },
-  {
-    id: 3,
-    question: "Quel est l'apport principal de l'Universal Journal (ACDOCA) en S/4HANA Finance ?",
-    options: ["Séparer FI et CO dans deux tables", "Fusionner FI et CO dans une seule table", "Supprimer la comptabilité fournisseurs"],
-    answer: 1,
-    explanation: "ACDOCA centralise FI et CO, ce qui simplifie le reporting temps réel FI/CO.",
-  },
-  {
-    id: 4,
-    question: "Quel sous-module FI gère les immobilisations et leurs amortissements ?",
-    options: ["Accounts Receivable (AR)", "Asset Accounting (AA)", "General Ledger (GL)"],
-    answer: 1,
-    explanation: "AA gère tout le cycle de vie des immobilisations (acquisition, mise en service, amortissement, cession).",
-  },
-  {
-    id: 5,
-    question: "Vrai ou Faux : dans un flux Order-to-Cash, la facturation SD crée automatiquement un document FI client.",
-    options: ["Vrai", "Faux"],
-    answer: 0,
-    explanation: "La facture SD génère un document FI en clients (AR) avec TVA, revenus et comptes clients.",
-  },
-  {
-    id: 6,
-    question: "La Fiscal Year Variant sert principalement à :",
-    options: ["Définir les devises utilisées", "Définir la structure de l'exercice comptable", "Définir les organisations d'achat"],
-    answer: 1,
-    explanation: "La Fiscal Year Variant définit la longueur de l'exercice, les périodes et leur calendrier.",
-  },
-  {
-    id: 7,
-    question: "Quel sous-module FI gère la relance des fournisseurs et les lots de paiements ?",
-    options: ["GL", "AP", "AR"],
-    answer: 1,
-    explanation: "AP (Accounts Payable) couvre la gestion des fournisseurs, des échéances et des paiements.",
-  },
-  {
-    id: 8,
-    question: "Dans un contexte S/4HANA Finance, quelles applications améliorent l'expérience utilisateur Finance ?",
-    options: ["SAP GUI uniquement", "Fiori apps Finance", "BW on HANA uniquement"],
-    answer: 1,
-    explanation: "Les Fiori apps Finance offrent des cockpits et listes analytiques temps réel pour les rôles Finance.",
-  },
-  {
-    id: 9,
-    question: "Vrai ou Faux : chaque écriture FI peut porter un objet de controlling (centre de coûts, ordre interne…).",
-    options: ["Vrai", "Faux"],
-    answer: 0,
-    explanation: "C'est un point clé d'intégration FI–CO : les écritures FI peuvent être imputées sur des objets CO.",
-  },
-  {
-    id: 10,
-    question: "Dans la clôture mensuelle FI, quelle activité est typiquement réalisée ?",
-    options: ["Création de commandes d'achat", "Planification MRP", "Provisions et écritures d'ajustement"],
-    answer: 2,
-    explanation: "La clôture FI implique souvent des provisions, ajustements et contrôles de cohérence avant les états financiers.",
-  },
-];
-
-const FiQuiz = () => {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [submitted, setSubmitted] = useState(false);
-
-  const score = QUIZ_QUESTIONS.reduce((acc, q) => acc + (answers[q.id] === q.answer ? 1 : 0), 0);
-
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.24 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6"
-    >
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Quiz FI — 10 questions</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
-        Valide tes connaissances comme si tu préparais un entretien consultant FI/CO junior.
-      </p>
-
-      <div className="space-y-4">
-        {QUIZ_QUESTIONS.map((q) => (
-          <div key={q.id} className="border border-gray-100 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
-              {q.id}. {q.question}
-            </p>
-            <div className="space-y-2">
-              {q.options.map((opt, idx) => {
-                const selected = answers[q.id] === idx;
-                const isCorrect = q.answer === idx;
-                let cls = "w-full text-left text-sm px-4 py-2.5 rounded-xl border transition-all duration-150 ";
-                if (!submitted) {
-                  cls += selected
-                    ? "border-sap-blue bg-sap-blue/10 text-sap-blue dark:text-sap-accent font-medium"
-                    : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-sap-blue/40 hover:bg-sap-blue/5";
-                } else if (isCorrect) {
-                  cls += "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium";
-                } else if (selected) {
-                  cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
-                } else {
-                  cls += "border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
-                }
-                return (
-                  <button key={idx} type="button" disabled={submitted} onClick={() => !submitted && setAnswers((p) => ({ ...p, [q.id]: idx }))} className={cls}>
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-            {submitted && (
-              <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">
-                {q.explanation}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        {!submitted ? (
-          <button type="button" onClick={() => setSubmitted(true)} className="btn-primary px-6 py-2.5">
-            Valider mes réponses
-          </button>
-        ) : (
-          <>
-            <div className="text-sm font-semibold text-slate-900 dark:text-white">
-              Score : <span className="gradient-text text-base">{score} / {QUIZ_QUESTIONS.length}</span>
-            </div>
-            <button type="button" onClick={() => { setAnswers({}); setSubmitted(false); }} className="btn-outline px-6 py-2.5 text-sm">
-              Recommencer
-            </button>
-          </>
-        )}
-      </div>
-    </motion.section>
-  );
-};
-
-/* ─────────────────────────────────────────────────────────────
    Ressources
 ───────────────────────────────────────────────────────────── */
 const RESOURCES = [
@@ -647,7 +495,7 @@ const FI = () => (
     description="Maîtrisez la comptabilité externe SAP : grand livre, fournisseurs, clients, immobilisations et clôture financière sur S/4HANA."
     gradient="from-sap-blue-dark via-sap-blue to-blue-500"
     badge="Comptabilité · Clôture · Reporting"
-    stats={["6 concepts clés", "4 T-codes essentiels", "Quiz de 10 questions", `Certification ${certCode("fi")}`]}
+    stats={["6 concepts clés", "4 T-codes essentiels", `Certification ${certCode("fi")}`]}
     examHref="/certifications/fi/examen"
   >
     <KeyConcepts />
@@ -658,7 +506,6 @@ const FI = () => (
     <CareerBenefits />
     <FiTcodes />
 
-    <FiQuiz />
     <FiResources />
     <FaqAccordion />
     <NextStep />

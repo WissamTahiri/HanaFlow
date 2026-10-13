@@ -164,58 +164,6 @@ const CareerBenefits = () => (
   </motion.section>
 );
 
-const QUIZ_QUESTIONS = [
-  { id: 1, question: "Quel est l'objectif principal du module CO dans SAP S/4HANA ?", options: ["Gérer la comptabilité légale externe", "Piloter les coûts et la rentabilité interne", "Gérer les stocks physiques"], answer: 1, explanation: "CO est dédié au controlling interne : analyse des coûts, marges, rentabilité par centre, produit, client." },
-  { id: 2, question: "Un Cost Center est avant tout utilisé pour :", options: ["Mesurer les revenus par client", "Suivre les coûts d'une unité ou fonction", "Gérer les stocks par entrepôt"], answer: 1, explanation: "Un centre de coûts regroupe les coûts pour une unité de responsabilité (service, atelier…)." },
-  { id: 3, question: "Un Profit Center est principalement utilisé pour :", options: ["Analyser les profits d'une business unit / ligne de produits", "Stocker les écritures FI brutes", "Gérer la paie"], answer: 0, explanation: "Un profit center représente une unité génératrice de revenus et de coûts (BU, région, ligne de produits)." },
-  { id: 4, question: "CO-PA (Profitability Analysis) sert à :", options: ["Analyser la rentabilité par dimensions (client, produit, région…)", "Configurer le plan de comptes", "Gérer les immobilisations"], answer: 0, explanation: "CO-PA permet d'analyser marges et contributions par multiples segments de marché." },
-  { id: 5, question: "Dans S/4HANA, quel type de CO-PA est fortement recommandé ?", options: ["Costing-based uniquement", "Account-based uniquement", "Account-based CO-PA (avec possibilité de coexistence costing-based)"], answer: 2, explanation: "S/4HANA pousse l'account-based CO-PA, aligné sur l'Universal Journal, tout en permettant la coexistence avec le costing-based." },
-  { id: 6, question: "Quel type d'objet est typiquement utilisé pour suivre les coûts d'un projet interne ou d'une campagne marketing ?", options: ["Cost Center", "Internal Order", "Profit Center"], answer: 1, explanation: "Les internal orders permettent de suivre des coûts temporaires ou spécifiques (projet, campagne) dans CO." },
-  { id: 7, question: "Dans un flux de production PP, quel composant CO suit les coûts par ordre de production ?", options: ["Product Cost Controlling (CO-PC)", "Accounts Receivable", "Asset Accounting"], answer: 0, explanation: "CO-PC suit coûts planifiés/réels, WIP et variances sur les ordres de production." },
-  { id: 8, question: "Vrai ou Faux : en S/4HANA, les écritures FI sont simultanément visibles en CO grâce à l'Universal Journal.", options: ["Vrai", "Faux"], answer: 0, explanation: "L'Universal Journal (ACDOCA) combine FI et CO, offrant une vue unique des coûts et revenus." },
-  { id: 9, question: 'Pour quelle raison crée-t-on souvent un "dummy" profit center ?', options: ["Pour les tests uniquement", "Comme centre par défaut quand aucun profit center n'est dérivé", "Pour stocker les données historiques"], answer: 1, explanation: "Un dummy profit center reçoit les écritures sans dérivation correcte, à nettoyer en clôture." },
-  { id: 10, question: "Quel bénéfice clé apporte le COGS split en CO-PA dans S/4HANA ?", options: ["Moins de détails sur le coût", "Répartition des COGS en composantes (matière, main-d'œuvre, overhead)", "Suppression des analyses de marge"], answer: 1, explanation: "Le COGS split permet de ventiler le coût des ventes par composantes pour une analyse de marge fine." },
-];
-
-const CoQuiz = () => {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const score = QUIZ_QUESTIONS.reduce((acc, q) => acc + (answers[q.id] === q.answer ? 1 : 0), 0);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.18 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Quiz CO — 10 questions</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Valide tes connaissances sur les centres de coûts, profit centers et CO-PA.</p>
-      <div className="space-y-4">
-        {QUIZ_QUESTIONS.map((q) => (
-          <div key={q.id} className="border border-gray-100 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">{q.id}. {q.question}</p>
-            <div className="space-y-2">
-              {q.options.map((opt, idx) => {
-                const selected = answers[q.id] === idx;
-                const isCorrect = q.answer === idx;
-                let cls = "w-full text-left text-sm px-4 py-2.5 rounded-xl border transition-all duration-150 ";
-                if (!submitted) cls += selected ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium" : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-emerald-400/60 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10";
-                else if (isCorrect) cls += "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium";
-                else if (selected) cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
-                else cls += "border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
-                return <button key={idx} type="button" disabled={submitted} onClick={() => !submitted && setAnswers((p) => ({ ...p, [q.id]: idx }))} className={cls}>{opt}</button>;
-              })}
-            </div>
-            {submitted && <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">{q.explanation}</p>}
-          </div>
-        ))}
-      </div>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        {!submitted ? <button type="button" onClick={() => setSubmitted(true)} className="btn-primary px-6 py-2.5">Valider mes réponses</button> : <>
-          <div className="text-sm font-semibold text-slate-900 dark:text-white">Score : <span className="gradient-text text-base">{score} / {QUIZ_QUESTIONS.length}</span></div>
-          <button type="button" onClick={() => { setAnswers({}); setSubmitted(false); }} className="btn-outline px-6 py-2.5 text-sm">Recommencer</button>
-        </>}
-      </div>
-    </motion.section>
-  );
-};
-
 const FAQ_ITEMS = [
   { q: "Quelle est la différence entre FI et CO ?", a: "FI produit les états financiers légaux (bilan, compte de résultat) destinés à l'extérieur. CO fournit des analyses internes de coûts et de rentabilité pour la direction. En S/4HANA, les deux partagent le même Universal Journal (ACDOCA), ce qui élimine la réconciliation." },
   { q: "Faut-il connaître la comptabilité pour faire du SAP CO ?", a: "Les bases comptables sont utiles (débits/crédits, marges, charges), mais CO est plus proche du contrôle de gestion que de la comptabilité pure. Un profil finance ou gestion peut très bien exceller en CO sans être comptable." },
@@ -284,8 +232,7 @@ export default function CO() {
       <CoPaSection />
       <S4HANAFeatures />
       <CareerBenefits />
-      <CoQuiz />
-      <CoResources />
+        <CoResources />
       <FaqAccordion />
     </ModuleLayout>
   );

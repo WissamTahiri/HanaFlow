@@ -162,59 +162,6 @@ const CareerBenefits = () => (
 );
 
 
-/* ─── Quiz ─── */
-const QUIZ_QUESTIONS = [
-  { id: 1, question: "Quel est l'objectif principal du processus Order-to-Cash (O2C) en SAP SD ?", options: ["Gérer le cycle complet de vente, de la commande client au paiement", "Planifier la production", "Gérer les achats fournisseurs"], answer: 0, explanation: "L'O2C couvre tout le flux client : pré-vente, commande, livraison, facturation, encaissement." },
-  { id: 2, question: "Quel document démarre généralement le cycle O2C dans SAP SD ?", options: ["Purchase Order", "Sales Order (VA01)", "Delivery (VL01N)"], answer: 1, explanation: "Le cycle O2C commence avec la création d'un Sales Order (VA01) après l'inquiry/quotation éventuelle." },
-  { id: 3, question: "Dans l'enchaînement standard, quel est l'ordre correct des étapes O2C ?", options: ["Delivery → Billing → Sales Order → Payment", "Sales Order → Billing → Delivery → Payment", "Sales Order → Delivery → Post Goods Issue → Billing → Payment"], answer: 2, explanation: "Le flux typique : Sales Order → Delivery → PGI → Billing → Payment." },
-  { id: 4, question: "Quel événement déclenche la sortie de stock et le COGS en FI ?", options: ["Sales Order", "Post Goods Issue (PGI)", "Billing"], answer: 1, explanation: "Le PGI (VL02N) réduit le stock et enregistre le COGS en FI." },
-  { id: 5, question: "Quel t-code est utilisé pour créer une facture client à partir d'une livraison ou d'un ordre ?", options: ["VF01", "VA01", "F-28"], answer: 0, explanation: "VF01 crée le billing document qui génère un document FI (client, revenus, taxes)." },
-  { id: 6, question: "Quel est le rôle de l'intégration SD–FI au moment de la facturation ?", options: ["Mettre à jour les stocks", "Créer un document FI pour revenus et créances clients", "Créer des ordres de fabrication"], answer: 1, explanation: "La facture SD déclenche un document FI : débit client / crédit revenus et taxes." },
-  { id: 7, question: "Vrai ou Faux : la création du Sales Order crée immédiatement une écriture FI.", options: ["Vrai", "Faux"], answer: 1, explanation: "Le Sales Order est logistique — c'est PGI et Billing qui génèrent les écritures FI." },
-  { id: 8, question: "Quel t-code FI est typiquement utilisé pour enregistrer le paiement client et lettrer la facture ?", options: ["F-28", "MIRO", "F110"], answer: 0, explanation: "F-28 sert à enregistrer les paiements entrants et à compenser les postes clients." },
-  { id: 9, question: "Dans un projet S/4HANA, quel composant gère la reconnaissance de revenus avancée pour des contrats complexes ?", options: ["CO-PA", "RAR (Revenue Accounting and Reporting)", "MM-IM"], answer: 1, explanation: "RAR s'intègre à SD et FI pour automatiser la revenue recognition selon IFRS 15 / ASC 606." },
-  { id: 10, question: "Quel bénéfice clé apporte S/4HANA à l'O2C par rapport à ECC ?", options: ["Moins d'intégration entre SD et FI", "Vision temps réel sur commandes, livraisons, revenus et marges", "Suppression de la facturation"], answer: 1, explanation: "S/4HANA offre un O2C intégré avec analytics temps réel sur ventes, revenus et marges." },
-];
-
-const SdQuiz = () => {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const score = QUIZ_QUESTIONS.reduce((acc, q) => acc + (answers[q.id] === q.answer ? 1 : 0), 0);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.18 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Quiz SD — 10 questions</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Valide ta compréhension du cycle O2C et de l'intégration SD–FI.</p>
-      <div className="space-y-4">
-        {QUIZ_QUESTIONS.map((q) => (
-          <div key={q.id} className="border border-gray-100 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">{q.id}. {q.question}</p>
-            <div className="space-y-2">
-              {q.options.map((opt, idx) => {
-                const selected = answers[q.id] === idx;
-                const isCorrect = q.answer === idx;
-                let cls = "w-full text-left text-sm px-4 py-2.5 rounded-xl border transition-all duration-150 ";
-                if (!submitted) cls += selected ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 font-medium" : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-purple-400/60";
-                else if (isCorrect) cls += "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium";
-                else if (selected) cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
-                else cls += "border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
-                return <button key={idx} type="button" disabled={submitted} onClick={() => !submitted && setAnswers((p) => ({ ...p, [q.id]: idx }))} className={cls}>{opt}</button>;
-              })}
-            </div>
-            {submitted && <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">{q.explanation}</p>}
-          </div>
-        ))}
-      </div>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        {!submitted ? <button type="button" onClick={() => setSubmitted(true)} className="btn-primary px-6 py-2.5">Valider mes réponses</button> : <>
-          <div className="text-sm font-semibold text-slate-900 dark:text-white">Score : <span className="gradient-text text-base">{score} / {QUIZ_QUESTIONS.length}</span></div>
-          <button type="button" onClick={() => { setAnswers({}); setSubmitted(false); }} className="btn-outline px-6 py-2.5 text-sm">Recommencer</button>
-        </>}
-      </div>
-    </motion.section>
-  );
-};
-
 /* ─── FAQ ─── */
 const FAQ_ITEMS = [
   { q: "Quelle est la différence entre SD et MM dans SAP ?", a: "SD gère les ventes (côté client) : commande, livraison, facturation. MM gère les achats (côté fournisseur) : commande d'achat, réception, facturation. Ensemble, ils couvrent la supply chain : MM pour le P2P, SD pour l'O2C." },
@@ -286,7 +233,6 @@ const SD = () => (
     <S4HANAFeatures />
     <CareerBenefits />
 
-    <SdQuiz />
     <SdResources />
     <FaqAccordion />
   </ModuleLayout>

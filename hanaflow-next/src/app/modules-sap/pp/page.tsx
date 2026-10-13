@@ -158,59 +158,6 @@ const CareerBenefits = () => (
 );
 
 
-/* ─── Quiz ─── */
-const QUIZ_QUESTIONS = [
-  { id: 1, question: "Quel est l'objectif principal du module PP dans SAP S/4HANA ?", options: ["Gérer la paie des employés", "Planifier et exécuter la production (MRP, ordres, capacités)", "Gérer les factures fournisseurs"], answer: 1, explanation: "PP gère la planification, l'ordonnancement et l'exécution de la production (MRP, ordres, capacités)." },
-  { id: 2, question: "Dans un scénario de production discrète, quel est l'objet central qui pilote un lot de fabrication ?", options: ["Sales Order", "Production Order", "Purchase Requisition"], answer: 1, explanation: "En production discrète, chaque lot est piloté par un Production Order qui porte BOM, routing, coûts et historique." },
-  { id: 3, question: "Quels master data sont essentiels pour un ordre de fabrication standard ?", options: ["BOM, Routing, Work Center, Production Version", "Vendor Master et Purchasing Info Record", "Customer Master et Pricing Conditions"], answer: 0, explanation: "Une production fiable dépend de BOM, routing, work centers et production versions propres." },
-  { id: 4, question: "Quel est l'ordre logique typique en PP pour la production discrète ?", options: ["Planification MRP → Planned Order → Production Order → Confirmation → Goods Issue/Receipt → Settlement", "Sales Order → Billing → Payment", "Purchase Requisition → Purchase Order → Goods Receipt → Invoice"], answer: 0, explanation: "Le flux standard PP : MRP → planned order → conversion en ordre → exécution/confirmations → GI/GR → settlement." },
-  { id: 5, question: "Quel mouvement de stock est typiquement utilisé pour la consommation de composants par un ordre de fabrication ?", options: ["101", "261", "601"], answer: 1, explanation: "Le mouvement 261 poste la consommation de composants pour un ordre de fabrication (goods issue)." },
-  { id: 6, question: "Quel module CO est le plus étroitement lié à PP pour le suivi des coûts de fabrication ?", options: ["CO-PA (Profitability Analysis)", "Product Cost Controlling (CO-PC)", "Asset Accounting (AA)"], answer: 1, explanation: "CO-PC gère les coûts standards, WIP, variances et settlement des ordres de fabrication." },
-  { id: 7, question: "Vrai ou Faux : les work centers en PP sont liés à des cost centers CO pour imputer les coûts d'activité.", options: ["Vrai", "Faux"], answer: 0, explanation: "Les work centers portent un cost center et des activity types pour imputer les coûts de main-d'œuvre/machine." },
-  { id: 8, question: "Quel est l'intérêt de MRP Live / planning avancé en S/4HANA PP ?", options: ["Supprimer le besoin de BOM", "Planifier en temps réel avec prise en compte des contraintes et feedback d'exécution", "Remplacer le module FI"], answer: 1, explanation: "MRP Live et PP/DS offrent planification temps réel, contraintes capacités et feedback d'exécution." },
-  { id: 9, question: "Quelle étape PP déclenche typiquement le Goods Receipt (101) du produit fini en stock ?", options: ["Création de l'ordre", "Confirmation finale de l'ordre", "Calcul du coût standard"], answer: 1, explanation: "La confirmation finale de l'ordre permet souvent de poster le GR 101 du produit fini." },
-  { id: 10, question: "Quel est le rôle de la settlement d'ordre de fabrication dans l'intégration PP–CO ?", options: ["Envoyer les coûts réels vers le bon objet (produit, cost center, WBS) et analyser les variances", "Créer des factures clients", "Créer des demandes d'achat"], answer: 0, explanation: "La settlement en CO affecte les coûts réels et variances vers le matériel ou autres objets CO." },
-];
-
-const PpQuiz = () => {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const score = QUIZ_QUESTIONS.reduce((acc, q) => acc + (answers[q.id] === q.answer ? 1 : 0), 0);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.18 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Quiz PP — 10 questions</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Valide tes connaissances sur la production discrète et l'intégration CO-PC.</p>
-      <div className="space-y-4">
-        {QUIZ_QUESTIONS.map((q) => (
-          <div key={q.id} className="border border-gray-100 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">{q.id}. {q.question}</p>
-            <div className="space-y-2">
-              {q.options.map((opt, idx) => {
-                const selected = answers[q.id] === idx;
-                const isCorrect = q.answer === idx;
-                let cls = "w-full text-left text-sm px-4 py-2.5 rounded-xl border transition-all duration-150 ";
-                if (!submitted) cls += selected ? "border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 font-medium" : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-teal-400/60";
-                else if (isCorrect) cls += "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium";
-                else if (selected) cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
-                else cls += "border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
-                return <button key={idx} type="button" disabled={submitted} onClick={() => !submitted && setAnswers((p) => ({ ...p, [q.id]: idx }))} className={cls}>{opt}</button>;
-              })}
-            </div>
-            {submitted && <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">{q.explanation}</p>}
-          </div>
-        ))}
-      </div>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        {!submitted ? <button type="button" onClick={() => setSubmitted(true)} className="btn-primary px-6 py-2.5">Valider mes réponses</button> : <>
-          <div className="text-sm font-semibold text-slate-900 dark:text-white">Score : <span className="gradient-text text-base">{score} / {QUIZ_QUESTIONS.length}</span></div>
-          <button type="button" onClick={() => { setAnswers({}); setSubmitted(false); }} className="btn-outline px-6 py-2.5 text-sm">Recommencer</button>
-        </>}
-      </div>
-    </motion.section>
-  );
-};
-
 /* ─── FAQ ─── */
 const FAQ_ITEMS = [
   { q: "Quelle est la différence entre PP discret et PP répétitif ?", a: "La production discrète (discrete manufacturing) utilise des ordres de fabrication individuels pour chaque lot — typique dans l'automobile ou l'aéronautique. La production répétitive (repetitive manufacturing) est basée sur des plannings de production sans ordre individuel, plus adaptée aux grandes séries continues." },
@@ -280,7 +227,6 @@ const PP = () => (
     <S4HANAFeatures />
     <CareerBenefits />
 
-    <PpQuiz />
     <PpResources />
     <FaqAccordion />
   </ModuleLayout>

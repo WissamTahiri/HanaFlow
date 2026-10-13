@@ -154,58 +154,6 @@ const CareerBenefits = () => (
   </motion.section>
 );
 
-const QUIZ_QUESTIONS = [
-  { id: 1, question: "Quel est l'objectif principal du processus Procure-to-Pay (P2P) en SAP MM ?", options: ["Planifier la production", "Acheter un bien/service et payer le fournisseur", "Gérer la paie des employés"], answer: 1, explanation: "Le P2P couvre le cycle complet de l'achat jusqu'au paiement du fournisseur dans SAP MM/FI." },
-  { id: 2, question: "Quel document interne déclenche généralement le P2P dans SAP MM ?", options: ["Sales Order", "Purchase Requisition (PR)", "Billing Document"], answer: 1, explanation: "Le P2P démarre souvent par une Purchase Requisition (ME51N) créée par un service interne." },
-  { id: 3, question: "Dans l'enchaînement P2P standard, quel est l'ordre correct des étapes ?", options: ["PO → PR → GR → Invoice → Payment", "PR → PO → GR → Invoice → Payment", "PR → GR → PO → Payment → Invoice"], answer: 1, explanation: "La séquence classique est PR → PO → GR → Invoice (MIRO) → Payment (FI)." },
-  { id: 4, question: "Quel document met à jour le stock et la valorisation d'inventaire dans MM ?", options: ["Purchase Order", "Goods Receipt (GR)", "Invoice Receipt (IR)"], answer: 1, explanation: "Le GR (MIGO) met à jour les quantités de stock, et déclenche la valorisation via FI." },
-  { id: 5, question: "Quel t-code est utilisé pour la vérification de facture fournisseur dans un flux P2P standard ?", options: ["MIRO", "FB50", "VA01"], answer: 0, explanation: "MIRO est utilisé pour l'Invoice Receipt et réalise le 3-way match PO–GR–Invoice." },
-  { id: 6, question: "Quel est le rôle de la GR/IR dans l'intégration FI–MM ?", options: ["Enregistrer les ventes", "Faire le lien temporaire entre réception de marchandises et facture", "Gérer les coûts de production"], answer: 1, explanation: "Le compte GR/IR sert à rapprocher GR et factures, au cœur de l'intégration FI–MM." },
-  { id: 7, question: "Vrai ou Faux : la création de la Purchase Order (PO) génère automatiquement une écriture FI.", options: ["Vrai", "Faux"], answer: 1, explanation: "La PO est un document logistique MM, sans écriture FI tant qu'il n'y a pas de GR ou de facture." },
-  { id: 8, question: "Quel t-code est typiquement utilisé pour la création d'une Purchase Requisition ?", options: ["ME51N", "ME21N", "MIGO"], answer: 0, explanation: "ME51N est le t-code standard pour créer une PR dans SAP MM." },
-  { id: 9, question: "Dans S/4HANA, quel avantage clé apporte l'architecture P2P par rapport à ECC ?", options: ["Moins d'intégration avec FI", "Plus de tables redondantes", "Vue temps réel sur stocks, engagements et dettes fournisseurs"], answer: 2, explanation: "S/4HANA fournit une visibilité temps réel sur inventaire, POs, GR/IR, dettes fournisseurs et cash-flow." },
-  { id: 10, question: "Vrai ou Faux : le paiement final au fournisseur est géré dans FI, pas dans MM.", options: ["Vrai", "Faux"], answer: 0, explanation: "Le paiement (F110/F-53) est exécuté en FI-AP, même si MM a déclenché la facture." },
-];
-
-const MmQuiz = () => {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const score = QUIZ_QUESTIONS.reduce((acc, q) => acc + (answers[q.id] === q.answer ? 1 : 0), 0);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.18 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Quiz MM — 10 questions</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Valide ta compréhension du cycle P2P et de l'intégration FI–MM.</p>
-      <div className="space-y-4">
-        {QUIZ_QUESTIONS.map((q) => (
-          <div key={q.id} className="border border-gray-100 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">{q.id}. {q.question}</p>
-            <div className="space-y-2">
-              {q.options.map((opt, idx) => {
-                const selected = answers[q.id] === idx;
-                const isCorrect = q.answer === idx;
-                let cls = "w-full text-left text-sm px-4 py-2.5 rounded-xl border transition-all duration-150 ";
-                if (!submitted) cls += selected ? "border-amber-400 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 font-medium" : "border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-amber-400/60";
-                else if (isCorrect) cls += "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium";
-                else if (selected) cls += "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400";
-                else cls += "border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
-                return <button key={idx} type="button" disabled={submitted} onClick={() => !submitted && setAnswers((p) => ({ ...p, [q.id]: idx }))} className={cls}>{opt}</button>;
-              })}
-            </div>
-            {submitted && <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">{q.explanation}</p>}
-          </div>
-        ))}
-      </div>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        {!submitted ? <button type="button" onClick={() => setSubmitted(true)} className="btn-primary px-6 py-2.5">Valider mes réponses</button> : <>
-          <div className="text-sm font-semibold text-slate-900 dark:text-white">Score : <span className="gradient-text text-base">{score} / {QUIZ_QUESTIONS.length}</span></div>
-          <button type="button" onClick={() => { setAnswers({}); setSubmitted(false); }} className="btn-outline px-6 py-2.5 text-sm">Recommencer</button>
-        </>}
-      </div>
-    </motion.section>
-  );
-};
-
 const FAQ_ITEMS = [
   { q: "Quelle est la différence entre PR et PO en SAP MM ?", a: "La Purchase Requisition (PR) est un document interne : un service demande un achat. La Purchase Order (PO) est le document externe envoyé au fournisseur après validation. La PR peut être convertie en PO automatiquement ou manuellement." },
   { q: "Pourquoi le compte GR/IR est-il si important dans MM ?", a: "Le compte GR/IR est un compte d'attente qui fait le pont entre la réception physique (GR) et la facture fournisseur (MIRO). Il assure que la comptabilité reflète fidèlement ce qui a été reçu mais pas encore facturé, et vice versa." },
@@ -273,8 +221,7 @@ export default function MM() {
       <Integration />
       <S4HANAFeatures />
       <CareerBenefits />
-      <MmQuiz />
-      <MmResources />
+        <MmResources />
       <FaqAccordion />
     </ModuleLayout>
   );
