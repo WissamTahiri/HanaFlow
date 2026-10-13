@@ -29,6 +29,13 @@ plus pages S/4HANA / AI Joule), avec :
 - **Certification** : émission de certificats PDF + vérification publique par URL.
 - **Gamification serveur** : XP, badges, streak (source de vérité en base).
 - **Growth** : widget feedback, prompt NPS, témoignages publics.
+- **Équipes (B2B)** : organisations multi-sièges créées par un admin (après contrat
+  "sur devis") — le owner (`/team`) invite par email (lien à 7 jours), voit les agrégats
+  de ses membres (certificats, score moyen examen, XP, dernière activité) et peut en
+  retirer ; rejoindre une invitation se fait depuis `/team/join`.
+- **Emplois** : job board (`/emplois`) filtrable par module SAP et séniorité ; candidater
+  (réservé aux membres Pro) envoie un snapshot du CV généré par l'IA, avec modération
+  des annonces et suivi des candidatures (statuts) côté admin.
 - Plan Pro (codes promo), panel admin complet.
 
 ## Stack
@@ -65,7 +72,9 @@ src/
 │   │   │                 # forgot/reset-password, verify-email, resend-verification
 │   │   ├── admin/        # users (+ bulk/export/[id]/impersonate/revoke-sessions),
 │   │   │                 # promo-codes, audit-log, settings, stats, analytics,
-│   │   │                 # feedback, nps, testimonials
+│   │   │                 # feedback, nps, testimonials, organizations (+ [id],
+│   │   │                 # [id]/transfer-owner), jobs (+ [id], [id]/applications,
+│   │   │                 # applications/[id])
 │   │   ├── tutor/chat/           # tuteur SAP (generateText)
 │   │   ├── interview/            # start + grade (mock interview, generateJSON)
 │   │   ├── cv/optimize/          # CV builder IA
@@ -75,14 +84,21 @@ src/
 │   │   ├── certificates/         # route + issue + verify/[id]
 │   │   ├── feedback/, nps/ (+ should-show), testimonials/
 │   │   ├── progress/
-│   │   └── promo/redeem/
+│   │   ├── promo/redeem/
+│   │   ├── team/                 # route (dashboard owner), invite (+ invite/accept),
+│   │   │                         # members/[userId] (DELETE) — gate `requireOrgOwner`
+│   │   └── jobs/                 # route (liste publique filtrée module/séniorité),
+│   │                             # [id]/apply (candidature, gate `requireProUser`),
+│   │                             # my-applications
 │   ├── admin/            # Panel admin : users, promo-codes, audit-log, settings,
-│   │                     # feedback, nps, testimonials
+│   │                     # feedback, nps, testimonials, organizations, jobs (+ [id]/applications)
 │   ├── modules-sap/      # fi, co, mm, sd, pp, ai
 │   ├── certifications/   # Pages d'intro + /examen par module + comparer
 │   ├── flashcards/       # révision espacée SM-2 (+ [code])
 │   ├── cv-builder/, entretien/, roadmap-personnalisee/   # outils IA carrière
 │   ├── certificats/, verifier-certificat/[id]/           # certifs + vérif publique
+│   ├── team/, team/join/         # dashboard équipe owner + acceptation d'invitation
+│   ├── emplois/, emplois/[id]/   # job board public (+ détail offre)
 │   ├── dashboard/, profil/, achievements/, pricing/, stats/, ecoles/
 │   ├── s4hana/, ai-joule/, processus-metier/, roadmap/, a-propos/, contact/
 │   ├── login/, register/, forgot-password/, reset-password/, verify-email/
@@ -113,7 +129,7 @@ src/
 
 ## Schéma Prisma
 
-~16 modèles dans `prisma/schema.prisma` :
+~19 modèles dans `prisma/schema.prisma` :
 - `User` — + `totp*` (secret chiffré AES-GCM, anti-replay, backup codes),
   `pwdChangedAt` (invalide les access tokens émis avant), `emailVerifiedAt`
 - `RefreshToken`, `PasswordResetToken`, `EmailVerificationToken` — tous hashés SHA-256
@@ -126,6 +142,11 @@ src/
 - `PromoCode` (code, usageLimit, expiresAt)
 - `AdminAuditLog` (actor, action, target, metadata, ip)
 - `SiteSetting` (key/value : maintenance mode, bannière, etc.)
+- `Organization`, `OrganizationMember` (role `owner` | `member`, 1 org par user),
+  `OrganizationInvite` (token hashé SHA-256, 7j, 1 par email en attente) — équipes B2B
+- `JobListing` (annonce `/emplois` : module SAP, séniorité, work mode, contrat ;
+  `source`/`externalId` préparent un futur import externe), `JobApplication`
+  (snapshot du CV au moment de la candidature, statut `new | reviewed | contacted | rejected`)
 
 ## Couche IA (`lib/ai.ts`)
 
