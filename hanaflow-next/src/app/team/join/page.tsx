@@ -31,6 +31,7 @@ function JoinTeamInner() {
       setStatus("done");
       // isPro n'est pas dans le JWT : un reload force AuthContext à re-fetch
       // la session (silentRefresh) et récupérer le nouvel état à jour.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- reload complet voulu, pas une navigation SPA
       setTimeout(() => { window.location.href = "/dashboard"; }, 1800);
     } catch {
       setMessage("Erreur réseau");
