@@ -17,17 +17,18 @@ function formatTime(seconds: number) {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
-// Pas de `correctIndex` ici : ces questions viennent du Server Component
-// via `getExamQuestionsForClient` (lib/certAccess.ts), qui retire la clé de
-// correction du payload RSC. La notation est faite côté serveur dans
-// POST /api/quiz/submit ; la correction par question (`correctAnswers`,
-// cf. props ci-dessous) n'est connue du client qu'APRÈS que la tentative a
-// été enregistrée en base.
+// Pas de `correctIndex` ni d'`explanation` ici : ces questions viennent du
+// Server Component via `getExamQuestionsForClient` (lib/certAccess.ts), qui
+// retire la clé de correction ET l'explication du payload RSC (l'explication
+// reformule presque toujours la bonne réponse en clair). La notation est
+// faite côté serveur dans POST /api/quiz/submit ; la correction et les
+// explications par question (`correctAnswers`/`explanations`, cf. props
+// ci-dessous) ne sont connues du client qu'APRÈS que la tentative a été
+// enregistrée en base.
 interface ExamQuestion {
   id?: string | number;
   question: string;
   options: string[];
-  explanation: string;
   chapter: string;
 }
 
@@ -76,7 +77,7 @@ function StartScreen({ onStart, questions, certInfo, certPath }: { onStart: () =
   );
 }
 
-function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, moduleId, correctAnswers }: {
+function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, moduleId, correctAnswers, explanations }: {
   answers: (number | null)[];
   questions: ExamQuestion[];
   timeUsed: number;
@@ -90,6 +91,8 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
    * en pourcentage brut, pour rester cohérent avec l'affichage "X/N".
    */
   correctAnswers: Record<string, number>;
+  /** Explications par questionId — même raison : connues seulement après notation. */
+  explanations: Record<string, string>;
 }) {
   const { user } = useAuth();
   const getCorrectIndex = (q: ExamQuestion, i: number) => correctAnswers[String(q.id ?? i)];
@@ -137,7 +140,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
           </div>
           <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4">
             <p className="text-xs font-semibold text-slate-500 mb-1">Explication</p>
-            <p className="text-sm text-slate-700 dark:text-slate-200">{q.explanation}</p>
+            <p className="text-sm text-slate-700 dark:text-slate-200">{explanations[String(q.id ?? reviewIndex)]}</p>
           </div>
           <div className="flex gap-3 mt-4">
             <button onClick={() => setReviewIndex((i) => Math.max(0, i - 1))} disabled={reviewIndex === 0} className="px-4 py-2 bg-gray-100 dark:bg-slate-700 rounded-xl text-sm font-semibold disabled:opacity-40">← Précédente</button>
@@ -235,6 +238,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
   // Corrigé renvoyé par le serveur après notation (POST /api/quiz/submit) —
   // `correctIndex` n'existe nulle part côté client avant ce moment.
   const [correctAnswers, setCorrectAnswers] = useState<Record<string, number>>({});
+  const [explanations, setExplanations] = useState<Record<string, string>>({});
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const answersRef = useRef(answers);
   useEffect(() => { answersRef.current = answers; }, [answers]);
@@ -251,6 +255,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
       answers: questions.map((q, i) => ({ questionId: String(q.id ?? i), selectedIndex: ans[i] })),
     });
     setCorrectAnswers(result?.correctAnswers ?? {});
+    setExplanations(result?.explanations ?? {});
     setPhase("results");
   }, [moduleId, submitQuizAttempt, questions]);
 
@@ -409,6 +414,7 @@ export default function ExamSimulatorTemplate({ questions, certInfo, moduleId, c
             certPath={certPath}
             moduleId={moduleId}
             correctAnswers={correctAnswers}
+            explanations={explanations}
           />
         )}
       </div>

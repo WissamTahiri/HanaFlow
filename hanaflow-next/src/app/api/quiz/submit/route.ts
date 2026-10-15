@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err, rateLimit, validateBody } from "@/lib/apiHelpers";
 import { applyGamificationEvent } from "@/lib/gamificationServer";
-import { getChapterQuiz, getExamQuestions, isValidModule, type CanonicalQuestion } from "@/lib/certAccess";
+import { getChapterQuiz, getExamQuestions, isPremiumChapter, isValidModule, type CanonicalQuestion } from "@/lib/certAccess";
 
 /**
  * POST /api/quiz/submit — enregistre une tentative de quiz de chapitre ou de
@@ -40,18 +40,20 @@ function gradeAnswers(
 ) {
   const selectedByQuestionId = new Map(submitted.map((a) => [a.questionId, a.selectedIndex]));
   let correct = 0;
-  // Corrigé une fois la tentative déjà notée : sûr à renvoyer au client (il ne
-  // peut plus s'en servir pour changer le score de CETTE tentative, déjà
-  // enregistrée en base). Sert à l'écran de révision du simulateur d'examen.
+  // Corrigé + explications une fois la tentative déjà notée : sûr à renvoyer
+  // au client (il ne peut plus s'en servir pour changer le score de CETTE
+  // tentative, déjà enregistrée en base). Sert à l'écran de révision.
   const correctAnswers: Record<string, number> = {};
+  const explanations: Record<string, string> = {};
   canonical.forEach((q, i) => {
     const questionId = q.id !== undefined ? String(q.id) : String(i);
     correctAnswers[questionId] = q.correctIndex;
+    if (q.explanation) explanations[questionId] = q.explanation;
     if (selectedByQuestionId.get(questionId) === q.correctIndex) correct++;
   });
   const questionsTotal = canonical.length;
   const score = questionsTotal > 0 ? Math.round((correct / questionsTotal) * 100) : 0;
-  return { score, questionsTotal, correctAnswers };
+  return { score, questionsTotal, correctAnswers, explanations };
 }
 
 export async function POST(req: NextRequest) {
@@ -69,18 +71,36 @@ export async function POST(req: NextRequest) {
 
   if (!isValidModule(moduleCode)) return err("Module SAP inconnu.", 400);
 
+  // Gate Pro : l'examen complet est toujours Pro ; un quiz de chapitre ne
+  // l'est que si CE chapitre est premium. Sans ce check, un compte gratuit
+  // pouvait appeler cette route directement (hors UI) pour obtenir une
+  // tentative d'examen "réussie" côté serveur, puis un vrai certificat via
+  // /api/certificates/issue — contournement total du paywall Pro.
+  const needsPro = kind === "exam" || (!!chapterId && isPremiumChapter(moduleCode, chapterId));
+  let userIsPro = auth.user.role === "admin";
+  if (needsPro && !userIsPro) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: auth.user.userId },
+      select: { isPro: true },
+    });
+    userIsPro = !!dbUser?.isPro;
+    if (!userIsPro) {
+      return err("Cette fonctionnalité est réservée aux membres Pro.", 402);
+    }
+  }
+
   let canonical: CanonicalQuestion[] | null;
   if (kind === "exam") {
     canonical = getExamQuestions(moduleCode);
   } else {
     if (!chapterId) return err("chapterId requis pour un quiz de chapitre.", 400);
-    canonical = getChapterQuiz(moduleCode, chapterId);
+    canonical = getChapterQuiz(moduleCode, chapterId, userIsPro);
   }
   if (!canonical || canonical.length === 0) {
     return err("Questions introuvables pour ce module/chapitre.", 400);
   }
 
-  const { score, questionsTotal } = gradeAnswers(canonical, answers);
+  const { score, questionsTotal, correctAnswers, explanations } = gradeAnswers(canonical, answers);
 
   const attempt = await prisma.quizAttempt.create({
     data: { userId: auth.user.userId, moduleCode, kind, chapterId: chapterId ?? null, score, questionsTotal },
@@ -94,5 +114,5 @@ export async function POST(req: NextRequest) {
       : { type: "exam_complete", module: moduleCode, passed: score >= 65 },
   );
 
-  return ok({ attempt, score, questionsTotal, gamification: state, newBadges });
+  return ok({ attempt, score, questionsTotal, correctAnswers, explanations, gamification: state, newBadges });
 }

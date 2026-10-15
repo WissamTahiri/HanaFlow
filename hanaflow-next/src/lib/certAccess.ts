@@ -87,19 +87,20 @@ export type ClientExamQuestion = {
   id?: string | number;
   question: string;
   options: string[];
-  explanation: string;
   chapter: string;
 };
 
 /**
  * Version des questions d'examen sûre à passer à un Client Component :
- * `correctIndex` est retiré. Le score reste calculé côté serveur dans
- * POST /api/quiz/submit à partir de `getExamQuestions` (banque complète,
- * jamais exposée au client), qui renvoie ensuite la correction par question
- * une fois la tentative déjà enregistrée en base.
+ * `correctIndex` ET `explanation` sont retirés. `explanation` reformule
+ * presque toujours la bonne réponse en toutes lettres ("ACDOCA est la table
+ * du Universal Journal...") — la laisser dans le payload initial revient à
+ * divulguer le corrigé même sans `correctIndex`. Le score ET les
+ * explications reviennent côté serveur dans POST /api/quiz/submit, une fois
+ * la tentative déjà enregistrée en base (cf. `gradeAnswers`).
  */
 export function getExamQuestionsForClient(moduleId: ModuleId): ClientExamQuestion[] {
-  return CERT_MAP[moduleId].exam.map(({ correctIndex: _correctIndex, ...rest }) => rest);
+  return CERT_MAP[moduleId].exam.map(({ correctIndex: _correctIndex, explanation: _explanation, ...rest }) => rest);
 }
 
 export function getCertMeta(moduleId: ModuleId) {
@@ -107,17 +108,27 @@ export function getCertMeta(moduleId: ModuleId) {
   return { code: certCode(moduleId), shortName: cert.shortName };
 }
 
-export type CanonicalQuestion = { id?: string | number; correctIndex: number };
+export type CanonicalQuestion = { id?: string | number; correctIndex: number; explanation?: string };
+
+/** Indique si un chapitre est premium (Pro requis). `false` si le chapitre n'existe pas. */
+export function isPremiumChapter(moduleId: ModuleId, chapterId: string): boolean {
+  const cert = CERT_MAP[moduleId].cert as CertShape;
+  const chapter = cert.chapters.find((ch) => (ch as { id?: string }).id === chapterId);
+  return chapter?.isPremium ?? false;
+}
 
 /**
  * Renvoie les questions du quiz d'un chapitre (banque officielle), pour
- * notation côté serveur. Retourne `null` si le module ou le chapitre
- * n'existe pas.
+ * notation côté serveur. Retourne `null` si le module/chapitre n'existe pas
+ * OU si le chapitre est premium et que `isPro` est faux — l'autorisation est
+ * appliquée ici, à la source des données, plutôt que déléguée à chaque
+ * caller (qui pourrait oublier de vérifier isPremium avant d'appeler ceci).
  */
-export function getChapterQuiz(moduleId: ModuleId, chapterId: string): CanonicalQuestion[] | null {
+export function getChapterQuiz(moduleId: ModuleId, chapterId: string, isPro: boolean): CanonicalQuestion[] | null {
   const cert = CERT_MAP[moduleId].cert as CertShape;
   const chapter = cert.chapters.find((ch) => (ch as { id?: string }).id === chapterId);
   if (!chapter) return null;
+  if (chapter.isPremium && !isPro) return null;
   const quiz = (chapter as { quiz?: CanonicalQuestion[] }).quiz;
   return quiz ?? null;
 }

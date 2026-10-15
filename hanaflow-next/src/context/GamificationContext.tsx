@@ -57,6 +57,7 @@ type QuizGradeResult = {
   score: number;
   questionsTotal: number;
   correctAnswers?: Record<string, number>;
+  explanations?: Record<string, string>;
 } | null;
 
 interface GamificationContextValue {
@@ -227,7 +228,7 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
         }
         const data = await res.json();
         applyServerState(data.gamification, data.newBadges);
-        return { score: data.score, questionsTotal: data.questionsTotal, correctAnswers: data.correctAnswers };
+        return { score: data.score, questionsTotal: data.questionsTotal, correctAnswers: data.correctAnswers, explanations: data.explanations };
       } catch (e) {
         console.warn("[gamification] réseau KO sur /api/quiz/submit", e);
         return null;

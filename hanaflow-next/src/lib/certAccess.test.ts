@@ -13,6 +13,7 @@ import {
   getExamQuestionsForClient,
   getCertMeta,
   getChapterQuiz,
+  isPremiumChapter,
   type ModuleId,
 } from "./certAccess";
 
@@ -102,12 +103,16 @@ describe("getExamQuestions (banque complète, server-only)", () => {
 });
 
 describe("getExamQuestionsForClient (sûr pour le client)", () => {
-  it("strips correctIndex from every question", () => {
+  it("strips correctIndex and explanation from every question", () => {
     for (const moduleId of MODULES) {
       const clientQuestions = getExamQuestionsForClient(moduleId);
       expect(clientQuestions.length).toBeGreaterThan(0);
       for (const q of clientQuestions) {
         expect(q).not.toHaveProperty("correctIndex");
+        // `explanation` reformule presque toujours la bonne réponse en clair
+        // (ex: "ACDOCA est la table du Universal Journal...") — la garder
+        // dans le payload initial reviendrait à divulguer le corrigé.
+        expect(q).not.toHaveProperty("explanation");
         expect(q.question).toBeTypeOf("string");
         expect(Array.isArray(q.options)).toBe(true);
       }
@@ -123,6 +128,20 @@ describe("getExamQuestionsForClient (sûr pour le client)", () => {
   });
 });
 
+describe("isPremiumChapter", () => {
+  it("matches isPremium flag of the actual chapter", () => {
+    const cert = getCertForPlan("fi", true);
+    const premiumChapter = cert.chapters.find((c: { isPremium: boolean }) => c.isPremium);
+    const freeChapter = cert.chapters.find((c: { isPremium: boolean }) => !c.isPremium);
+    expect(isPremiumChapter("fi", premiumChapter.id)).toBe(true);
+    expect(isPremiumChapter("fi", freeChapter.id)).toBe(false);
+  });
+
+  it("returns false for an unknown chapter id", () => {
+    expect(isPremiumChapter("fi", "does-not-exist")).toBe(false);
+  });
+});
+
 describe("getCertMeta", () => {
   it("returns code + shortName for each module", () => {
     for (const moduleId of MODULES) {
@@ -134,10 +153,11 @@ describe("getCertMeta", () => {
 });
 
 describe("getChapterQuiz", () => {
-  it("returns the canonical quiz (with correctIndex) for a valid chapter", () => {
+  it("returns the canonical quiz (with correctIndex) for a free chapter, even without Pro", () => {
     const cert = getCertForPlan("fi", true);
-    const firstChapterId = cert.chapters[0].id;
-    const quiz = getChapterQuiz("fi", firstChapterId);
+    const freeChapter = cert.chapters.find((c: { isPremium: boolean }) => !c.isPremium);
+    expect(freeChapter).toBeDefined();
+    const quiz = getChapterQuiz("fi", freeChapter.id, false);
     expect(quiz).not.toBeNull();
     expect(quiz!.length).toBeGreaterThan(0);
     for (const q of quiz!) {
@@ -145,16 +165,23 @@ describe("getChapterQuiz", () => {
     }
   });
 
-  it("returns the quiz for a premium chapter too (server-side grading needs the full bank)", () => {
+  it("returns the quiz for a premium chapter when the caller has verified isPro", () => {
     const cert = getCertForPlan("fi", true);
     const premiumChapter = cert.chapters.find((c: { isPremium: boolean }) => c.isPremium);
     expect(premiumChapter).toBeDefined();
-    const quiz = getChapterQuiz("fi", premiumChapter.id);
+    const quiz = getChapterQuiz("fi", premiumChapter.id, true);
     expect(quiz).not.toBeNull();
     expect(quiz!.length).toBeGreaterThan(0);
   });
 
+  it("returns null for a premium chapter when isPro is false — no paywall bypass via server-side grading", () => {
+    const cert = getCertForPlan("fi", true);
+    const premiumChapter = cert.chapters.find((c: { isPremium: boolean }) => c.isPremium);
+    expect(premiumChapter).toBeDefined();
+    expect(getChapterQuiz("fi", premiumChapter.id, false)).toBeNull();
+  });
+
   it("returns null for an unknown chapter id", () => {
-    expect(getChapterQuiz("fi", "does-not-exist")).toBeNull();
+    expect(getChapterQuiz("fi", "does-not-exist", true)).toBeNull();
   });
 });

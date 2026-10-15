@@ -91,10 +91,17 @@ export async function POST(req: NextRequest) {
   // Récupère le user pour avoir son nom à la date d'émission
   const dbUser = await prisma.user.findUnique({
     where: { id: auth.user.userId },
-    select: { name: true, isSuspended: true, emailVerifiedAt: true },
+    select: { name: true, isSuspended: true, emailVerifiedAt: true, isPro: true },
   });
   if (!dbUser) return err("Utilisateur introuvable", 401);
   if (dbUser.isSuspended) return err("Compte suspendu", 403);
+  // Le certificat de completion est un avantage Pro — sans ce check, un
+  // compte gratuit qui poste une tentative d'examen directement contre
+  // /api/quiz/submit (hors UI) pouvait obtenir un vrai certificat vérifiable
+  // publiquement sans jamais payer l'abonnement Pro.
+  if (!dbUser.isPro && auth.user.role !== "admin") {
+    return err("La délivrance de certificat est réservée aux membres Pro.", 402);
+  }
   if (!dbUser.emailVerifiedAt) {
     return err(
       "Tu dois vérifier ton email avant de pouvoir générer un certificat.",
