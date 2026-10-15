@@ -58,8 +58,17 @@ export async function POST(req: NextRequest) {
   // notifie le titulaire réel du compte plutôt que de le dire à l'appelant.
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
   if (existing) {
-    const tpl = templates.duplicateRegistrationAttempt(existing.name);
-    void sendEmail({ to: existing.email, ...tpl });
+    // On calcule quand même un hash Argon2id (jeté) pour que le temps de
+    // réponse soit comparable au chemin "nouvel utilisateur" plus bas, qui
+    // fait le même calcul coûteux — même logique anti-timing que /login.
+    void argon2.hash(data.password, { type: argon2.argon2id });
+    // Rate-limit dédié par email visé (indépendant du rate-limit par IP) :
+    // sans ça, un attaquant qui change d'IP peut spammer indéfiniment la
+    // boîte mail d'une victime précise avec cette notification.
+    if (await rateLimit(`register:dup-notify:${existing.email}`, 3, 24 * 60 * 60 * 1000)) {
+      const tpl = templates.duplicateRegistrationAttempt(existing.name);
+      void sendEmail({ to: existing.email, ...tpl });
+    }
     return err("Impossible de créer ce compte avec ces informations.", 400);
   }
 

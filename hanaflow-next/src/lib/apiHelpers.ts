@@ -281,14 +281,17 @@ async function redisRateLimit(key: string, maxRequests: number, windowMs: number
       // quand même : sans ça, une panne Upstash désactive silencieusement
       // tous les rate limits (login, reset password, codes promo, quotas IA)
       // pendant toute la durée de l'incident, sans aucune alerte.
-      console.error(`[rateLimit] fail-open (HTTP ${res.status}) sur ${key}`);
+      // On ne logge que la catégorie (préfixe avant ":"), jamais la clé
+      // complète : elle peut embarquer un email ou une IP (ex: "login:email:
+      // user@domain.com") et ne doit pas finir en clair dans les logs.
+      console.error(`[rateLimit] fail-open (HTTP ${res.status}) sur la categorie "${key.split(":")[0]}"`);
       return true;
     }
     const data = (await res.json()) as Array<{ result: number | string }>;
     const count = typeof data[0]?.result === "number" ? data[0].result : parseInt(String(data[0]?.result), 10);
     return Number.isFinite(count) && count <= maxRequests;
   } catch (e) {
-    console.error(`[rateLimit] fail-open (erreur réseau) sur ${key}:`, e);
+    console.error(`[rateLimit] fail-open (erreur réseau) sur la categorie "${key.split(":")[0]}":`, e);
     return true; // fail-open
   }
 }
