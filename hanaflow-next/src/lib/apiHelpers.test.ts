@@ -20,7 +20,6 @@ import { signAccessToken, signImpersonationToken } from "./auth";
 
 beforeAll(() => {
   process.env.JWT_SECRET = "test-secret-32chars-minimum-please";
-  process.env.JWT_REFRESH_SECRET = "test-refresh-secret-32chars-minimum";
 });
 
 beforeEach(() => {

@@ -198,7 +198,7 @@ directement dans une route** — tout passe par ce module.
 Vercel, auto-deploy sur `master`. `vercel.json` : framework `nextjs`, région `cdg1`.
 
 Variables d'env requises en prod (voir `hanaflow-next/README.md`) :
-`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `NEXT_PUBLIC_APP_URL`, et optionnellement `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `JWT_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`, `TOTP_ENCRYPTION_KEY` (chiffre les secrets TOTP), `GROQ_API_KEY` (features IA ; sans clé, les routes IA renvoient `no_provider`), `GROQ_MODEL` (override). Voir `hanaflow-next/.env.example`.
+`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `NEXT_PUBLIC_APP_URL`, et optionnellement `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `JWT_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`, `TOTP_ENCRYPTION_KEY` (chiffre les secrets TOTP), `GROQ_API_KEY` (features IA ; sans clé, les routes IA renvoient `no_provider`), `GROQ_MODEL` (override). Voir `hanaflow-next/.env.example`.
 
 ## Promouvoir un admin
 

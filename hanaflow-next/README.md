@@ -66,8 +66,7 @@ Voir `.env.example` pour la liste complète.
 |----------|-------------|
 | `DATABASE_URL` | URL poolée Neon PostgreSQL |
 | `DIRECT_URL` | URL directe Neon PostgreSQL (migrations) |
-| `JWT_SECRET` | Secret pour les access tokens (min 32 chars) |
-| `JWT_REFRESH_SECRET` | Secret pour les refresh tokens (min 32 chars) |
+| `JWT_SECRET` | Secret pour les access tokens (min 32 chars). Les refresh tokens sont des octets aléatoires hashés en base, pas des JWT — pas de secret séparé à générer pour eux. |
 | `NEXT_PUBLIC_APP_URL` | URL publique du site (ex: `http://localhost:3000` en dev) |
 | `TOTP_ENCRYPTION_KEY` | Chiffre les secrets 2FA — sans elle, stockés en clair (à éviter en prod) |
 | `GROQ_API_KEY` | Requis pour le tuteur SAP, CV builder, mock interview, roadmap |

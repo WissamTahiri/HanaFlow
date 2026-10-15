@@ -20,7 +20,7 @@ npm run e2e:debug      # avec inspecteur
 Les tests créent et suppriment des users en DB via `/api/auth/register`. Il faut donc :
 
 - une `DATABASE_URL` valide (généralement la même que dev — surtout pas la prod)
-- les variables `JWT_SECRET`, `JWT_REFRESH_SECRET`
+- la variable `JWT_SECRET`
 - `NEXT_PUBLIC_APP_URL=http://localhost:3000`
 - `RESEND_API_KEY` peut rester vide (les emails partent en console.log et les
   tests ne les vérifient pas par email — uniquement par token DB)
