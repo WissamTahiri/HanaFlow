@@ -126,6 +126,20 @@ export const templates = {
     `),
   }),
 
+  totpDisabled: (name: string) => ({
+    subject: "Authentification à deux facteurs désactivée",
+    html: wrap(`
+      <h1 style="font-size:20px;margin:0 0 16px 0;">2FA désactivée sur ton compte</h1>
+      <p style="line-height:1.6;color:#334155;">
+        Bonjour ${esc(name)}, la vérification en deux étapes vient d'être désactivée sur ton compte HanaFlow.
+      </p>
+      <p style="font-size:13px;color:#64748B;margin-top:16px;">
+        Si tu n'es pas à l'origine de cette action, change ton mot de passe immédiatement
+        et réactive la 2FA depuis ton profil.
+      </p>
+    `),
+  }),
+
   proActivated: (name: string) => ({
     subject: "Plan Pro activé !",
     html: wrap(`
@@ -250,6 +264,29 @@ export const templates = {
       </p>
       <p style="font-size:13px;color:#64748B;margin-top:24px;">
         Si ce n'était pas toi, aucune action n'est requise — aucun compte n'a été créé ni modifié.
+      </p>
+    `),
+  }),
+
+  /**
+   * Alerte envoyée à ADMIN_NOTIFICATION_EMAIL sur une action admin à haut
+   * risque (impersonation, suppression de compte, désactivation 2FA...).
+   * Si le compte admin lui-même est compromis, c'est le seul signal qui
+   * arrive par un canal différent de l'app — sans ça, rien n'avertit
+   * personne tant que l'audit log n'est pas consulté manuellement.
+   */
+  adminSecurityAlert: (details: { action: string; actorEmail: string; targetEmail?: string; extra?: string }) => ({
+    subject: sanitizeHeader(`Action admin sensible : ${details.action}`),
+    html: wrap(`
+      <h1 style="font-size:18px;margin:0 0 16px 0;">Action admin à haut risque</h1>
+      <p style="line-height:1.6;color:#334155;">
+        <strong>${esc(details.action)}</strong> déclenchée par <strong>${esc(details.actorEmail)}</strong>
+        ${details.targetEmail ? `sur le compte <strong>${esc(details.targetEmail)}</strong>` : ""}.
+      </p>
+      ${details.extra ? `<p style="line-height:1.6;color:#334155;">${esc(details.extra)}</p>` : ""}
+      <p style="font-size:13px;color:#64748B;margin-top:24px;">
+        Si tu n'es pas à l'origine de cette action, change ton mot de passe immédiatement
+        et consulte le journal d'audit (/admin/audit-log).
       </p>
     `),
   }),

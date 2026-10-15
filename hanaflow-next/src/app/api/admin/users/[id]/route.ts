@@ -4,7 +4,7 @@ import argon2 from "argon2";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, ok, err, validateBody, verifyAdminPassword, rateLimit } from "@/lib/apiHelpers";
 import { logAudit } from "@/lib/audit";
-import { sendEmail, templates } from "@/lib/email";
+import { sendEmail, templates, getAdminEmail } from "@/lib/email";
 
 const patchSchema = z.object({
   isPro: z.boolean().optional(),
@@ -198,6 +198,15 @@ export async function DELETE(
       metadata: { email: user?.email, name: user?.name },
       req,
     });
+    const notifyEmail = getAdminEmail();
+    if (notifyEmail && user?.email) {
+      const tpl = templates.adminSecurityAlert({
+        action: "Suppression de compte",
+        actorEmail: auth.user.email,
+        targetEmail: user.email,
+      });
+      void sendEmail({ to: notifyEmail, ...tpl });
+    }
     return ok({ message: "Utilisateur supprimé" });
   } catch {
     return err("Utilisateur introuvable", 404);

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, ok, err, verifyAdminPassword, rateLimit } from "@/lib/apiHelpers";
 import { signImpersonationToken } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
+import { sendEmail, templates, getAdminEmail } from "@/lib/email";
 
 export async function POST(
   req: NextRequest,
@@ -51,6 +52,15 @@ export async function POST(
       metadata: { targetEmail: target.email, durationMinutes: 15 },
       req,
     });
+    const notifyEmail = getAdminEmail();
+    if (notifyEmail) {
+      const tpl = templates.adminSecurityAlert({
+        action: "Impersonation",
+        actorEmail: auth.user.email,
+        targetEmail: target.email,
+      });
+      void sendEmail({ to: notifyEmail, ...tpl });
+    }
 
     return ok({
       token,

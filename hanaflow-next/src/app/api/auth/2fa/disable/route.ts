@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err, validateBody, rateLimit, getClientIp } from "@/lib/apiHelpers";
 import { verifyTotpWithStep } from "@/lib/totp";
 import { decryptTotpSecret, consumeBackupCode } from "@/lib/totpCrypto";
+import { sendEmail, templates } from "@/lib/email";
 
 const schema = z.object({
   password: z.string().min(1),
@@ -72,6 +73,11 @@ export async function POST(req: NextRequest) {
         totpBackupCodes: undefined,
       },
     });
+
+    // Signal utile si la session a été compromise : l'utilisateur doit
+    // savoir que sa 2FA vient de tomber, même si c'est lui qui l'a fait.
+    const tpl = templates.totpDisabled(user.name);
+    void sendEmail({ to: user.email, ...tpl });
 
     return ok({ message: "2FA désactivée", backupCodeUsed });
   } catch (e) {
