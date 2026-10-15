@@ -7,15 +7,15 @@
 
 export const sdCertification = {
   id: "c-ts4sd-2023",
-  code: "C_TS460_2023",
+  code: "C_TS462",
   name: "SAP Certified Associate – SAP S/4HANA for Sales and Distribution",
   shortName: "SAP SD Certification",
   level: "Associate",
   examDuration: 180,
   examQuestions: 80,
   simulatorQuestions: 80,
-  passingScore: 65,
-  officialLink: "https://training.sap.com/certification/c_ts4sd_2023",
+  passingScore: 82,
+  officialLink: "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-sales",
   color: "from-purple-900 via-purple-700 to-purple-500",
 
   chapters: [

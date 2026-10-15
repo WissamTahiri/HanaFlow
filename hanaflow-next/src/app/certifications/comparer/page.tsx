@@ -190,12 +190,12 @@ export default function CompararePage() {
 
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4">
-                    <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Questions officielles</p>
-                    <p className="text-xl font-bold text-slate-900 dark:text-white">{selected.officialQuestions}</p>
+                    <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Format de l&apos;examen</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white leading-snug">{selected.format}</p>
                   </div>
                   <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4">
                     <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">HanaFlow simulateur</p>
-                    <p className="text-xl font-bold text-slate-900 dark:text-white">{selected.questions}</p>
+                    <p className="text-xl font-bold text-slate-900 dark:text-white">{selected.questions} questions</p>
                   </div>
                 </div>
 

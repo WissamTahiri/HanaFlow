@@ -22,10 +22,10 @@ export const aiCertification = {
   name: "SAP Certified Associate – Generative AI Developer",
   shortName: "SAP Generative AI Developer",
   level: "Associate",
-  examDuration: 120,        // minutes (examen réel, format pratique)
+  examDuration: 180,        // minutes (examen réel, format pratique)
   examQuestions: 60,
   simulatorQuestions: 30,
-  passingScore: 65,
+  passingScore: 76,
   officialLink: "https://learning.sap.com/certifications/sap-certified-associate-sap-generative-ai-developer",
   color: "from-violet-600 via-purple-700 to-fuchsia-700",
 

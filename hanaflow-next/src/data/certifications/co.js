@@ -18,8 +18,8 @@ export const coCertification = {
   examDuration: 180,
   examQuestions: 80,
   simulatorQuestions: 80,
-  passingScore: 65,
-  officialLink: "https://training.sap.com/certification/c_ts4co_2023",
+  passingScore: 59,
+  officialLink: "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-for-management-accounting-associates",
   color: "from-indigo-900 via-indigo-700 to-indigo-500",
 
   chapters: [

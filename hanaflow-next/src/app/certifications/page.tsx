@@ -25,7 +25,6 @@ const certifications = ["fi", "co", "mm", "sd", "ai", "pp"].map((id) => {
     code: certCode(id),
     ...CARD_STYLE[id],
     level: m.level,
-    questions: m.officialQuestions,
     duration: m.durationMin,
     chapters: m.chapters,
     passingScore: m.passingScore,
@@ -44,7 +43,7 @@ const lastVerifiedLabel = new Date(certCatalog.lastVerified).toLocaleDateString(
 
 const FAQ_ITEMS = [
   { q: "Dois-je refaire la formation sur le site de SAP ?", a: "Non. Les cours officiels SAP ne sont pas obligatoires. Vous passez l'examen directement sur SAP Certification Hub après votre préparation sur HanaFlow." },
-  { q: "Quel est le format de l'examen officiel ?", a: "Selon la certification : 60 à 80 questions, 120 à 180 minutes, seuil de réussite entre 64 % et 76 % (le détail exact est sur la fiche de chaque certification et la page Comparer). L'examen se passe en ligne (proctored) ou dans un centre de test agréé." },
+  { q: "Quel est le format de l'examen officiel ?", a: "SAP a basculé ses certifications S/4HANA vers des System-Based Assessments : plus de QCM, mais une activité pratique unique réalisée dans un système SAP réel (3h, seuil de réussite entre 59 % et 82 % selon le module — le détail exact est sur la fiche de chaque certification et la page Comparer). L'examen se passe en ligne (proctored) ou dans un centre de test agréé." },
   { q: "Combien coûte l'examen ?", a: "Un voucher d'examen SAP coûte environ 500 à 535 €. Il vous donne accès à une tentative. En cas d'échec, un 2ème voucher peut être acheté." },
 ];
 
@@ -125,8 +124,8 @@ export default function CertificationsPage() {
                       <div className="p-5">
                         <div className="grid grid-cols-3 gap-3 mb-4">
                           <div className="text-center">
-                            <p className="text-xl font-bold text-slate-900 dark:text-white">{cert.questions}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">questions</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-white">{cert.passingScore}%</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">seuil de réussite</p>
                           </div>
                           <div className="text-center border-x border-gray-100 dark:border-slate-700">
                             <p className="text-xl font-bold text-slate-900 dark:text-white">{cert.duration}<span className="text-sm">min</span></p>
@@ -165,8 +164,8 @@ export default function CertificationsPage() {
                     <div className="p-5">
                       <div className="grid grid-cols-3 gap-3 mb-4">
                         <div className="text-center">
-                          <p className="text-xl font-bold text-slate-900 dark:text-white">{cert.questions}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">questions</p>
+                          <p className="text-xl font-bold text-slate-900 dark:text-white">{cert.passingScore}%</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">seuil de réussite</p>
                         </div>
                         <div className="text-center border-x border-gray-100 dark:border-slate-700">
                           <p className="text-xl font-bold text-slate-900 dark:text-white">{cert.duration}<span className="text-sm">min</span></p>

@@ -18,8 +18,8 @@ export const fiCertification = {
   examDuration: 180,       // minutes (examen réel)
   examQuestions: 80,       // questions (examen réel)
   simulatorQuestions: 80,  // questions disponibles dans notre simulateur (= format examen réel)
-  passingScore: 65,        // % minimum pour réussir
-  officialLink: "https://training.sap.com/certification/c_ts4fi_2023",
+  passingScore: 60,        // % minimum pour réussir
+  officialLink: "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-for-financial-accounting",
   color: "from-blue-900 via-blue-700 to-blue-500",
 
   chapters: [

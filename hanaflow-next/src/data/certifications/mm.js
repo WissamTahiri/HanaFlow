@@ -17,7 +17,7 @@ export const mmCertification = {
   examQuestions: 80,
   simulatorQuestions: 80,
   passingScore: 76,
-  officialLink: "https://training.sap.com/certification/c_ts4mm_2023",
+  officialLink: "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-sourcing-and-procurement",
   color: "from-emerald-900 via-emerald-700 to-emerald-500",
 
   chapters: [
