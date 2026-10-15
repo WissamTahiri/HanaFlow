@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, err, ok, validateBody } from "@/lib/apiHelpers";
+import { logAudit } from "@/lib/audit";
 
 const patchSchema = z.object({
   authorName: z.string().min(1).max(120).optional(),
@@ -32,6 +33,14 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     where: { id: tId },
     data: validated.data,
   });
+  void logAudit({
+    actor: auth.user,
+    action: "testimonial.update",
+    targetType: "testimonial",
+    targetId: tId,
+    metadata: validated.data,
+    req,
+  });
   return ok({ testimonial: updated });
 }
 
@@ -44,5 +53,12 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   if (!Number.isFinite(tId)) return err("ID invalide", 400);
 
   await prisma.testimonial.delete({ where: { id: tId } });
+  void logAudit({
+    actor: auth.user,
+    action: "testimonial.delete",
+    targetType: "testimonial",
+    targetId: tId,
+    req,
+  });
   return ok({ message: "Témoignage supprimé" });
 }

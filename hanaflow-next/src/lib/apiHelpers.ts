@@ -277,13 +277,18 @@ async function redisRateLimit(key: string, maxRequests: number, windowMs: number
     });
     if (!res.ok) {
       // Si Redis ne répond pas, on laisse passer (fail-open) plutôt que de bloquer
-      // tout le service. Vercel WAF doit prendre le relais en prod.
+      // tout le service. Vercel WAF doit prendre le relais en prod. On logge
+      // quand même : sans ça, une panne Upstash désactive silencieusement
+      // tous les rate limits (login, reset password, codes promo, quotas IA)
+      // pendant toute la durée de l'incident, sans aucune alerte.
+      console.error(`[rateLimit] fail-open (HTTP ${res.status}) sur ${key}`);
       return true;
     }
     const data = (await res.json()) as Array<{ result: number | string }>;
     const count = typeof data[0]?.result === "number" ? data[0].result : parseInt(String(data[0]?.result), 10);
     return Number.isFinite(count) && count <= maxRequests;
-  } catch {
+  } catch (e) {
+    console.error(`[rateLimit] fail-open (erreur réseau) sur ${key}:`, e);
     return true; // fail-open
   }
 }
