@@ -46,6 +46,11 @@ const nextConfig: NextConfig = {
   // Le composant CvDocument reste de toute façon chargé via next/dynamic
   // ssr:false côté client uniquement.
   transpilePackages: ["@react-pdf/renderer"],
+  // `next/image` n'est utilisé nulle part dans src/ — désactiver son
+  // optimisation (sharp) supprime la surface d'attaque de cette dépendance
+  // (plusieurs CVE hautes dans libvips/libheif/librsvg) sans attendre
+  // l'upgrade Next.js qui la corrige en cascade.
+  images: { unoptimized: true },
   async redirects() {
     return [
       // HCM a été remplacé par AI (certif SAP C_THR12 retirée en mars 2025).
