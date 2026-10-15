@@ -235,6 +235,25 @@ export const templates = {
     `),
   }),
 
+  duplicateRegistrationAttempt: (name: string) => ({
+    subject: "Quelqu'un a essayé de créer un compte avec ton adresse",
+    html: wrap(`
+      <h1 style="font-size:20px;margin:0 0 16px 0;">Tentative de création de compte</h1>
+      <p style="line-height:1.6;color:#334155;">
+        Bonjour ${esc(name)}, quelqu'un a essayé de créer un compte HanaFlow avec ton adresse email.
+        Tu as déjà un compte — si c'est toi, connecte-toi simplement.
+      </p>
+      <p style="margin-top:24px;">
+        <a href="https://hanaflow.vercel.app/login" style="display:inline-block;padding:12px 20px;background:#2563EB;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;">
+          Se connecter →
+        </a>
+      </p>
+      <p style="font-size:13px;color:#64748B;margin-top:24px;">
+        Si ce n'était pas toi, aucune action n'est requise — aucun compte n'a été créé ni modifié.
+      </p>
+    `),
+  }),
+
   adminNewSignup: (newUser: { name: string; email: string }) => ({
     subject: sanitizeHeader(`Nouveau compte : ${newUser.name}`),
     html: wrap(`

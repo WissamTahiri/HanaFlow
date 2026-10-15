@@ -18,6 +18,7 @@ import { getPublicSettings } from "@/lib/settings";
 import { sendEmail, templates, getAdminEmail } from "@/lib/email";
 import { checkPasswordBreached } from "@/lib/passwordBreach";
 import { issueEmailVerification } from "@/lib/emailVerification";
+import { logAudit } from "@/lib/audit";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Nom trop long"),
@@ -51,8 +52,16 @@ export async function POST(req: NextRequest) {
   if (!validated.success) return err(validated.error, 400);
   const { data } = validated;
 
+  // Anti-énumération : ne jamais confirmer explicitement qu'un email est déjà
+  // utilisé (sinon un attaquant peut tester une liste d'emails — ex. les
+  // employés d'une entreprise cliente — pour savoir qui a un compte). On
+  // notifie le titulaire réel du compte plutôt que de le dire à l'appelant.
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
-  if (existing) return err("Email déjà utilisé", 400);
+  if (existing) {
+    const tpl = templates.duplicateRegistrationAttempt(existing.name);
+    void sendEmail({ to: existing.email, ...tpl });
+    return err("Impossible de créer ce compte avec ces informations.", 400);
+  }
 
   // Refuser les mots de passe connus comme compromis (HIBP, k-anonymity).
   // On ne bloque pas en cas d'erreur réseau pour ne pas casser l'inscription.
@@ -87,6 +96,28 @@ export async function POST(req: NextRequest) {
     },
     select: { id: true, name: true, email: true, role: true, isPro: true, isSuspended: true, createdAt: true },
   });
+
+  if (isAutoAdmin) {
+    // Bootstrap discret et sans alerte = un oubli de retrait d'un email de
+    // ADMIN_EMAILS (ou une fuite de cette liste) donnerait un accès admin
+    // instantané sans que personne ne le remarque.
+    void logAudit({
+      actor: { userId: user.id, email: user.email, role: user.role },
+      action: "auth.auto_admin_promotion",
+      targetType: "user",
+      targetId: user.id,
+      metadata: { via: "ADMIN_EMAILS" },
+      req,
+    });
+    const notifyEmail = getAdminEmail();
+    if (notifyEmail) {
+      void sendEmail({
+        to: notifyEmail,
+        subject: "Nouveau compte admin créé via ADMIN_EMAILS",
+        html: `<p>Le compte <strong>${user.email}</strong> vient d'être créé avec le rôle admin via la liste ADMIN_EMAILS. Si ce n'était pas attendu, retire cet email de la variable d'environnement et révoque ses sessions.</p>`,
+      });
+    }
+  }
 
   const accessToken = signAccessToken({ userId: user.id, email: user.email, role: user.role });
   const rawRefresh = crypto.randomBytes(64).toString("hex");

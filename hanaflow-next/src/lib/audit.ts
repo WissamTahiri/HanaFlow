@@ -14,6 +14,7 @@ export type AuditAction =
   | "promo.delete"
   | "settings.update"
   | "auth.admin_login"
+  | "auth.auto_admin_promotion"
   | "org.create"
   | "org.update"
   | "org.delete"
@@ -22,7 +23,9 @@ export type AuditAction =
   | "job.create"
   | "job.update"
   | "job.delete"
-  | "job.application.status_update";
+  | "job.application.status_update"
+  | "testimonial.update"
+  | "testimonial.delete";
 
 interface AuditEntry {
   actor: JwtPayload;
