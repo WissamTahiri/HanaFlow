@@ -33,6 +33,11 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
   "promo.delete":         { label: "Suppr. promo",           color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
   "settings.update":      { label: "Modif. paramètres",      color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400" },
   "auth.admin_login":     { label: "Connexion admin",        color: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300" },
+  "auth.auto_admin_promotion": { label: "Auto-promotion admin", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" },
+  "auth.login_failed":   { label: "Échec de connexion",     color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+  "auth.2fa_failed":     { label: "Échec 2FA",               color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+  "testimonial.update":  { label: "Modif. témoignage",       color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
+  "testimonial.delete":  { label: "Suppr. témoignage",       color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
 };
 
 export default function AuditLogPage() {
@@ -137,7 +142,17 @@ export default function AuditLogPage() {
                             {meta.label}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{e.actorEmail}</td>
+                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
+                          {e.actorEmail}
+                          {e.actorId === null && (
+                            <span
+                              className="ml-1.5 inline-flex px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400"
+                              title="Email saisi par un appelant non authentifié — pas de preuve d'identité"
+                            >
+                              non vérifié
+                            </span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs">
                           {e.targetType ? `${e.targetType}#${e.targetId}` : "—"}
                         </td>
