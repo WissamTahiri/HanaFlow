@@ -30,6 +30,9 @@ type Row = {
   quizPassCount: number;
   lastActivityAt: Date | null;
   lessonProgress: Record<string, number>;
+  quizXpCredited: Record<string, number>;
+  passedQuizChapters: string[];
+  examXpCredited: Record<string, number>;
 };
 
 const DAY_MS = 86_400_000;
@@ -43,6 +46,9 @@ function baseRow(overrides: Partial<Row> = {}): Row {
     quizPassCount: 0,
     lastActivityAt: null,
     lessonProgress: {},
+    quizXpCredited: {},
+    passedQuizChapters: [],
+    examXpCredited: {},
     ...overrides,
   };
 }
@@ -64,6 +70,9 @@ function setupTx(row: Row) {
       quizPassCount: data.quizPassCount ?? row.quizPassCount,
       lastActivityAt: (data.lastActivityAt as Date | null | undefined) ?? row.lastActivityAt,
       lessonProgress: data.lessonProgress ?? row.lessonProgress,
+      quizXpCredited: data.quizXpCredited ?? row.quizXpCredited,
+      passedQuizChapters: data.passedQuizChapters ?? row.passedQuizChapters,
+      examXpCredited: data.examXpCredited ?? row.examXpCredited,
     };
   });
 
@@ -248,23 +257,49 @@ describe("applyGamificationEvent — module_visit (vérifié en DB, pas confianc
 describe("applyGamificationEvent — quiz_pass / exam_complete / pro_activated", () => {
   it("awards quizXp(100)=150 + the quiz_perfect badge XP (200) for a 100% quiz", async () => {
     setupTx(baseRow());
-    const { state, newBadges } = await applyGamificationEvent(1, { type: "quiz_pass", scorePct: 100 });
+    const { state, newBadges } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 });
     expect(newBadges).toContain("quiz_perfect");
     expect(state.totalXp).toBe(150 + 200); // quizXp + badge.xp (badges portent leur propre XP)
   });
 
   it("awards only quizXp (no badge bonus) once quiz_perfect is already earned", async () => {
     setupTx(baseRow({ badges: ["quiz_perfect"] }));
-    const { state, newBadges } = await applyGamificationEvent(1, { type: "quiz_pass", scorePct: 100 });
+    const { state, newBadges } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 });
     expect(newBadges).not.toContain("quiz_perfect");
     expect(state.totalXp).toBe(150);
   });
 
   it("awards the quiz_pass badge on the 3rd passing quiz (>=65%)", async () => {
     setupTx(baseRow({ quizPassCount: 2 }));
-    const { newBadges, state } = await applyGamificationEvent(1, { type: "quiz_pass", scorePct: 70 });
+    const { newBadges, state } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 70 });
     expect(state.quizPassCount).toBe(3);
     expect(newBadges).toContain("quiz_pass");
+  });
+
+  it("anti-farming : replaying the same chapter's quiz does not grant XP again", async () => {
+    setupTx(baseRow({ quizXpCredited: { "fi:ch1": 150 }, badges: ["quiz_perfect"] }));
+    const { state } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 });
+    expect(state.totalXp).toBe(0);
+  });
+
+  it("anti-farming : improving a chapter from non-perfect to 100% credits only the delta (150-75)", async () => {
+    // quiz_perfect déjà acquis via un autre chapitre, pour isoler le delta de CE chapitre.
+    setupTx(baseRow({ quizXpCredited: { "fi:ch1": 75 }, badges: ["quiz_perfect"] }));
+    const { state } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 });
+    expect(state.totalXp).toBe(75);
+  });
+
+  it("anti-farming : a different chapter is tracked independently and still grants full XP", async () => {
+    setupTx(baseRow({ quizXpCredited: { "fi:ch1": 150 }, badges: ["quiz_perfect"] }));
+    const { state } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch2", scorePct: 100 });
+    expect(state.totalXp).toBe(150);
+  });
+
+  it("anti-farming : passing the same chapter twice only increments quizPassCount once", async () => {
+    setupTx(baseRow({ passedQuizChapters: ["fi:ch1"], quizPassCount: 1, quizXpCredited: { "fi:ch1": 75 } }));
+    const { state, newBadges } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 70 });
+    expect(state.quizPassCount).toBe(1);
+    expect(newBadges).not.toContain("quiz_pass");
   });
 
   it("awards examXp(passed)=400 + exam_fi badge (300) + exam_pass badge (500) when an exam is passed", async () => {
@@ -301,6 +336,30 @@ describe("applyGamificationEvent — quiz_pass / exam_complete / pro_activated",
     expect(state.totalXp).toBe(400);
   });
 
+  it("anti-farming : replaying the same module's exam does not grant XP again", async () => {
+    setupTx(baseRow({ examXpCredited: { fi: 400 }, badges: ["exam_fi", "exam_pass"] }));
+    const { state } = await applyGamificationEvent(1, { type: "exam_complete", module: "fi", passed: true });
+    expect(state.totalXp).toBe(0);
+  });
+
+  it("anti-farming : a failed retry after a passed exam credits no extra XP (tier already at max)", async () => {
+    setupTx(baseRow({ examXpCredited: { fi: 400 }, badges: ["exam_fi", "exam_pass"] }));
+    const { state } = await applyGamificationEvent(1, { type: "exam_complete", module: "fi", passed: false });
+    expect(state.totalXp).toBe(0);
+  });
+
+  it("anti-farming : passing after an earlier failed attempt credits the XP delta plus the exam_pass badge (first pass)", async () => {
+    setupTx(baseRow({ examXpCredited: { fi: 150 }, badges: ["exam_fi"] }));
+    const { state } = await applyGamificationEvent(1, { type: "exam_complete", module: "fi", passed: true });
+    expect(state.totalXp).toBe(250 + 500); // tier delta (400-150) + exam_pass badge (première réussite)
+  });
+
+  it("anti-farming : a different module is tracked independently and still grants full XP", async () => {
+    setupTx(baseRow({ examXpCredited: { fi: 400 } }));
+    const { state } = await applyGamificationEvent(1, { type: "exam_complete", module: "co", passed: true });
+    expect(state.totalXp).toBe(400 + 300 + 500); // examXp + exam_co badge + exam_pass badge
+  });
+
   it("only awards pro_member when the DB confirms isPro=true (never trusts the client)", async () => {
     setupTx(baseRow());
     userFindUniqueMock.mockResolvedValue({ isPro: false });
@@ -333,7 +392,7 @@ describe("applyGamificationEvent — write conflict retry (Serializable P2034)",
       };
       return fn(tx);
     });
-    const { state } = await applyGamificationEvent(1, { type: "quiz_pass", scorePct: 100 });
+    const { state } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 });
     expect(calls).toBe(2);
     expect(state.totalXp).toBe(150 + 200); // quizXp + badge quiz_perfect
   });
@@ -344,7 +403,7 @@ describe("applyGamificationEvent — write conflict retry (Serializable P2034)",
       err.code = "P2034";
       throw err;
     });
-    await expect(applyGamificationEvent(1, { type: "quiz_pass", scorePct: 100 })).rejects.toThrow("conflict");
+    await expect(applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 })).rejects.toThrow("conflict");
   });
 
   it("rethrows immediately for non-conflict errors (no retry)", async () => {
@@ -353,7 +412,7 @@ describe("applyGamificationEvent — write conflict retry (Serializable P2034)",
       calls += 1;
       throw new Error("boom");
     });
-    await expect(applyGamificationEvent(1, { type: "quiz_pass", scorePct: 100 })).rejects.toThrow("boom");
+    await expect(applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 })).rejects.toThrow("boom");
     expect(calls).toBe(1);
   });
 });

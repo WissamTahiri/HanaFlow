@@ -84,6 +84,24 @@ model UserGamification {
    * pour farmer de l'XP : seul le delta au-dessus du max connu est crédité.
    */
   lessonProgress Json      @default("{}") @map("lesson_progress")
+  /**
+   * Plus haut palier d'XP déjà crédité par quiz de chapitre, clé
+   * "module:chapterId" (JSON {clé: xp}). Anti-farming : un même quiz rejoué
+   * ne crédite que le delta au-dessus du palier déjà obtenu (75 non-parfait,
+   * 150 à 100%), jamais l'XP complet à chaque soumission.
+   */
+  quizXpCredited Json      @default("{}") @map("quiz_xp_credited")
+  /**
+   * Chapitres "module:chapterId" déjà réussis (≥65%) au moins une fois
+   * (JSON array). Fait progresser le badge quiz_pass une seule fois par
+   * chapitre, même si l'utilisateur rejoue le même quiz en boucle.
+   */
+  passedQuizChapters Json  @default("[]") @map("passed_quiz_chapters")
+  /**
+   * Plus haut palier d'XP déjà crédité par examen, par module (JSON
+   * {module: xp}). Même logique anti-farming que quizXpCredited.
+   */
+  examXpCredited Json      @default("{}") @map("exam_xp_credited")
   updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

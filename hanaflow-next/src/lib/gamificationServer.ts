@@ -23,7 +23,7 @@ export type GamificationEvent =
   | { type: "login" }
   | { type: "module_visit" }
   | { type: "lesson_complete"; module: string; lessonCount: number }
-  | { type: "quiz_pass"; scorePct: number }
+  | { type: "quiz_pass"; module: string; chapterId: string; scorePct: number }
   | { type: "exam_complete"; module: string; passed: boolean }
   | { type: "pro_activated" };
 
@@ -38,6 +38,9 @@ type Row = {
   quizPassCount: number;
   lastActivityAt: Date | null;
   lessonProgress: unknown;
+  quizXpCredited: unknown;
+  passedQuizChapters: unknown;
+  examXpCredited: unknown;
 };
 
 function toState(row: Row): GamificationState & { lastActivityAt: Date | null } {
@@ -51,14 +54,20 @@ function toState(row: Row): GamificationState & { lastActivityAt: Date | null } 
   };
 }
 
-/** Extrait un `{module: count}` sûr depuis le JSON stocké en base. */
-function toLessonProgress(value: unknown): Record<string, number> {
+/** Extrait un `{clé: nombre}` sûr depuis le JSON stocké en base. */
+function toNumberMap(value: unknown): Record<string, number> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   const out: Record<string, number> = {};
   for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
     if (typeof v === "number" && Number.isFinite(v)) out[k] = v;
   }
   return out;
+}
+
+/** Extrait un tableau de strings sûr depuis le JSON stocké en base. */
+function toStringSet(value: unknown): Set<string> {
+  if (!Array.isArray(value)) return new Set();
+  return new Set(value.filter((v): v is string => typeof v === "string"));
 }
 
 export async function getGamification(userId: number) {
@@ -113,7 +122,10 @@ async function runGamificationEvent(tx: Tx, userId: number, event: GamificationE
   let xpDelta = 0;
   let { streakCurrent, streakBest, quizPassCount } = current;
   let lastActivityAt = current.lastActivityAt;
-  const lessonProgress = toLessonProgress(existingRow.lessonProgress);
+  const lessonProgress = toNumberMap(existingRow.lessonProgress);
+  const quizXpCredited = toNumberMap(existingRow.quizXpCredited);
+  const passedQuizChapters = toStringSet(existingRow.passedQuizChapters);
+  const examXpCredited = toNumberMap(existingRow.examXpCredited);
 
   const award = (id: string) => {
     if (badges.has(id)) return;
@@ -164,16 +176,35 @@ async function runGamificationEvent(tx: Tx, userId: number, event: GamificationE
       break;
     }
     case "quiz_pass": {
-      xpDelta += quizXp(event.scorePct);
+      // Anti-farming : rejouer le même quiz de chapitre ne crédite plus
+      // d'XP à l'infini. On ne crédite que le delta au-dessus du palier déjà
+      // obtenu pour CE chapitre (75 non-parfait, 150 à 100%), et le badge de
+      // progression quiz_pass ne compte qu'une seule fois par chapitre réussi.
+      const chapterKey = `${event.module}:${event.chapterId}`;
+      const prevTier = quizXpCredited[chapterKey] ?? 0;
+      const newTier = quizXp(event.scorePct);
+      const tierDelta = newTier - prevTier;
+      if (tierDelta > 0) {
+        xpDelta += tierDelta;
+        quizXpCredited[chapterKey] = newTier;
+      }
       if (event.scorePct === 100) award("quiz_perfect");
-      if (event.scorePct >= 65) {
+      if (event.scorePct >= 65 && !passedQuizChapters.has(chapterKey)) {
+        passedQuizChapters.add(chapterKey);
         quizPassCount += 1;
         if (quizPassCount >= 3) award("quiz_pass");
       }
       break;
     }
     case "exam_complete": {
-      xpDelta += examXp(event.passed);
+      // Même logique anti-farming que quiz_pass, par module cette fois.
+      const prevTier = examXpCredited[event.module] ?? 0;
+      const newTier = examXp(event.passed);
+      const tierDelta = newTier - prevTier;
+      if (tierDelta > 0) {
+        xpDelta += tierDelta;
+        examXpCredited[event.module] = newTier;
+      }
       if (EXAM_BADGE_MODULES.includes(event.module)) award(`exam_${event.module}`);
       if (event.passed) award("exam_pass");
       break;
@@ -196,6 +227,9 @@ async function runGamificationEvent(tx: Tx, userId: number, event: GamificationE
       quizPassCount,
       lastActivityAt,
       lessonProgress,
+      quizXpCredited,
+      passedQuizChapters: [...passedQuizChapters],
+      examXpCredited,
     },
   });
 

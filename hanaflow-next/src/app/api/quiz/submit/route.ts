@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
   const { state, newBadges } = await applyGamificationEvent(
     auth.user.userId,
     kind === "quiz"
-      ? { type: "quiz_pass", scorePct: score }
+      ? { type: "quiz_pass", module: moduleCode, chapterId: chapterId!, scorePct: score }
       : { type: "exam_complete", module: moduleCode, passed: score >= 65 },
   );
 
