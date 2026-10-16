@@ -14,6 +14,7 @@ import {
   generateCsrfToken,
   getClientIp,
 } from "@/lib/apiHelpers";
+import { logSecurityEvent } from "@/lib/audit";
 import { verifyTotpWithStep } from "@/lib/totp";
 import { decryptTotpSecret, consumeBackupCode } from "@/lib/totpCrypto";
 
@@ -61,6 +62,7 @@ export async function POST(req: NextRequest) {
 
   // Même message pour email inexistant et mauvais mot de passe (anti-énumération)
   if (!user || !validPassword) {
+    void logSecurityEvent({ targetEmail: data.email, action: "auth.login_failed", req });
     return err("Identifiants invalides", 400);
   }
 
@@ -84,6 +86,7 @@ export async function POST(req: NextRequest) {
     if (step !== null) {
       // TOTP valide → vérifier qu'il n'a pas déjà été utilisé (anti-replay)
       if (user.totpLastStep !== null && step <= user.totpLastStep) {
+        void logSecurityEvent({ targetEmail: data.email, action: "auth.2fa_failed", req, metadata: { reason: "replay" } });
         return NextResponse.json(
           { message: "Code 2FA déjà utilisé. Attendez 30 secondes.", requires2fa: true },
           { status: 401 },
@@ -100,6 +103,7 @@ export async function POST(req: NextRequest) {
         : null;
       const remaining = storedCodes ? await consumeBackupCode(data.totpCode, storedCodes) : null;
       if (!remaining) {
+        void logSecurityEvent({ targetEmail: data.email, action: "auth.2fa_failed", req, metadata: { reason: "invalid_code" } });
         return NextResponse.json(
           { message: "Identifiants invalides", requires2fa: true },
           { status: 401 },

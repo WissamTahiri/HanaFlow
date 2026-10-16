@@ -25,7 +25,9 @@ export type AuditAction =
   | "job.delete"
   | "job.application.status_update"
   | "testimonial.update"
-  | "testimonial.delete";
+  | "testimonial.delete"
+  | "auth.login_failed"
+  | "auth.2fa_failed";
 
 interface AuditEntry {
   actor: JwtPayload;
@@ -89,6 +91,45 @@ function sanitizeMetadata(meta: Record<string, unknown>): Record<string, unknown
     };
   }
   return truncated;
+}
+
+/**
+ * Log d'un événement de sécurité sans acteur authentifié (échec de login,
+ * échec de 2FA...). Sans ça, un credential-stuffing lent qui reste sous le
+ * seuil du rate-limit (ex: quelques tentatives espacées sur plusieurs jours)
+ * ne laisse absolument aucune trace consultable — seul le rate-limit Redis
+ * (TTL, non persistant) voit passer les tentatives.
+ *
+ * `actorId` reste null : on ne sait PAS qui a tenté, seulement quel email a
+ * été visé — ne jamais confondre avec une action réellement authentifiée.
+ */
+export async function logSecurityEvent({
+  targetEmail,
+  action,
+  req,
+  metadata,
+}: {
+  targetEmail: string;
+  action: "auth.login_failed" | "auth.2fa_failed";
+  req?: NextRequest;
+  metadata?: Record<string, unknown>;
+}): Promise<void> {
+  const ipAddress = req ? getClientIp(req) : null;
+  try {
+    await prisma.adminAuditLog.create({
+      data: {
+        actorId: null,
+        actorEmail: targetEmail,
+        action,
+        metadata: metadata
+          ? (sanitizeMetadata(metadata) as Parameters<typeof prisma.adminAuditLog.create>[0]["data"]["metadata"])
+          : undefined,
+        ipAddress,
+      },
+    });
+  } catch (error) {
+    console.error("[logSecurityEvent] échec d'écriture (non bloquant):", error);
+  }
 }
 
 export async function logAudit({
