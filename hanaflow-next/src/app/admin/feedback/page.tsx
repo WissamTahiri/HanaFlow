@@ -37,6 +37,7 @@ export default function AdminFeedbackPage() {
   const [filter, setFilter] = useState("new");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,14 +59,24 @@ export default function AdminFeedbackPage() {
   }, [load]);
 
   const updateStatus = async (id: number, status: string) => {
-    const token = await getToken();
-    await fetch(`/api/admin/feedback/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
-      credentials: "include",
-      body: JSON.stringify({ status }),
-    });
-    load();
+    setError("");
+    try {
+      const token = await getToken();
+      const r = await fetch(`/api/admin/feedback/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+        credentials: "include",
+        body: JSON.stringify({ status }),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setError(d.message ?? "Erreur lors de la mise à jour du statut");
+        return;
+      }
+      await load();
+    } catch {
+      setError("Erreur réseau");
+    }
   };
 
   return (
@@ -76,6 +87,12 @@ export default function AdminFeedbackPage() {
           Voix des utilisateurs envoyée via le widget flottant.
         </p>
       </div>
+
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Filter tabs */}
       <div className="flex flex-wrap gap-2 mb-5">

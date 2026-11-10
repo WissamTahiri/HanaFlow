@@ -17,7 +17,7 @@ const CheckIcon = () => (
 export const metadata: Metadata = {
   title: "Pour les écoles et universités",
   description:
-    "Formez vos étudiants SAP avec HanaFlow : 6 modules S/4HANA en français, simulateurs d'examen au format officiel, certificats vérifiables en ligne. Offre établissement sur devis.",
+    `Formez vos étudiants SAP avec HanaFlow : ${HANAFLOW_STATS.modules} modules S/4HANA en français, simulateurs d'examen au format officiel, certificats vérifiables en ligne. Offre établissement sur devis.`,
 };
 
 const PROBLEMS = [
@@ -86,7 +86,7 @@ const STEPS = [
     n: "3",
     icon: RocketIcon,
     title: "Vos étudiants sont opérationnels",
-    desc: "Comptes provisionnés, accès immédiat aux 6 modules, suivi de leur progression pendant tout le programme.",
+    desc: `Comptes provisionnés, accès immédiat aux ${HANAFLOW_STATS.modules} modules, suivi de leur progression pendant tout le programme.`,
   },
 ];
 

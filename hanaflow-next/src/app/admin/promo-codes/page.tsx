@@ -21,6 +21,7 @@ export default function AdminPromoCodesPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const [form, setForm] = useState({
     code: "",
@@ -51,8 +52,9 @@ export default function AdminPromoCodesPage() {
 
   const createCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token || !form.code.trim()) return;
+    if (!token || !form.code.trim() || creating) return;
     setError("");
+    setCreating(true);
     try {
       const body: Record<string, unknown> = { code: form.code.trim() };
       if (form.description.trim()) body.description = form.description.trim();
@@ -72,6 +74,8 @@ export default function AdminPromoCodesPage() {
       setShowForm(false);
     } catch {
       setError("Erreur réseau");
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -177,9 +181,10 @@ export default function AdminPromoCodesPage() {
           <div className="sm:col-span-2 flex justify-end">
             <button
               type="submit"
-              className="px-5 py-2 bg-sap-blue text-white rounded-lg text-sm font-semibold hover:bg-sap-blue/90 transition-colors"
+              disabled={creating}
+              className="px-5 py-2 bg-sap-blue text-white rounded-lg text-sm font-semibold hover:bg-sap-blue/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Créer le code
+              {creating ? "Création…" : "Créer le code"}
             </button>
           </div>
         </form>

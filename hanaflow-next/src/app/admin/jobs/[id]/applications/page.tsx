@@ -26,6 +26,7 @@ export default function AdminJobApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [error, setError] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -45,20 +46,36 @@ export default function AdminJobApplicationsPage() {
   useEffect(() => { load(); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateStatus = async (appId: number, status: Application["status"]) => {
-    const token = await getToken();
-    await fetch(`/api/admin/jobs/applications/${appId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
-      credentials: "include",
-      body: JSON.stringify({ status }),
-    });
-    setApplications((prev) => prev.map((a) => (a.id === appId ? { ...a, status } : a)));
+    setError("");
+    try {
+      const token = await getToken();
+      const r = await fetch(`/api/admin/jobs/applications/${appId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+        credentials: "include",
+        body: JSON.stringify({ status }),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setError(d.message ?? "Erreur lors de la mise à jour du statut");
+        return;
+      }
+      setApplications((prev) => prev.map((a) => (a.id === appId ? { ...a, status } : a)));
+    } catch {
+      setError("Erreur réseau");
+    }
   };
 
   return (
     <div className="max-w-4xl">
       <Link href="/admin/jobs" className="text-sm text-sap-blue hover:underline mb-4 inline-block">← Retour aux annonces</Link>
       <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Candidatures</h1>
+
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+          {error}
+        </div>
+      )}
 
       {loading ? (
         <p className="text-sm text-slate-400">Chargement…</p>

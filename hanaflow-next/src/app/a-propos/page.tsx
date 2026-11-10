@@ -174,7 +174,7 @@ export default function AboutPage() {
       <Section title="Ce que couvre HanaFlow">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
           {[
-            { title: "6 modules SAP", desc: "FI, CO, MM, SD, PP, IA générative — chacun avec hero, concepts clés, processus, quiz et FAQ.", icon: <BookIcon /> },
+            { title: `${HANAFLOW_STATS.modules} modules SAP`, desc: "FI, CO, MM, SD, PP, IA générative — chacun avec hero, concepts clés, processus, quiz et FAQ.", icon: <BookIcon /> },
             { title: "S/4HANA & IA Joule", desc: "Universal Journal, Fiori, migration, agents IA, Joule Studio et cas d'usage.", icon: <CpuIcon /> },
             { title: "Processus métier", desc: "P2P, O2C, R2R expliqués étape par étape avec t-codes et diagrammes de flux.", icon: <RefreshIcon /> },
             { title: "Quizzes interactifs", desc: "Questions par chapitre avec correction instantanée et explications détaillées.", icon: <CheckCircleIcon /> },

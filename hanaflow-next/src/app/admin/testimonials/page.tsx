@@ -120,24 +120,44 @@ export default function AdminTestimonialsPage() {
 
   const del = async (id: number) => {
     if (!confirm("Supprimer ce témoignage définitivement ?")) return;
-    const token = await getToken();
-    await fetch(`/api/admin/testimonials/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token ?? ""}` },
-      credentials: "include",
-    });
-    await load();
+    setError("");
+    try {
+      const token = await getToken();
+      const r = await fetch(`/api/admin/testimonials/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token ?? ""}` },
+        credentials: "include",
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setError(d.message ?? "Erreur lors de la suppression");
+        return;
+      }
+      await load();
+    } catch {
+      setError("Erreur réseau");
+    }
   };
 
   const togglePublish = async (t: Testimonial) => {
-    const token = await getToken();
-    await fetch(`/api/admin/testimonials/${t.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
-      credentials: "include",
-      body: JSON.stringify({ isPublished: !t.isPublished }),
-    });
-    await load();
+    setError("");
+    try {
+      const token = await getToken();
+      const r = await fetch(`/api/admin/testimonials/${t.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+        credentials: "include",
+        body: JSON.stringify({ isPublished: !t.isPublished }),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setError(d.message ?? "Erreur lors de la mise à jour");
+        return;
+      }
+      await load();
+    } catch {
+      setError("Erreur réseau");
+    }
   };
 
   return (
@@ -151,6 +171,12 @@ export default function AdminTestimonialsPage() {
           + Ajouter
         </button>
       </div>
+
+      {error && !showForm && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+          {error}
+        </div>
+      )}
 
       {loading ? (
         <p className="text-sm text-slate-400">Chargement…</p>

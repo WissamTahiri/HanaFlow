@@ -302,6 +302,16 @@ describe("applyGamificationEvent — quiz_pass / exam_complete / pro_activated",
     expect(newBadges).not.toContain("quiz_pass");
   });
 
+  it("anti-farming : a lower-score retry after a 100% quiz credits no extra XP (tier not downgraded)", async () => {
+    // Symétrique au cas exam_complete ligne ~345 : le palier déjà crédité (150, le max)
+    // ne doit jamais être abaissé par un replay à score plus faible, et tierDelta
+    // (75 - 150 < 0) ne doit rien créditer.
+    setupTx(baseRow({ quizXpCredited: { "fi:ch1": 150 }, badges: ["quiz_perfect"], passedQuizChapters: ["fi:ch1"], quizPassCount: 1 }));
+    const { state, newBadges } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 70 });
+    expect(state.totalXp).toBe(0);
+    expect(newBadges).toEqual([]);
+  });
+
   it("awards examXp(passed)=400 + exam_fi badge (300) + exam_pass badge (500) when an exam is passed", async () => {
     setupTx(baseRow());
     const { state, newBadges } = await applyGamificationEvent(1, {

@@ -1,5 +1,5 @@
 // SAP PP (Production Planning) — C_TS422_2601
-// 7 chapitres, contenu pédagogique, 40 questions simulateur
+// 7 chapitres, contenu pédagogique, 80 questions simulateur
 
 export const ppCertification = {
   id: "pp",
@@ -10,6 +10,13 @@ export const ppCertification = {
     "Maîtrisez la planification de production et la fabrication dans SAP S/4HANA : structures organisationnelles, MRP, ordres de fabrication, gestion d'atelier et intégrations.",
   duration: 180,
   questions: 80,
+  // Alias alignés sur le schéma des autres data files (fi/co/mm/sd/ai.js) :
+  // certAccess.ts, CertificationTemplate.tsx et cert-catalog.json lisent ces
+  // clés-ci en priorité (avec repli sur duration/questions ci-dessus).
+  examDuration: 180,
+  examQuestions: 80,
+  simulatorQuestions: 80,
+  officialLink: "https://learning.sap.com/certifications/sap-certified-associate-sap-s-4hana-production-planning-and-manufacturing",
   passingScore: 64,
   color: "from-rose-600 to-rose-800",
 
@@ -964,7 +971,7 @@ Extension cloud pour la gestion fine de l'atelier :
   ],
 };
 
-// ─── Questions simulateur d'examen PP (40 questions) ───
+// ─── Questions simulateur d'examen PP (80 questions) ───
 export const ppMockExamQuestions = [
   // Ch1 — Structures organisationnelles (6 questions)
   {

@@ -152,7 +152,7 @@ export default function ModulesOverview() {
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
             className="text-blue-100 max-w-xl mx-auto text-base mb-10"
           >
-            Les 6 modules fonctionnels que tu retrouves sur chaque projet S/4HANA — chacun prépare
+            Les {HANAFLOW_STATS.modules} modules fonctionnels que tu retrouves sur chaque projet S/4HANA — chacun prépare
             une certification officielle SAP. Difficulté, prérequis et ordre conseillé, en un coup d'œil.
           </motion.p>
 

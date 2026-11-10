@@ -944,7 +944,7 @@ export const mmCertification = {
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// QUESTIONS DU SIMULATEUR D'EXAMEN MM (40 questions)
+// QUESTIONS DU SIMULATEUR D'EXAMEN MM (80 questions)
 // ═══════════════════════════════════════════════════════════════════
 export const mmMockExamQuestions = [
   // — Ch1 Structures & données de base (5 questions) ─────────────

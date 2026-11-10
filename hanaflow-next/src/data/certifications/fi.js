@@ -5,8 +5,8 @@
  * Structure :
  * - 7 chapitres couvrant 100% du périmètre de l'examen officiel
  * - Leçons avec contenu pédagogique, concepts clés, T-codes
- * - Quiz de chapitre (8-10 questions chacun)
- * - 40 questions pour le simulateur d'examen (format réel)
+ * - Quiz de chapitre (6-10 questions chacun)
+ * - 80 questions pour le simulateur d'examen (format réel)
  */
 
 export const fiCertification = {
@@ -1083,7 +1083,7 @@ export const fiCertification = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════
-// SIMULATEUR D'EXAMEN — 40 questions distribuées sur tous les chapitres
+// SIMULATEUR D'EXAMEN — 80 questions distribuées sur tous les chapitres
 // Distribution proportionnelle aux pondérations réelles de l'examen
 // ═══════════════════════════════════════════════════════════════════════
 export const fiMockExamQuestions = [

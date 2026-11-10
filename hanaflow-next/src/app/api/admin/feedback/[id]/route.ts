@@ -28,10 +28,14 @@ export async function PATCH(
   const validated = validateBody(patchSchema, body);
   if (!validated.success) return err(validated.error, 400);
 
-  const updated = await prisma.feedback.update({
-    where: { id: fbId },
-    data: { status: validated.data.status },
-  });
+  try {
+    const updated = await prisma.feedback.update({
+      where: { id: fbId },
+      data: { status: validated.data.status },
+    });
 
-  return ok({ feedback: updated });
+    return ok({ feedback: updated });
+  } catch {
+    return err("Feedback introuvable", 404);
+  }
 }

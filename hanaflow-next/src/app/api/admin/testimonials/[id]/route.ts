@@ -29,19 +29,23 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const validated = validateBody(patchSchema, body);
   if (!validated.success) return err(validated.error, 400);
 
-  const updated = await prisma.testimonial.update({
-    where: { id: tId },
-    data: validated.data,
-  });
-  void logAudit({
-    actor: auth.user,
-    action: "testimonial.update",
-    targetType: "testimonial",
-    targetId: tId,
-    metadata: validated.data,
-    req,
-  });
-  return ok({ testimonial: updated });
+  try {
+    const updated = await prisma.testimonial.update({
+      where: { id: tId },
+      data: validated.data,
+    });
+    await logAudit({
+      actor: auth.user,
+      action: "testimonial.update",
+      targetType: "testimonial",
+      targetId: tId,
+      metadata: validated.data,
+      req,
+    });
+    return ok({ testimonial: updated });
+  } catch {
+    return err("Témoignage introuvable", 404);
+  }
 }
 
 export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
@@ -52,13 +56,17 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   const tId = parseInt(id, 10);
   if (!Number.isFinite(tId)) return err("ID invalide", 400);
 
-  await prisma.testimonial.delete({ where: { id: tId } });
-  void logAudit({
-    actor: auth.user,
-    action: "testimonial.delete",
-    targetType: "testimonial",
-    targetId: tId,
-    req,
-  });
-  return ok({ message: "Témoignage supprimé" });
+  try {
+    await prisma.testimonial.delete({ where: { id: tId } });
+    await logAudit({
+      actor: auth.user,
+      action: "testimonial.delete",
+      targetType: "testimonial",
+      targetId: tId,
+      req,
+    });
+    return ok({ message: "Témoignage supprimé" });
+  } catch {
+    return err("Témoignage introuvable", 404);
+  }
 }

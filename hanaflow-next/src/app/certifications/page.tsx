@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import certCatalog from "@/data/cert-catalog.json";
 import { certCode } from "@/lib/certCodes";
+import { HANAFLOW_STATS } from "@/config/stats";
 
 // Données de certification : toujours lues depuis cert-catalog.json (source
 // de vérité, mise à jour par scripts/sap-cert-watch.mjs) — jamais hardcodées
@@ -105,7 +106,7 @@ export default function CertificationsPage() {
           {/* Grille de certifications */}
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">Certifications disponibles</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">6 modules S/4HANA Cloud, contenu et quiz alignés sur le périmètre officiel de chaque examen.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{HANAFLOW_STATS.modules} modules S/4HANA Cloud, contenu et quiz alignés sur le périmètre officiel de chaque examen.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-5">
             {certifications.map((cert, i) => (

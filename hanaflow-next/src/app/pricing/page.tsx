@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { useAuth } from "@/context/AuthContext";
 import { trackEvent } from "@/lib/analytics";
+import { HANAFLOW_STATS } from "@/config/stats";
 
 const CheckIcon = () => (
   <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -31,7 +32,7 @@ const PLANS = [
     cta: "Commencer gratuitement",
     ctaStyle: "bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700",
     features: [
-      { label: "6 modules SAP complets (FI, CO, MM, SD, PP, IA générative)", included: true },
+      { label: `${HANAFLOW_STATS.modules} modules SAP complets (FI, CO, MM, SD, PP, IA générative)`, included: true },
       { label: "Chapitre 1 de chaque certification (aperçu)", included: true },
       { label: "Roadmap personnalisée (basique)", included: true },
       { label: "Suivi de progression (modules visités)", included: true },
@@ -57,7 +58,7 @@ const PLANS = [
     cta: "Activer Pro gratuitement",
     ctaStyle: "bg-sap-blue text-white hover:bg-sap-blue-dark",
     features: [
-      { label: "6 modules SAP complets (FI, CO, MM, SD, PP, IA générative)", included: true },
+      { label: `${HANAFLOW_STATS.modules} modules SAP complets (FI, CO, MM, SD, PP, IA générative)`, included: true },
       { label: "Chapitre 1 de chaque certification (aperçu)", included: true },
       { label: "Roadmap personnalisée (basique)", included: true },
       { label: "Suivi de progression (modules visités)", included: true },

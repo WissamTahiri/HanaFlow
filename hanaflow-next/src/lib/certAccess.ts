@@ -100,6 +100,10 @@ export type ClientExamQuestion = {
  * la tentative déjà enregistrée en base (cf. `gradeAnswers`).
  */
 export function getExamQuestionsForClient(moduleId: ModuleId): ClientExamQuestion[] {
+  // Destructuration volontaire pour exclure ces deux champs sensibles de `rest`
+  // (cf. commentaire ci-dessus) — les bindings `_correctIndex`/`_explanation`
+  // ne sont jamais utilisés, c'est le but.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return CERT_MAP[moduleId].exam.map(({ correctIndex: _correctIndex, explanation: _explanation, ...rest }) => rest);
 }
 

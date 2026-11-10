@@ -117,24 +117,44 @@ export default function AdminJobsPage() {
 
   const del = async (id: number) => {
     if (!confirm("Supprimer cette annonce définitivement ?")) return;
-    const token = await getToken();
-    await fetch(`/api/admin/jobs/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token ?? ""}` },
-      credentials: "include",
-    });
-    await load();
+    setError("");
+    try {
+      const token = await getToken();
+      const r = await fetch(`/api/admin/jobs/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token ?? ""}` },
+        credentials: "include",
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setError(d.message ?? "Erreur lors de la suppression");
+        return;
+      }
+      await load();
+    } catch {
+      setError("Erreur réseau");
+    }
   };
 
   const togglePublish = async (j: JobListing) => {
-    const token = await getToken();
-    await fetch(`/api/admin/jobs/${j.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
-      credentials: "include",
-      body: JSON.stringify({ isPublished: !j.isPublished }),
-    });
-    await load();
+    setError("");
+    try {
+      const token = await getToken();
+      const r = await fetch(`/api/admin/jobs/${j.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+        credentials: "include",
+        body: JSON.stringify({ isPublished: !j.isPublished }),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setError(d.message ?? "Erreur lors de la mise à jour");
+        return;
+      }
+      await load();
+    } catch {
+      setError("Erreur réseau");
+    }
   };
 
   return (
@@ -146,6 +166,12 @@ export default function AdminJobsPage() {
         </div>
         <button onClick={openCreate} className="btn-primary px-5 py-2 text-sm">+ Ajouter</button>
       </div>
+
+      {error && !showForm && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+          {error}
+        </div>
+      )}
 
       {loading ? (
         <p className="text-sm text-slate-400">Chargement…</p>

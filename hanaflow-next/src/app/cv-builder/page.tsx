@@ -663,7 +663,7 @@ function StepLanguages({ form, setForm }: StepProps) {
             <div key={i} className="flex gap-2 items-center">
               <input className={inputCls} value={lang.name} onChange={(e) => update(i, "name", e.target.value)} placeholder="Anglais" />
               <input className={inputCls} value={lang.level} onChange={(e) => update(i, "level", e.target.value)} placeholder="C1 / Courant" />
-              <button onClick={() => remove(i)} className="text-xs text-red-500 hover:text-red-700 px-2">×</button>
+              <button type="button" onClick={() => remove(i)} aria-label={`Supprimer la langue ${lang.name || i + 1}`} className="text-xs text-red-500 hover:text-red-700 px-2">×</button>
             </div>
           ))}
           <button onClick={add} className="w-full py-2.5 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-600 text-xs text-slate-600 dark:text-slate-400 hover:border-sap-blue/50 transition-colors">

@@ -330,6 +330,7 @@ function ProfileContent() {
                   <button
                     type="button"
                     onClick={() => setShowPwd((v) => !v)}
+                    aria-label={showPwd ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   >
                     <EyeIcon open={showPwd} />

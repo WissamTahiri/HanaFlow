@@ -1,8 +1,8 @@
 /**
- * Contenu de la certification C_TS460_2023
+ * Contenu de la certification C_TS462
  * SAP Certified Associate – SAP S/4HANA for Sales and Distribution
  *
- * 7 chapitres · leçons · quiz · 40 questions simulateur
+ * 7 chapitres · leçons · quiz · 80 questions simulateur
  */
 
 export const sdCertification = {
@@ -882,7 +882,7 @@ export const sdCertification = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// QUESTIONS SIMULATEUR D'EXAMEN — 40 questions
+// QUESTIONS SIMULATEUR D'EXAMEN — 80 questions
 // ═══════════════════════════════════════════════════════════════════════════
 export const sdMockExamQuestions = [
   // Chapitre 1 — Structures organisationnelles SD

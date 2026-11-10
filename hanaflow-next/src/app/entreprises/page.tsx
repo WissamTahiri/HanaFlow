@@ -17,7 +17,7 @@ const CheckIcon = () => (
 export const metadata: Metadata = {
   title: "Pour les entreprises",
   description:
-    "Formez vos consultants SAP avec HanaFlow : 6 modules S/4HANA, simulateurs d'examen, suivi d'équipe centralisé (certificats, score, XP) et certificats vérifiables en ligne. Offre entreprise sur devis.",
+    `Formez vos consultants SAP avec HanaFlow : ${HANAFLOW_STATS.modules} modules S/4HANA, simulateurs d'examen, suivi d'équipe centralisé (certificats, score, XP) et certificats vérifiables en ligne. Offre entreprise sur devis.`,
 };
 
 const PROBLEMS = [
