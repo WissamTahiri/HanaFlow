@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ok, err, rateLimit, validateBody } from "@/lib/apiHelpers";
 import { applyGamificationEvent } from "@/lib/gamificationServer";
-import { getChapterQuiz, getExamQuestions, isPremiumChapter, isValidModule, type CanonicalQuestion } from "@/lib/certAccess";
+import { getCertMeta, getChapterQuiz, getExamQuestions, isPremiumChapter, isValidModule, type CanonicalQuestion } from "@/lib/certAccess";
 
 /**
  * POST /api/quiz/submit — enregistre une tentative de quiz de chapitre ou de
@@ -107,11 +107,14 @@ export async function POST(req: NextRequest) {
     select: { id: true, attemptedAt: true },
   });
 
+  // Le seuil de réussite officiel varie par module (59 à 82 %, cf. cert-catalog.json)
+  // — un flat 65% créditerait "exam_pass" à tort sur un module plus exigeant (SD: 82%),
+  // ou refuserait le badge sur un module moins exigeant (CO: 59%) pourtant réussi.
   const { state, newBadges } = await applyGamificationEvent(
     auth.user.userId,
     kind === "quiz"
       ? { type: "quiz_pass", module: moduleCode, chapterId: chapterId!, scorePct: score }
-      : { type: "exam_complete", module: moduleCode, passed: score >= 65 },
+      : { type: "exam_complete", module: moduleCode, passed: score >= getCertMeta(moduleCode).passingScore },
   );
 
   return ok({ attempt, score, questionsTotal, correctAnswers, explanations, gamification: state, newBadges });

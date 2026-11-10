@@ -57,8 +57,8 @@ const CoIntro = () => (
 );
 
 const KEY_CONCEPTS = [
-  { code: "CCA", label: "Cost Center Accounting", description: "Suit les coûts par unité de responsabilité (atelier, service IT, direction commerciale…). Compare chaque mois coûts planifiés et coûts réels, poste par poste.", color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400" },
-  { code: "PCA", label: "Profit Center Accounting", description: "Produit un P&L interne par business unit, ligne de produits ou région — intégré nativement à ACDOCA depuis S/4HANA, sans module séparé.", color: "bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-400" },
+  { code: "CCA", label: "Cost Center Accounting", description: "Suit les coûts par unité de responsabilité (atelier, service IT, direction commerciale…). Compare chaque mois coûts planifiés et coûts réels, poste par poste.", color: "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-400" },
+  { code: "PCA", label: "Profit Center Accounting", description: "Produit un P&L interne par business unit, ligne de produits ou région — intégré nativement à ACDOCA depuis S/4HANA, sans module séparé.", color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400" },
   { code: "IO",  label: "Internal Orders", description: "Objets temporaires pour suivre les coûts d'un projet, d'une campagne ou d'un événement, avec budget et contrôle de disponibilité, avant règlement vers d'autres objets CO.", color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400" },
   { code: "CO-PC", label: "Product Cost Controlling", description: "Calcule le coût standard des produits fabriqués à partir de la nomenclature et de la gamme, suit le WIP (Work in Process) et analyse les écarts à la clôture des ordres de production.", color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-400" },
   { code: "CO-PA", label: "Profitability Analysis", description: "Analyse la rentabilité par dimensions métier (client, produit, canal, région). Le cœur du reporting de marge, aujourd'hui recommandé en version account-based (Margin Analysis).", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400" },
@@ -100,7 +100,7 @@ const CoObjects = () => (
         { term: "Operating Concern", def: "Structure la plus large de CO-PA : définit les dimensions d'analyse (client, produit, canal…) et les champs de valeur partagés par toutes les sociétés qui l'utilisent." },
       ].map(({ term, def }) => (
         <div key={term} className="flex gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-700">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
+          <div className="w-2 h-2 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{term}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{def}</p>
@@ -118,13 +118,13 @@ const SUBMODULES = [
   {
     code: "CCA",
     title: "Cost Center Accounting",
-    color: "bg-emerald-600",
+    color: "bg-indigo-600",
     desc: "Le plus ancien et le plus transversal des sous-modules. Chaque charge indirecte — salaires, loyers, énergie, amortissements — est imputée à un centre de coûts dès sa comptabilisation en FI. Le responsable du centre compare ensuite, chaque mois, le réalisé au plan grâce aux rapports standard et peut répartir les coûts non directement affectables (maintenance générale, services supports) vers les centres consommateurs via des cycles d'allocation. C'est le socle sur lequel reposent presque tous les autres sous-modules CO.",
   },
   {
     code: "PCA",
     title: "Profit Center Accounting",
-    color: "bg-teal-600",
+    color: "bg-blue-600",
     desc: "Historiquement un module distinct (EC-PCA) dans ECC, avec ses propres tables de totaux (GLPCT). En S/4HANA, le profit center est devenu une dimension native de l'Universal Journal : chaque ligne d'ACDOCA porte directement un profit center, ce qui permet de produire un compte de résultat par business unit ou par région sans traitement de clôture dédié. L'objectif reste le même — donner à chaque patron de BU sa propre vision P&L — mais l'exécution technique est radicalement simplifiée.",
   },
   {
@@ -180,7 +180,7 @@ const CostProfitCenters = () => (
     <div className="grid sm:grid-cols-2 gap-5">
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded text-xs font-bold bg-emerald-600 text-white">CCA</span>
+          <span className="px-2 py-0.5 rounded text-xs font-bold bg-indigo-600 text-white">CCA</span>
           <h3 className="text-base font-semibold text-slate-900 dark:text-white">Cost Centers</h3>
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-300">
@@ -197,7 +197,7 @@ const CostProfitCenters = () => (
       </div>
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded text-xs font-bold bg-teal-600 text-white">PCA</span>
+          <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-600 text-white">PCA</span>
           <h3 className="text-base font-semibold text-slate-900 dark:text-white">Profit Centers</h3>
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-300">
@@ -215,15 +215,15 @@ const CostProfitCenters = () => (
       </div>
     </div>
     <div className="mt-5 grid sm:grid-cols-2 gap-4">
-      <div className="rounded-xl border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-900/10 p-4">
-        <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-1">Distribution (KSV1 / KSV5)</p>
+      <div className="rounded-xl border border-indigo-200 dark:border-indigo-800/40 bg-indigo-50 dark:bg-indigo-900/10 p-4">
+        <p className="text-sm font-bold text-indigo-700 dark:text-indigo-400 mb-1">Distribution (KSV1 / KSV5)</p>
         <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
           Transfère les coûts primaires tels quels : le compte de coûts d'origine reste visible chez le receveur.
           Utile quand la traçabilité du poste source compte plus que la simplicité du reporting.
         </p>
       </div>
-      <div className="rounded-xl border border-teal-200 dark:border-teal-800/40 bg-teal-50 dark:bg-teal-900/10 p-4">
-        <p className="text-sm font-bold text-teal-700 dark:text-teal-400 mb-1">Assessment (KSU1 / KSU5)</p>
+      <div className="rounded-xl border border-blue-200 dark:border-blue-800/40 bg-blue-50 dark:bg-blue-900/10 p-4">
+        <p className="text-sm font-bold text-blue-700 dark:text-blue-400 mb-1">Assessment (KSU1 / KSU5)</p>
         <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
           Regroupe plusieurs coûts primaires sous un cost élément secondaire dédié côté receveur (ex. 9500 "Frais de
           maintenance imputés"). Exemple : les 18 000 € du centre "Maintenance Générale" sont répartis au prorata des
@@ -348,7 +348,7 @@ const CoPaSection = () => (
     </div>
     <div className="grid sm:grid-cols-2 gap-4">
       {[
-        { title: "Account-based CO-PA (Margin Analysis)", desc: "Recommandé en S/4HANA : les revenus et coûts sont stockés avec les mêmes comptes (cost/revenue elements) que le grand livre, directement dans ACDOCA. Réconciliation permanente avec FI, sans conversion de champs de valeur. Consultation via KE24 (postes réels) ou les rapports Fiori de Margin Analysis.", color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-400" },
+        { title: "Account-based CO-PA (Margin Analysis)", desc: "Recommandé en S/4HANA : les revenus et coûts sont stockés avec les mêmes comptes (cost/revenue elements) que le grand livre, directement dans ACDOCA. Réconciliation permanente avec FI, sans conversion de champs de valeur. Consultation via KE24 (postes réels) ou les rapports Fiori de Margin Analysis.", color: "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-400" },
         { title: "Costing-based CO-PA", desc: "Utilise des champs de valeur propres (ex. matière, remise, fret) définis dans l'Operating Concern (KEA0), plus flexibles pour des schémas de marge sur mesure, mais nécessitant une conversion/réconciliation périodique avec FI — SAP n'investit plus sur cette variante en S/4HANA.", color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/40 text-blue-700 dark:text-blue-400" },
       ].map(({ title, desc, color }) => (
         <div key={title} className={`rounded-xl border p-4 ${color}`}>
@@ -382,8 +382,8 @@ const Integration = () => (
         title="Flux d'une charge primaire vers la marge"
         steps={[
           { label: "Facture fournisseur", sublabel: "MIRO · FI/MM", color: "bg-blue-500/10 border-blue-500/30 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300" },
-          { label: "Cost Center", sublabel: "CCA", color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300" },
-          { label: "Cycle d'assessment", sublabel: "KSU5", color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300" },
+          { label: "Cost Center", sublabel: "CCA", color: "bg-indigo-500/10 border-indigo-500/30 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300" },
+          { label: "Cycle d'assessment", sublabel: "KSU5", color: "bg-indigo-500/10 border-indigo-500/30 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300" },
           { label: "Ordre de fabrication", sublabel: "CO-PC", color: "bg-purple-500/10 border-purple-500/30 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300" },
           { label: "Segment de marge", sublabel: "CO-PA", color: "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300" },
         ]}
@@ -392,9 +392,9 @@ const Integration = () => (
     <div className="grid sm:grid-cols-2 gap-4">
       {[
         { pair: "CO – FI", desc: "Chaque écriture FI porteuse d'une charge (salaire, achat, amortissement) exige un objet CO de destination — c'est la \"dérivation de compte\" (account assignment). Sans objet CO valide, l'écriture FI est rejetée.", color: "bg-sap-blue/5 dark:bg-sap-blue/10 text-sap-blue dark:text-sap-accent border-sap-blue/20" },
-        { pair: "CO – MM", desc: "Une commande d'achat ou une sortie de stock pour consommation (mouvement 201/261) impute directement un centre de coûts ou un ordre de fabrication, qui remonte ensuite dans CCA ou CO-PC.", color: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/40" },
-        { pair: "CO – PP", desc: "L'ordre de fabrication est à la fois un objet PP (planification, confirmation) et un objet de coût CO-PC (collecte des coûts réels, calcul de WIP et d'écarts à la clôture).", color: "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800/40" },
-        { pair: "CO – SD", desc: "La facturation SD transfère automatiquement revenus, remises et COGS vers CO-PA par segment client/produit — c'est le point d'entrée de la plupart des flux de Margin Analysis.", color: "bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border-teal-200 dark:border-teal-800/40" },
+        { pair: "CO – MM", desc: "Une commande d'achat ou une sortie de stock pour consommation (mouvement 201/261) impute directement un centre de coûts ou un ordre de fabrication, qui remonte ensuite dans CCA ou CO-PC.", color: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/40" },
+        { pair: "CO – PP", desc: "L'ordre de fabrication est à la fois un objet PP (planification, confirmation) et un objet de coût CO-PC (collecte des coûts réels, calcul de WIP et d'écarts à la clôture).", color: "bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/40" },
+        { pair: "CO – SD", desc: "La facturation SD transfère automatiquement revenus, remises et COGS vers CO-PA par segment client/produit — c'est le point d'entrée de la plupart des flux de Margin Analysis.", color: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/40" },
       ].map(({ pair, desc, color }) => (
         <div key={pair} className={`rounded-xl border p-4 ${color}`}>
           <p className="text-sm font-bold mb-1">{pair}</p>
@@ -425,7 +425,7 @@ const ClotureMensuelle = () => (
         { title: "Contrôle de cohérence et reporting", desc: "Vérification que chaque objet CO a bien été soldé à zéro, puis diffusion des rapports de centres de coûts, de profit centers et de rentabilité (KE30)." },
       ].map((step, i) => (
         <li key={step.title} className="flex items-start gap-3">
-          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center mt-0.5">{i + 1}</span>
+          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold flex items-center justify-center mt-0.5">{i + 1}</span>
           <div>
             <p className="font-semibold text-slate-900 dark:text-white">{step.title}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{step.desc}</p>
@@ -448,8 +448,8 @@ const S4HANAFeatures = () => (
         { title: "Universal Allocation", desc: "Un ensemble d'apps Fiori (Manage Allocations, Run Allocations, Allocation Results…) harmonise ce qui exigeait auparavant des transactions séparées par type d'allocation — cost centers, profit centers, top-down CO-PA — avec une simulation avant exécution réelle." },
         { title: "Fiori apps pour Controllers", desc: "Cockpits d'analyse cost centers, profit centers, CO-PA et product costing accessibles depuis n'importe quel navigateur, en complément (pas en remplacement complet) des transactions SAP GUI historiques comme KSB1 ou KE24." },
       ].map(({ title, desc }) => (
-        <div key={title} className="flex gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/40">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
+        <div key={title} className="flex gap-3 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-800/40">
+          <div className="w-2 h-2 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
@@ -462,7 +462,7 @@ const S4HANAFeatures = () => (
 
 const CareerBenefits = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.22 }}
-    className="bg-linear-to-br from-emerald-900 to-emerald-700 rounded-2xl p-6 text-white">
+    className="bg-linear-to-br from-indigo-900 to-indigo-700 rounded-2xl p-6 text-white">
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser CO ?</h2>
     <p className="text-sm text-white/70 mb-5">CO est demandé dans tous les projets S/4HANA Finance. Les profils FI/CO bénéficient d'une prime salariale significative, et le contrôle de gestion reste l'un des métiers finance les moins automatisables à court terme.</p>
     <div className="grid sm:grid-cols-2 gap-4">
@@ -500,8 +500,8 @@ const CoTcodes = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les transactions SAP GUI à connaître pour un consultant ou un contrôleur de gestion junior — y compris sous Fiori, elles restent la référence des rapports de détail.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {TCODES.map((t) => (
-        <div key={t.code} className="border border-emerald-200 dark:border-emerald-800/40 rounded-xl p-4 bg-emerald-50 dark:bg-emerald-900/10">
-          <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1">{t.code} — {t.label}</p>
+        <div key={t.code} className="border border-indigo-200 dark:border-indigo-800/40 rounded-xl p-4 bg-indigo-50 dark:bg-indigo-900/10">
+          <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-1">{t.code} — {t.label}</p>
           <p className="text-xs text-slate-600 dark:text-slate-300">{t.usage}</p>
         </div>
       ))}
@@ -558,9 +558,9 @@ const CoResources = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Contenus à jour pour approfondir CO, CO-PA, Product Costing et les allocations S/4HANA.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {RESOURCES.map((r) => (
-        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-md transition-all group">
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">{r.source}</span>
-          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug">{r.title}</span>
+        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-indigo-400/50 hover:shadow-md transition-all group">
+          <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">{r.source}</span>
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">{r.title}</span>
         </a>
       ))}
     </div>
@@ -572,9 +572,9 @@ const CoResources = () => (
 ───────────────────────────────────────────────────────────── */
 const NextStep = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-    className="rounded-2xl border border-emerald-500/20 dark:border-emerald-400/30 bg-emerald-500/[0.03] dark:bg-emerald-400/[0.06] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    className="rounded-2xl border border-indigo-500/20 dark:border-indigo-400/30 bg-indigo-500/[0.03] dark:bg-indigo-400/[0.06] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-1">Étape suivante du parcours</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-400 mb-1">Étape suivante du parcours</p>
       <h2 className="text-base font-bold text-slate-900 dark:text-white">CO acquis ? Passe à MM pour voir d'où viennent les coûts imputés.</h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
         Une bonne partie des coûts que CO analyse — matière, sous-traitance, consommation d'articles — naît dans MM.
@@ -594,7 +594,7 @@ export default function CO() {
       code="CO"
       title="Controlling"
       description="Maîtrisez l'analyse interne des coûts et de la rentabilité SAP : cost centers, profit centers, internal orders, product costing et CO-PA sur S/4HANA."
-      gradient="from-emerald-900 via-emerald-700 to-teal-500"
+      gradient="from-indigo-900 via-indigo-700 to-blue-500"
       badge="Controlling · Rentabilité · CO-PA"
       stats={["~30 min de lecture", "5 sous-modules détaillés", `Certification ${certCode("co")}`]}
       examHref="/certifications/co/examen"

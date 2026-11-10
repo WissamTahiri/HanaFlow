@@ -16,8 +16,8 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
 
 /* ─── Concepts clés ─── */
 const KEY_CONCEPTS = [
-  { code: "BOM", label: "Bill of Materials", description: "Liste structurée de tous les composants nécessaires à la fabrication d'une unité de produit fini : quantités, unités de mesure et validité. Une BOM peut compter plusieurs niveaux — un sous-ensemble a sa propre BOM, et le système explose la structure jusqu'à la matière première.", color: "bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-400" },
-  { code: "ROUTING", label: "Gamme (Routing)", description: "Séquence des opérations de fabrication : pour chaque étape, le work center utilisé, une clé de contrôle qui pilote les mouvements de stock automatiques, et des valeurs standards (setup, temps machine, temps main-d'œuvre) qui servent à planifier la capacité et calculer le coût.", color: "bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800/50 text-cyan-700 dark:text-cyan-400" },
+  { code: "BOM", label: "Bill of Materials", description: "Liste structurée de tous les composants nécessaires à la fabrication d'une unité de produit fini : quantités, unités de mesure et validité. Une BOM peut compter plusieurs niveaux — un sous-ensemble a sa propre BOM, et le système explose la structure jusqu'à la matière première.", color: "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800/50 text-rose-700 dark:text-rose-400" },
+  { code: "ROUTING", label: "Gamme (Routing)", description: "Séquence des opérations de fabrication : pour chaque étape, le work center utilisé, une clé de contrôle qui pilote les mouvements de stock automatiques, et des valeurs standards (setup, temps machine, temps main-d'œuvre) qui servent à planifier la capacité et calculer le coût.", color: "bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800/50 text-pink-700 dark:text-pink-400" },
   { code: "MRP", label: "Material Requirements Planning", description: "Calcul des besoins nets, matériau par matériau : demande moins stock disponible moins stock de sécurité. Génère automatiquement des ordres planifiés (fabrication interne) ou des demandes d'achat (approvisionnement externe) selon le type de MRP et le mode d'approvisionnement du matériau.", color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400" },
   { code: "PrdOrd", label: "Production Order", description: "Ordre de fabrication : porte la BOM et la gamme chargées pour un lot donné, les coûts planifiés et réels, les confirmations d'opérations et l'historique des mouvements de stock jusqu'à la clôture (settlement).", color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400" },
   { code: "CO-PC", label: "Product Cost Controlling", description: "Module CO lié à PP : calcule le coût standard du produit à partir de la BOM, de la gamme et des taux d'activité, valorise le work in progress en cours de mois et affecte les variances entre coûts réels et coûts cibles en clôture.", color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-400" },
@@ -71,7 +71,7 @@ const MasterData = () => (
     <div className="grid sm:grid-cols-2 gap-4 mb-6">
       {MASTER_DATA_ITEMS.map(({ term, def }) => (
         <div key={term} className="flex gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-700">
-          <div className="w-2 h-2 rounded-full bg-teal-500 mt-2 flex-shrink-0" />
+          <div className="w-2 h-2 rounded-full bg-rose-500 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{term}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{def}</p>
@@ -80,7 +80,7 @@ const MasterData = () => (
       ))}
     </div>
 
-    <div className="rounded-xl border border-teal-100 dark:border-teal-900/30 bg-teal-50/40 dark:bg-teal-900/10 p-4">
+    <div className="rounded-xl border border-rose-100 dark:border-rose-900/30 bg-rose-50/40 dark:bg-rose-900/10 p-4">
       <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Explosion de BOM — un exemple chiffré</p>
       <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
         Un ordre de 300 vélos VTT doit exploser la BOM multi-niveau du produit fini. Au niveau 1, chaque composant est multiplié par sa quantité
@@ -92,7 +92,7 @@ const MasterData = () => (
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-teal-200/60 dark:border-teal-800/40">
+            <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-rose-200/60 dark:border-rose-800/40">
               <th className="py-1.5 pr-3 font-semibold">Composant</th>
               <th className="py-1.5 pr-3 font-semibold">Niveau</th>
               <th className="py-1.5 pr-3 font-semibold">Qté unitaire</th>
@@ -101,11 +101,11 @@ const MasterData = () => (
           </thead>
           <tbody>
             {BOM_EXPLOSION_ROWS.map((r) => (
-              <tr key={r.component} className="border-b border-teal-100/60 dark:border-teal-900/20 last:border-0">
+              <tr key={r.component} className="border-b border-rose-100/60 dark:border-rose-900/20 last:border-0">
                 <td className="py-1.5 pr-3 text-slate-700 dark:text-slate-300">{r.component}</td>
                 <td className="py-1.5 pr-3 text-slate-500 dark:text-slate-400">{r.level}</td>
                 <td className="py-1.5 pr-3 text-slate-500 dark:text-slate-400">{r.qtyUnit}</td>
-                <td className="py-1.5 font-semibold text-teal-700 dark:text-teal-400">{r.needed}</td>
+                <td className="py-1.5 font-semibold text-rose-700 dark:text-rose-400">{r.needed}</td>
               </tr>
             ))}
           </tbody>
@@ -206,8 +206,8 @@ const ProductionFlow = () => (
         { step: "5", label: "Goods Receipt (mvt 101)", desc: "Entrée en stock du produit fini, automatique si le control key de la dernière opération l'autorise, sinon via MIGO. Impact MM (augmentation stock PF) et FI (valorisation au coût standard)." },
         { step: "6", label: "Order Settlement (KO88/CO88)", desc: "Clôture de l'ordre : WIP calculé (KKAO) sur les ordres encore ouverts, variances calculées (KKS1) une fois l'ordre livré, puis réglées — affectées à CO-PA, à un compte de résultat ou à un centre de coûts." },
       ].map(({ step, label, desc }) => (
-        <div key={step} className="flex gap-4 p-4 rounded-xl bg-teal-50/50 dark:bg-teal-900/5 border border-teal-100 dark:border-teal-900/20">
-          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-xs font-bold flex items-center justify-center">{step}</span>
+        <div key={step} className="flex gap-4 p-4 rounded-xl bg-rose-50/50 dark:bg-rose-900/5 border border-rose-100 dark:border-rose-900/20">
+          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-center">{step}</span>
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{label}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
@@ -245,8 +245,8 @@ const CapacityPlanning = () => (
         { title: "Prérequis techniques", desc: "Une évaluation de capacité fiable suppose un control key portant l'indicateur de besoin de capacité et de planification à capacité finie sur la gamme, et un work center correctement configuré : catégorie de capacité, calendrier d'usine, équipes (shifts)." },
         { title: "Embedded PP/DS — capacité finie en amont", desc: "Contrairement au CRP classique qui évalue la charge après coup, PP/DS planifie directement à capacité finie, avec un découpage temporel pouvant descendre à l'heure ou à la minute — utile quand une seule contrainte matière ne suffit pas à produire un plan exécutable." },
       ].map(({ title, desc }) => (
-        <div key={title} className="flex gap-3 p-4 rounded-xl bg-cyan-50 dark:bg-cyan-900/10 border border-cyan-200 dark:border-cyan-800/40">
-          <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 flex-shrink-0" />
+        <div key={title} className="flex gap-3 p-4 rounded-xl bg-pink-50 dark:bg-pink-900/10 border border-pink-200 dark:border-pink-800/40">
+          <div className="w-2 h-2 rounded-full bg-pink-500 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
@@ -345,8 +345,8 @@ const S4HANAFeatures = () => (
         { title: "Demand-Driven MRP (DDMRP)", desc: "Approche de pilotage par buffers dynamiques plutôt que par prévisions pures : des points de découplage absorbent la variabilité de la demande et de l'approvisionnement via trois zones (rouge pour le stock de sécurité, jaune jusqu'au point de commande, verte au-delà). Configurée via le type MRP D1 et la procédure de lot H1 sur les matériaux concernés — à réserver aux références qui justifient un stock tampon, pas à l'ensemble du portefeuille." },
         { title: "Fiori apps pour ateliers", desc: "Confirmation de production, suivi des ordres, tableaux de pilotage de capacité — accessibles depuis des terminaux d'atelier sans SAP GUI, avec une UX pensée pour un usage debout, au poste de travail." },
       ].map(({ title, desc }) => (
-        <div key={title} className="flex gap-3 p-4 rounded-xl bg-teal-50 dark:bg-teal-900/10 border border-teal-200 dark:border-teal-800/40">
-          <div className="w-2 h-2 rounded-full bg-teal-500 mt-2 flex-shrink-0" />
+        <div key={title} className="flex gap-3 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-800/40">
+          <div className="w-2 h-2 rounded-full bg-rose-500 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
@@ -360,7 +360,7 @@ const S4HANAFeatures = () => (
 /* ─── Débouchés ─── */
 const CareerBenefits = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.19 }}
-    className="bg-linear-to-br from-teal-900 to-teal-600 rounded-2xl p-6 text-white">
+    className="bg-linear-to-br from-rose-900 to-rose-600 rounded-2xl p-6 text-white">
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser PP ?</h2>
     <p className="text-sm text-white/70 mb-5">PP est incontournable dans les entreprises industrielles (automobile, aéronautique, chimie, agroalimentaire). La demande est forte et les profils qui tiennent les deux bouts — production et coûts — restent rares.</p>
     <div className="grid sm:grid-cols-2 gap-4">
@@ -400,8 +400,8 @@ const PpTcodes = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les transactions SAP GUI à connaître pour un consultant ou un planificateur de production junior.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {TCODES.map((t) => (
-        <div key={t.code} className="border border-teal-500/20 rounded-xl p-4 bg-teal-50/60 dark:bg-teal-900/10">
-          <p className="text-xs font-bold text-teal-700 dark:text-teal-400 mb-1">{t.code} — {t.label}</p>
+        <div key={t.code} className="border border-rose-500/20 rounded-xl p-4 bg-rose-50/60 dark:bg-rose-900/10">
+          <p className="text-xs font-bold text-rose-700 dark:text-rose-400 mb-1">{t.code} — {t.label}</p>
           <p className="text-xs text-slate-600 dark:text-slate-300">{t.usage}</p>
         </div>
       ))}
@@ -458,9 +458,9 @@ const PpResources = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Documentation et guides pour approfondir PP, la capacité, PP/DS et le Product Costing.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {RESOURCES.map((r) => (
-        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-teal-400/50 hover:shadow-md transition-all group">
-          <span className="text-xs text-teal-500 dark:text-teal-400 font-medium">{r.source}</span>
-          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors leading-snug">{r.title}</span>
+        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-rose-400/50 hover:shadow-md transition-all group">
+          <span className="text-xs text-rose-500 dark:text-rose-400 font-medium">{r.source}</span>
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-rose-500 dark:group-hover:text-rose-400 transition-colors leading-snug">{r.title}</span>
         </a>
       ))}
     </div>
@@ -470,9 +470,9 @@ const PpResources = () => (
 /* ─── Prochaine étape ─── */
 const NextStep = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.27 }}
-    className="rounded-2xl border border-teal-500/20 dark:border-teal-400/30 bg-teal-500/[0.03] dark:bg-teal-400/[0.06] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    className="rounded-2xl border border-rose-500/20 dark:border-rose-400/30 bg-rose-500/[0.03] dark:bg-rose-400/[0.06] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-teal-600 dark:text-teal-400 mb-1">Étape suivante du parcours</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-rose-600 dark:text-rose-400 mb-1">Étape suivante du parcours</p>
       <h2 className="text-base font-bold text-slate-900 dark:text-white">PP acquis ? Passe à CO pour boucler le costing de production.</h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
         PP et CO-PC s&apos;articulent sur le settlement d&apos;ordre — comprendre comment un coût standard se construit et se solde
@@ -492,7 +492,7 @@ const PP = () => (
     code="PP"
     title="Production Planning"
     description="Maîtrisez la planification et l'exécution de production SAP : BOM, gammes, MRP, capacité, ordres de fabrication, intégration CO-PC et S/4HANA."
-    gradient="from-teal-900 via-teal-700 to-cyan-500"
+    gradient="from-rose-900 via-rose-700 to-pink-500"
     badge="Production · MRP · CO-PC"
     stats={["~27 min de lecture", "10 T-codes essentiels", `Certification ${certCode("pp")}`]}
     examHref="/certifications/pp/examen"

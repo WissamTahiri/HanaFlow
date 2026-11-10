@@ -108,8 +108,8 @@ export function getExamQuestionsForClient(moduleId: ModuleId): ClientExamQuestio
 }
 
 export function getCertMeta(moduleId: ModuleId) {
-  const cert = CERT_MAP[moduleId].cert as { shortName: string };
-  return { code: certCode(moduleId), shortName: cert.shortName };
+  const cert = CERT_MAP[moduleId].cert as { shortName: string; passingScore: number };
+  return { code: certCode(moduleId), shortName: cert.shortName, passingScore: cert.passingScore };
 }
 
 export type CanonicalQuestion = { id?: string | number; correctIndex: number; explanation?: string };

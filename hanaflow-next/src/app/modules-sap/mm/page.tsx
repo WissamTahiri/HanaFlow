@@ -18,9 +18,9 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
    Concepts clés
 ───────────────────────────────────────────────────────────── */
 const KEY_CONCEPTS = [
-  { code: "P2P",     label: "Procure-to-Pay",                description: "Du besoin d'achat au paiement fournisseur : PR → PO → GR → MIRO → F110. Chaque étape génère un document MM et, dès qu'un stock ou une facture est concerné, une écriture FI miroir.", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400" },
+  { code: "P2P",     label: "Procure-to-Pay",                description: "Du besoin d'achat au paiement fournisseur : PR → PO → GR → MIRO → F110. Chaque étape génère un document MM et, dès qu'un stock ou une facture est concerné, une écriture FI miroir.", color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400" },
   { code: "ME51N",   label: "Purchase Requisition (PR)",      description: "Demande d'achat interne : création manuelle par un service, ou génération automatique par le MRP (PP) quand un besoin de matière première est détecté. Pas d'engagement externe à ce stade.", color: "bg-sky-50 dark:bg-sky-900/20 border-sky-200 dark:border-sky-800/50 text-sky-700 dark:text-sky-400" },
-  { code: "GR",      label: "Goods Receipt (MIGO)",           description: "Réception physique de la marchandise, le plus souvent en mouvement 101 (avec référence PO). Met à jour le stock et déclenche une écriture FI : débit stock, crédit compte GR/IR.", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400" },
+  { code: "GR",      label: "Goods Receipt (MIGO)",           description: "Réception physique de la marchandise, le plus souvent en mouvement 101 (avec référence PO). Met à jour le stock et déclenche une écriture FI : débit stock, crédit compte GR/IR.", color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400" },
   { code: "GR/IR",   label: "Compte de régularisation",        description: "Compte transitoire FI-MM piloté via OBYC. Crédité au GR (marchandise reçue, facture pas encore reçue), débité au MIRO — c'est le pont comptable entre logistique et facturation.", color: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-400" },
   { code: "MM01",    label: "Material Master",                 description: "Fiche article pivot : vues Achats, MRP, Stocks, Compta 1/2, Calcul du coût. Chaque vue porte des données différentes (unité, groupe de marchandises, classe de valorisation, indicateur de prix).", color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400" },
   { code: "MIRO",    label: "Logistics Invoice Verification",  description: "Vérification de facture avec contrôle à 3 voies (PO + GR + facture). Un écart hors tolérance (clés PP, BR…) bloque le paiement — géré ensuite via MRBR.", color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-400" },
@@ -65,7 +65,7 @@ const OrgStructure = () => (
         { term: "Valuation Area", def: "Niveau auquel la valorisation financière est pilotée — en standard aligné sur le plant. Porte aussi le type de Material Ledger, obligatoire en S/4HANA." },
       ].map(({ term, def }) => (
         <div key={term} className="flex gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-700">
-          <div className="w-2 h-2 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+          <div className="w-2 h-2 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{term}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{def}</p>
@@ -83,8 +83,8 @@ const SUB_MODULES = [
   {
     code: "MM-PUR",
     title: "Purchasing (Achats)",
-    color: "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/40",
-    badge: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
+    color: "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/40",
+    badge: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
     desc: "Pilote l'ensemble du cycle d'achat : demande (ME51N), appel d'offres fournisseur (ME41 RFQ, comparaison des offres via ME49), commande (ME21N), et accords-cadres — contrat (ME31K) ou accord de livraison planifiée (ME31L). S'appuie sur le fichier fournisseurs (vendor master), les enregistrements d'informations d'achat (ME11, prix et délai négociés par couple matériau-fournisseur) et les conditions de prix.",
   },
   {
@@ -169,11 +169,11 @@ const P2PCycle = () => (
         { step: "5", code: "MIRO",  label: "Invoice Receipt", desc: "Contrôle à 3 voies PO–GR–Facture. Si l'écart dépasse les tolérances (clé PP sur le prix, BR sur la quantité), la facture est postée mais bloquée pour paiement — à débloquer en MRBR. Écriture FI : débit GR/IR / crédit fournisseur." },
         { step: "6", code: "F110",  label: "Payment", desc: "Traitement du paiement fournisseur (FI-AP), seulement pour les factures non bloquées. Écriture FI : débit fournisseur / crédit banque. Clôture du cycle P2P." },
       ].map(({ step, code, label, desc }) => (
-        <div key={step} className="flex gap-4 p-4 rounded-xl bg-amber-50/50 dark:bg-amber-900/5 border border-amber-100 dark:border-amber-900/20">
-          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center justify-center">{step}</span>
+        <div key={step} className="flex gap-4 p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/5 border border-emerald-100 dark:border-emerald-900/20">
+          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">{step}</span>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{code}</span>
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{code}</span>
               <span className="text-sm font-semibold text-slate-900 dark:text-white">{label}</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
@@ -319,8 +319,8 @@ const Integration = () => (
     <div className="grid sm:grid-cols-2 gap-4">
       {[
         { pair: "MM – FI", desc: "Chaque GR et chaque MIRO génère une écriture FI automatique via la classe de valorisation (OBYC) : stock, GR/IR, fournisseur, écart de prix.", color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/40 text-blue-700 dark:text-blue-400" },
-        { pair: "MM – PP", desc: "Le MRP (PP) génère automatiquement des PR pour les matières premières manquantes. En sous-traitance, la consommation des composants est pilotée par la nomenclature.", color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/40 text-purple-700 dark:text-purple-400" },
-        { pair: "MM – SD", desc: "La vérification de disponibilité (ATP) sur une commande client consulte le stock MM en temps réel. En procurement tiers, la commande client déclenche directement un PO.", color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-400" },
+        { pair: "MM – PP", desc: "Le MRP (PP) génère automatiquement des PR pour les matières premières manquantes. En sous-traitance, la consommation des composants est pilotée par la nomenclature.", color: "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-400" },
+        { pair: "MM – SD", desc: "La vérification de disponibilité (ATP) sur une commande client consulte le stock MM en temps réel. En procurement tiers, la commande client déclenche directement un PO.", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-400" },
       ].map(({ pair, desc, color }) => (
         <div key={pair} className={`rounded-xl border p-4 ${color}`}>
           <p className="text-sm font-bold mb-1">{pair}</p>
@@ -346,8 +346,8 @@ const S4HANAFeatures = () => (
         { title: "Fiori apps pour acheteurs", desc: "Manage Purchase Orders, Monitor Purchase Order Items, My Purchasing Document Items — gestion des PR, approbation de PO, suivi fournisseurs sans SAP GUI." },
         { title: "Visibilité temps réel", desc: "Vue consolidée sur stocks, engagements budgétaires, compte GR/IR et dettes fournisseurs — sans attendre les batchs de reporting nocturnes de l'ECC." },
       ].map(({ title, desc }) => (
-        <div key={title} className="flex gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40">
-          <div className="w-2 h-2 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+        <div key={title} className="flex gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/40">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
@@ -363,7 +363,7 @@ const S4HANAFeatures = () => (
 ───────────────────────────────────────────────────────────── */
 const CareerBenefits = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.22 }}
-    className="bg-linear-to-br from-amber-900 to-amber-700 rounded-2xl p-6 text-white">
+    className="bg-linear-to-br from-emerald-900 to-emerald-700 rounded-2xl p-6 text-white">
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser MM ?</h2>
     <p className="text-sm text-white/70 mb-5">MM est présent dans chaque projet S/4HANA industriel ou de distribution — le P2P est l'un des processus les plus déployés en consulting.</p>
     <div className="grid sm:grid-cols-2 gap-4">
@@ -403,8 +403,8 @@ const MmTcodes = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les transactions SAP GUI à connaître pour un consultant, un acheteur ou un gestionnaire de stocks junior.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {TCODES.map((t) => (
-        <div key={t.code} className="border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 bg-amber-50/60 dark:bg-amber-900/10">
-          <p className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-1">{t.code} — {t.label}</p>
+        <div key={t.code} className="border border-emerald-200 dark:border-emerald-800/40 rounded-xl p-4 bg-emerald-50/60 dark:bg-emerald-900/10">
+          <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1">{t.code} — {t.label}</p>
           <p className="text-xs text-slate-600 dark:text-slate-300">{t.usage}</p>
         </div>
       ))}
@@ -466,9 +466,9 @@ const MmResources = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Contenus à jour pour approfondir MM, le cycle P2P et la valorisation des stocks.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {RESOURCES.map((r) => (
-        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-amber-400/50 hover:shadow-md transition-all group">
-          <span className="text-xs text-amber-500 dark:text-amber-400 font-medium">{r.source}</span>
-          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors leading-snug">{r.title}</span>
+        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-md transition-all group">
+          <span className="text-xs text-emerald-500 dark:text-emerald-400 font-medium">{r.source}</span>
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors leading-snug">{r.title}</span>
         </a>
       ))}
     </div>
@@ -480,9 +480,9 @@ const MmResources = () => (
 ───────────────────────────────────────────────────────────── */
 const NextStep = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-    className="rounded-2xl border border-amber-300/40 dark:border-amber-700/40 bg-amber-50/50 dark:bg-amber-900/10 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    className="rounded-2xl border border-emerald-300/40 dark:border-emerald-700/40 bg-emerald-50/50 dark:bg-emerald-900/10 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 mb-1">Étape suivante du parcours</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 mb-1">Étape suivante du parcours</p>
       <h2 className="text-base font-bold text-slate-900 dark:text-white">MM acquis ? Passe à PP pour voir comment le MRP déclenche les achats.</h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
         Les PR générées automatiquement, les besoins en composants de sous-traitance et les transferts de stock
@@ -502,7 +502,7 @@ export default function MM() {
       code="MM"
       title="Materials Management"
       description="Maîtrisez le cycle Procure-to-Pay SAP : achats, réception des marchandises, vérification de factures, valorisation des stocks et intégration FI-MM sur S/4HANA."
-      gradient="from-amber-900 via-amber-600 to-amber-400"
+      gradient="from-emerald-900 via-emerald-600 to-emerald-400"
       badge="Achats · Stocks · P2P"
       stats={["8 concepts clés", "5 sous-modules", "~30 min de lecture", `Certification ${certCode("mm")}`]}
       examHref="/certifications/mm/examen"

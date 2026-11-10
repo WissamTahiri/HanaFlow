@@ -35,6 +35,7 @@ interface ExamQuestion {
 interface CertInfo {
   code: string;
   shortName: string;
+  passingScore: number;
 }
 
 function StartScreen({ onStart, questions, certInfo, certPath }: { onStart: () => void; questions: ExamQuestion[]; certInfo: CertInfo; certPath: string }) {
@@ -52,7 +53,7 @@ function StartScreen({ onStart, questions, certInfo, certPath }: { onStart: () =
           {[
             { label: "Questions", value: questions.length },
             { label: "Durée", value: "90 min" },
-            { label: "Seuil", value: "65%" },
+            { label: "Seuil", value: `${certInfo.passingScore}%` },
             { label: "Format", value: "QCM" },
           ].map((item) => (
             <div key={item.label} className="bg-gray-50 dark:bg-slate-700/50 rounded-xl p-3">
@@ -98,7 +99,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
   const getCorrectIndex = (q: ExamQuestion, i: number) => correctAnswers[String(q.id ?? i)];
   const score = questions.filter((q, i) => answers[i] === getCorrectIndex(q, i)).length;
   const pct = Math.round((score / questions.length) * 100);
-  const passed = pct >= 65;
+  const passed = pct >= certInfo.passingScore;
 
   const byChapter: Record<string, { total: number; correct: number }> = {};
   questions.forEach((q, i) => {
@@ -158,7 +159,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
         <p className={`text-xl font-bold mb-1 ${passed ? "text-emerald-700 dark:text-emerald-300" : "text-amber-600 dark:text-amber-400"}`}>{passed ? "✓ Examen réussi !" : "Examen non réussi"}</p>
         <p className="text-slate-600 dark:text-slate-400">{score}/{questions.length} bonnes réponses · Temps utilisé : {formatTime(timeUsed)}</p>
         <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
-          Seuil de réussite : 65% {passed ? `· Vous avez dépassé le seuil de ${pct - 65} points` : `· Il vous manque ${65 - pct} points`}
+          Seuil de réussite : {certInfo.passingScore}% {passed ? `· Vous avez dépassé le seuil de ${pct - certInfo.passingScore} points` : `· Il vous manque ${certInfo.passingScore - pct} points`}
         </p>
       </div>
 
@@ -174,7 +175,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
                   <p className="text-xs font-bold text-slate-900 dark:text-white">{data.correct}/{data.total}</p>
                 </div>
                 <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${chPct >= 65 ? "bg-emerald-500" : chPct >= 40 ? "bg-amber-400" : "bg-red-500"}`} style={{ width: `${chPct}%` }} />
+                  <div className={`h-full rounded-full transition-all ${chPct >= certInfo.passingScore ? "bg-emerald-500" : chPct >= 40 ? "bg-amber-400" : "bg-red-500"}`} style={{ width: `${chPct}%` }} />
                 </div>
               </div>
             );
@@ -208,7 +209,7 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
           <p className="font-semibold mb-1">Conseils pour progresser :</p>
           <ul className="space-y-1">
             {Object.entries(byChapter)
-              .filter(([, data]) => data.correct / data.total < 0.65)
+              .filter(([, data]) => data.correct / data.total < certInfo.passingScore / 100)
               .map(([chapter]) => <li key={chapter}>• Révisez le chapitre : <strong>{chapter}</strong></li>)
             }
           </ul>

@@ -148,6 +148,8 @@ describe("getCertMeta", () => {
       const meta = getCertMeta(moduleId);
       expect(meta.code).toBeTypeOf("string");
       expect(meta.shortName).toBeTypeOf("string");
+      expect(meta.passingScore).toBeGreaterThan(0);
+      expect(meta.passingScore).toBeLessThanOrEqual(100);
     }
   });
 });

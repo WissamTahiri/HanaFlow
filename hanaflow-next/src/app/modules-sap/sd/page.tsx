@@ -18,7 +18,7 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
    Concepts clés
 ───────────────────────────────────────────────────────────── */
 const KEY_CONCEPTS = [
-  { code: "O2C",      label: "Order-to-Cash",            description: "De la commande client à l'encaissement : Sales Order → Livraison → PGI → Billing → Payment. Chaque étape pivot déclenche une écriture FI miroir, exactement comme MM le fait côté achats pour le P2P.", color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-400" },
+  { code: "O2C",      label: "Order-to-Cash",            description: "De la commande client à l'encaissement : Sales Order → Livraison → PGI → Billing → Payment. Chaque étape pivot déclenche une écriture FI miroir, exactement comme MM le fait côté achats pour le P2P.", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400" },
   { code: "VA01",     label: "Sales Order",               description: "Commande client avec prix, quantités, conditions de paiement et taxes. Déclenche la vérification de disponibilité (ATP) et le calcul du prix, mais aucune écriture FI à ce stade.", color: "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-400" },
   { code: "PGI",      label: "Post Goods Issue",          description: "Sortie physique de stock lors de la livraison (VL02N). Transfert de propriété au client et écriture FI automatique : crédit stock / débit COGS (coût des marchandises vendues).", color: "bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800/50 text-pink-700 dark:text-pink-400" },
   { code: "VF01",     label: "Billing",                   description: "Facturation client (VF01). Crée le document FI AR correspondant : débit compte client / crédit revenus et TVA. Clé de voûte de l'intégration SD-FI, pilotée par la détermination de comptes (VKOA).", color: "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800/50 text-rose-700 dark:text-rose-400" },
@@ -66,7 +66,7 @@ const OrgStructure = () => (
         { term: "Sales Office / Sales Group", def: "Découpage commercial interne (agence, équipe de vente) utilisé pour le reporting et l'affectation des commerciaux, sans impact sur la comptabilité." },
       ].map(({ term, def }) => (
         <div key={term} className="flex gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-700">
-          <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
+          <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{term}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{def}</p>
@@ -84,8 +84,8 @@ const SUB_MODULES = [
   {
     code: "SD-SLS",
     title: "Sales (Ventes)",
-    color: "bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/40",
-    badge: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400",
+    color: "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/40",
+    badge: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
     desc: "Gère les documents de vente (demande de prix VA11, devis VA21, commande VA01, contrat-cadre VA41, accord de livraison planifiée) ainsi que les données maître client (XD01/BP) et matériau côté ventes. C'est le point d'entrée du cycle O2C : chaque document porte un type (OR pour commande standard, par exemple) qui pilote le schéma de copie vers les documents suivants.",
   },
   {
@@ -177,11 +177,11 @@ const O2CCycle = () => (
         { step: "5", code: "VF01", label: "Billing", desc: "Facturation client, à partir de la livraison (standard) ou de la commande (facturation directe). Crée le document FI AR : débit compte client / crédit revenus et TVA." },
         { step: "6", code: "F-28", label: "Payment", desc: "Encaissement client (FI-AR). Écriture FI : débit banque / crédit client, avec lettrage automatique ou manuel du poste ouvert correspondant." },
       ].map(({ step, code, label, desc }) => (
-        <div key={step} className="flex gap-4 p-4 rounded-xl bg-purple-50/50 dark:bg-purple-900/5 border border-purple-100 dark:border-purple-900/20">
-          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs font-bold flex items-center justify-center">{step}</span>
+        <div key={step} className="flex gap-4 p-4 rounded-xl bg-amber-50/50 dark:bg-amber-900/5 border border-amber-100 dark:border-amber-900/20">
+          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center justify-center">{step}</span>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-bold text-purple-600 dark:text-purple-400">{code}</span>
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{code}</span>
               <span className="text-sm font-semibold text-slate-900 dark:text-white">{label}</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
@@ -336,7 +336,7 @@ const Integration = () => (
     <div className="grid sm:grid-cols-3 gap-4">
       {[
         { event: "Post Goods Issue (PGI)", debit: "COGS (Coût des ventes)", credit: "Compte Stock", color: "bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800/40 text-pink-700 dark:text-pink-400" },
-        { event: "Billing (VF01)", debit: "Compte Client (AR)", credit: "Revenus + TVA", color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/40 text-purple-700 dark:text-purple-400" },
+        { event: "Billing (VF01)", debit: "Compte Client (AR)", credit: "Revenus + TVA", color: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-400" },
         { event: "Payment (F-28)", debit: "Compte Banque", credit: "Compte Client (AR)", color: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-400" },
       ].map(({ event, debit, credit, color }) => (
         <div key={event} className={`rounded-xl border p-4 ${color}`}>
@@ -365,8 +365,8 @@ const S4HANAFeatures = () => (
         { title: "Vision temps réel O2C", desc: "Analytics sur commandes en cours, livraisons en retard, factures impayées et marges par produit ou client — directement sur l'Universal Journal (ACDOCA), sans extraction BW ni batch nocturne." },
         { title: "Revenue Accounting & Reporting (RAR)", desc: "Gestion de la reconnaissance de revenus selon IFRS 15 / ASC 606 pour les contrats complexes (abonnements, projets multi-éléments, bundles matériel + service)." },
       ].map(({ title, desc }) => (
-        <div key={title} className="flex gap-3 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800/40">
-          <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
+        <div key={title} className="flex gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40">
+          <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
@@ -382,7 +382,7 @@ const S4HANAFeatures = () => (
 ───────────────────────────────────────────────────────────── */
 const CareerBenefits = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-    className="bg-linear-to-br from-purple-900 to-violet-700 rounded-2xl p-6 text-white">
+    className="bg-linear-to-br from-amber-900 to-amber-700 rounded-2xl p-6 text-white">
     <h2 className="text-xl font-bold mb-1">Pourquoi maîtriser SD ?</h2>
     <p className="text-sm text-white/70 mb-5">SD est le module clé pour toutes les entreprises B2B ou B2C. La maîtrise de l'O2C et du pricing est un prérequis pour de nombreux projets S/4HANA.</p>
     <div className="grid sm:grid-cols-2 gap-4">
@@ -422,8 +422,8 @@ const SdTcodes = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les transactions SAP GUI à connaître pour un consultant, un gestionnaire ventes ou un service client junior.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {TCODES.map((t) => (
-        <div key={t.code} className="border border-purple-200 dark:border-purple-800/40 rounded-xl p-4 bg-purple-50/60 dark:bg-purple-900/10">
-          <p className="text-xs font-bold text-purple-700 dark:text-purple-400 mb-1">{t.code} — {t.label}</p>
+        <div key={t.code} className="border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 bg-amber-50/60 dark:bg-amber-900/10">
+          <p className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-1">{t.code} — {t.label}</p>
           <p className="text-xs text-slate-600 dark:text-slate-300">{t.usage}</p>
         </div>
       ))}
@@ -484,9 +484,9 @@ const SdResources = () => (
     <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Contenus à jour pour approfondir SD, le cycle O2C et le pricing.</p>
     <div className="grid sm:grid-cols-2 gap-3">
       {RESOURCES.map((r) => (
-        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-purple-400/50 hover:shadow-md transition-all group">
-          <span className="text-xs text-purple-500 dark:text-purple-400 font-medium">{r.source}</span>
-          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors leading-snug">{r.title}</span>
+        <a key={r.href} href={r.href} target="_blank" rel="noreferrer" className="flex flex-col gap-1 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-amber-400/50 hover:shadow-md transition-all group">
+          <span className="text-xs text-amber-500 dark:text-amber-400 font-medium">{r.source}</span>
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors leading-snug">{r.title}</span>
         </a>
       ))}
     </div>
@@ -498,9 +498,9 @@ const SdResources = () => (
 ───────────────────────────────────────────────────────────── */
 const NextStep = () => (
   <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.28 }}
-    className="rounded-2xl border border-purple-300/40 dark:border-purple-700/40 bg-purple-50/50 dark:bg-purple-900/10 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    className="rounded-2xl border border-amber-300/40 dark:border-amber-700/40 bg-amber-50/50 dark:bg-amber-900/10 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-purple-600 dark:text-purple-400 mb-1">Étape suivante du parcours</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 mb-1">Étape suivante du parcours</p>
       <h2 className="text-base font-bold text-slate-900 dark:text-white">SD acquis ? Passe à FI pour voir comment la facture devient une écriture comptable.</h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
         Le PGI et la facturation que tu viens d'étudier déclenchent chacun un document FI — comprendre la
@@ -521,7 +521,7 @@ export default function SD() {
       code="SD"
       title="Sales & Distribution"
       description="Maîtrisez le cycle Order-to-Cash SAP : commande client, livraison, facturation, pricing, credit management et intégration FI-SD sur S/4HANA."
-      gradient="from-purple-900 via-violet-700 to-purple-500"
+      gradient="from-amber-900 via-amber-700 to-amber-500"
       badge="Ventes · O2C · Facturation"
       stats={["8 concepts clés", "6 sous-modules", "~28 min de lecture", `Certification ${certCode("sd")}`]}
       examHref="/certifications/sd/examen"

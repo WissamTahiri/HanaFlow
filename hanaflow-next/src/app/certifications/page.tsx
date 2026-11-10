@@ -14,7 +14,7 @@ const CARD_STYLE: Record<string, { name: string; module: string; color: string }
   fi: { name: "Financial Accounting",    module: "SAP FI",         color: "from-blue-600 to-blue-800" },
   co: { name: "Management Accounting",   module: "SAP CO",         color: "from-indigo-600 to-indigo-800" },
   mm: { name: "Materials Management",    module: "SAP MM",         color: "from-emerald-600 to-emerald-800" },
-  sd: { name: "Sales & Distribution",    module: "SAP SD",         color: "from-purple-600 to-purple-800" },
+  sd: { name: "Sales & Distribution",    module: "SAP SD",         color: "from-amber-600 to-amber-800" },
   ai: { name: "Generative AI Developer", module: "SAP AI / Joule", color: "from-violet-600 to-fuchsia-700" },
   pp: { name: "Production Planning",     module: "SAP PP",         color: "from-rose-600 to-rose-800" },
 };
