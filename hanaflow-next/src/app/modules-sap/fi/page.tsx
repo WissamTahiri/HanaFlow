@@ -1,28 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import FlowDiagram from "@/components/diagrams/FlowDiagram";
 import FiOrgDiagram from "@/components/diagrams/FiOrgDiagram";
 import ModuleLayout from "@/components/ModuleLayout";
 import { certCode } from "@/lib/certCodes";
-
-/* ─────────────────────────────────────────────────────────────
-   Icônes SVG inline
-───────────────────────────────────────────────────────────── */
-const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-);
-
-const ChevronIcon = ({ open }: { open: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-    className={`transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`} aria-hidden="true">
-    <polyline points="6 9 12 15 18 9"/>
-  </svg>
-);
+import { CheckIcon } from "@/components/sap/ModuleIcons";
+import FaqAccordion from "@/components/sap/FaqAccordion";
 
 /* ─────────────────────────────────────────────────────────────
    Concepts clés
@@ -448,42 +433,6 @@ const FAQ_ITEMS = [
   },
 ];
 
-const FaqAccordion = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6"
-    >
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Questions fréquentes</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les doutes les plus courants sur SAP FI.</p>
-      <div className="space-y-2">
-        {FAQ_ITEMS.map((item, i) => (
-          <div key={i} className="border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setOpenIndex(openIndex === i ? null : i)}
-              className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-sm font-medium text-slate-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
-              aria-expanded={openIndex === i}
-            >
-              <span>{item.q}</span>
-              <ChevronIcon open={openIndex === i} />
-            </button>
-            {openIndex === i && (
-              <div className="px-4 pb-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-gray-100 dark:border-slate-700 pt-3">
-                {item.a}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.section>
-  );
-};
-
 
 /* ─────────────────────────────────────────────────────────────
    Ressources
@@ -581,7 +530,7 @@ const FI = () => (
     <FiTcodes />
 
     <FiResources />
-    <FaqAccordion />
+    <FaqAccordion items={FAQ_ITEMS} moduleLabel="FI" />
     <NextStep />
   </ModuleLayout>
 );

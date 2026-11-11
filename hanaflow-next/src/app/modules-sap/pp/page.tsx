@@ -1,18 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import FlowDiagram from "@/components/diagrams/FlowDiagram";
 import ModuleLayout from "@/components/ModuleLayout";
 import { certCode } from "@/lib/certCodes";
-
-const ChevronIcon = ({ open }: { open: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-    className={`transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`} aria-hidden="true">
-    <polyline points="6 9 12 15 18 9"/>
-  </svg>
-);
+import FaqAccordion from "@/components/sap/FaqAccordion";
 
 /* ─── Concepts clés ─── */
 const KEY_CONCEPTS = [
@@ -417,29 +410,8 @@ const FAQ_ITEMS = [
   { q: "Qu'est-ce que le MRP Live en S/4HANA ?", a: "MRP Live (MD01N) est la version S/4HANA du calcul des besoins en matières. Contrairement à l'ECC où le MRP classique traitait les matériaux en boucle, MRP Live s'appuie sur la base de données HANA pour calculer tout le périmètre en une procédure, avec une visibilité quasi temps réel sur les manques et les surcharges — un gain surtout net au-delà de la centaine de matériaux planifiés." },
   { q: "Quelle est la différence entre MRP classique et embedded PP/DS ?", a: "MRP (classique ou Live) planifie à capacité infinie : il garantit la couverture matière mais pas que le work center pourra absorber la charge. Embedded PP/DS ajoute une planification à capacité finie, avec des heuristiques de séquencement et un découpage temporel plus fin — utile quand la contrainte de capacité est aussi critique que la contrainte matière." },
   { q: "Qu'est-ce que le Demand-Driven MRP (DDMRP) apporte de différent ?", a: "Plutôt que de propager des prévisions à travers toute la chaîne, DDMRP positionne des points de découplage protégés par des buffers dynamiques (zones rouge, jaune, verte) qui absorbent la variabilité. Il se configure matériau par matériau (type MRP D1, lot H1) et ne remplace pas le MRP classique sur l'ensemble du portefeuille — seulement sur les références qui justifient ce stock tampon." },
-  { q: "PP est-il difficile à apprendre en partant de zéro ?", a: "PP est parmi les modules les plus complexes car il est à l'intersection de la logistique, du paramétrage technique et du controlling. La clé est de commencer par le flux discret simple (BOM + Routing + MRP + Ordre + Settlement), de bien comprendre l'intégration avec MM (GI/GR) et CO-PC, avant d'aborder la capacité, la production répétitive ou process, et enfin PP/DS." },
+  { q: "Quel est le niveau de difficulté réel de SAP PP pour un débutant ?", a: "PP est parmi les modules les plus complexes car il est à l'intersection de la logistique, du paramétrage technique et du controlling. La clé est de commencer par le flux discret simple (BOM + Routing + MRP + Ordre + Settlement), de bien comprendre l'intégration avec MM (GI/GR) et CO-PC, avant d'aborder la capacité, la production répétitive ou process, et enfin PP/DS." },
 ];
-
-const FaqAccordion = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.23 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Questions fréquentes</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les doutes les plus courants sur SAP PP.</p>
-      <div className="space-y-2">
-        {FAQ_ITEMS.map((item, i) => (
-          <div key={i} className="border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
-            <button type="button" onClick={() => setOpenIndex(openIndex === i ? null : i)} className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-sm font-medium text-slate-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors" aria-expanded={openIndex === i}>
-              <span>{item.q}</span><ChevronIcon open={openIndex === i} />
-            </button>
-            {openIndex === i && <div className="px-4 pb-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-gray-100 dark:border-slate-700 pt-3">{item.a}</div>}
-          </div>
-        ))}
-      </div>
-    </motion.section>
-  );
-};
 
 /* ─── Ressources ─── */
 const RESOURCES = [
@@ -509,7 +481,7 @@ const PP = () => (
     <PpTcodes />
 
     <PpResources />
-    <FaqAccordion />
+    <FaqAccordion items={FAQ_ITEMS} moduleLabel="PP" />
     <NextStep />
   </ModuleLayout>
 );

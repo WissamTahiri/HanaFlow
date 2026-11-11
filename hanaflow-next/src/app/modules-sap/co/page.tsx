@@ -1,24 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import FlowDiagram from "@/components/diagrams/FlowDiagram";
 import ModuleLayout from "@/components/ModuleLayout";
 import { certCode } from "@/lib/certCodes";
-
-const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-);
-
-const ChevronIcon = ({ open }: { open: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-    className={`transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`} aria-hidden="true">
-    <polyline points="6 9 12 15 18 9"/>
-  </svg>
-);
+import { CheckIcon } from "@/components/sap/ModuleIcons";
+import FaqAccordion from "@/components/sap/FaqAccordion";
 
 /* ─────────────────────────────────────────────────────────────
    Introduction — le rôle du Controlling
@@ -514,32 +502,11 @@ const FAQ_ITEMS = [
   { q: "Faut-il connaître la comptabilité pour faire du SAP CO ?", a: "Les bases comptables sont utiles (débits/crédits, marges, charges), mais CO est plus proche du contrôle de gestion que de la comptabilité générale. Un profil finance ou gestion peut très bien exceller en CO sans être comptable — l'essentiel est de comprendre la logique de responsabilité (qui engage le coût) et d'allocation (comment il se répartit)." },
   { q: "Qu'est-ce que le COGS split et pourquoi c'est important ?", a: "Le COGS split décompose le coût des marchandises vendues en composantes (matière première, main-d'œuvre, frais généraux de production). Cette ventilation, produite par CO-PC et reprise dans CO-PA, permet d'identifier précisément où se perdent les marges par produit ou famille de produits plutôt que de constater un seul chiffre agrégé." },
   { q: "CO-PA account-based vs costing-based : quelle différence ?", a: "L'account-based CO-PA (Margin Analysis) est aligné sur les comptes GL, compatible nativement avec l'Universal Journal, et produit des analyses toujours réconciliées avec FI. Le costing-based utilise des champs de valeur propres à l'Operating Concern, plus flexibles pour des schémas de marge personnalisés, mais qui nécessitent une conversion et une réconciliation avec FI. En S/4HANA, l'account-based est recommandé par SAP pour tout nouveau déploiement." },
-  { q: "SAP CO est-il difficile à apprendre en partant de zéro ?", a: "CO est plus conceptuel que FI : il n'y a pas de référentiel légal externe à respecter, donc la logique dépend entièrement de l'organisation du client. La clé est de comprendre l'articulation des objets de coûts (centre, ordre, segment de marge) avant de s'attaquer au Customizing. Commencer par les cost centers, puis les profit centers, puis CO-PA, est le chemin le plus naturel." },
+  { q: "Par où commencer pour apprendre SAP CO sans expérience préalable ?", a: "CO est plus conceptuel que FI : il n'y a pas de référentiel légal externe à respecter, donc la logique dépend entièrement de l'organisation du client. La clé est de comprendre l'articulation des objets de coûts (centre, ordre, segment de marge) avant de s'attaquer au Customizing. Commencer par les cost centers, puis les profit centers, puis CO-PA, est le chemin le plus naturel." },
   { q: "Quelle différence entre un ordre interne statistique et un ordre interne réel ?", a: "Un ordre statistique sert uniquement à analyser une dépense sous un angle transversal, en parallèle d'une imputation réelle effectuée ailleurs (sur un centre de coûts par exemple) — il n'est jamais soldé et ne porte pas de budget contraignant. Un ordre réel porte véritablement les coûts, peut être budgétisé avec contrôle de disponibilité, et doit être réglé (KO88) vers un objet CO de destination à la fin de son cycle de vie." },
   { q: "Qu'est-ce que l'Universal Allocation apporté par S/4HANA ?", a: "C'est un cadre unique qui remplace, app Fiori par app Fiori (Manage Allocations, Run Allocations, Allocation Results), les multiples transactions séparées d'ECC pour les cycles de distribution, d'assessment, de répartition de profit centers et de top-down CO-PA. Il s'appuie sur les mêmes tables que l'Universal Journal (ACDOCA pour le réel, ACDOCP pour le plan) et permet de simuler une allocation avant de l'exécuter réellement." },
   { q: "Comment se calcule concrètement un écart de coût de production ?", a: "Le coût standard (fixé via CK11N à partir de la nomenclature et de la gamme) est comparé, à la clôture de l'ordre de fabrication, au coût réel constaté — matière effectivement consommée, heures réellement passées. KKS1 (ou KKS2 en individuel) décompose l'écart total par catégorie : écart de prix (le cours d'achat a changé), de quantité ou de rendement (plus de matière ou de temps consommé que prévu pour la même quantité produite), et de reste. Ces écarts sont ensuite réglés vers FI et, selon la configuration, vers CO-PA." },
 ];
-
-const FaqAccordion = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.26 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Questions fréquentes</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les doutes les plus courants sur SAP CO.</p>
-      <div className="space-y-2">
-        {FAQ_ITEMS.map((item, i) => (
-          <div key={i} className="border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
-            <button type="button" onClick={() => setOpenIndex(openIndex === i ? null : i)} className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-sm font-medium text-slate-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors" aria-expanded={openIndex === i}>
-              <span>{item.q}</span><ChevronIcon open={openIndex === i} />
-            </button>
-            {openIndex === i && <div className="px-4 pb-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-gray-100 dark:border-slate-700 pt-3">{item.a}</div>}
-          </div>
-        ))}
-      </div>
-    </motion.section>
-  );
-};
 
 const RESOURCES = [
   { title: "Cost Center and Internal Order Accounting in SAP S/4HANA", href: "https://learning.sap.com/courses/cost-center-and-internal-order-accounting-in-sap-s-4hana", source: "SAP Learning" },
@@ -613,7 +580,7 @@ export default function CO() {
       <CareerBenefits />
       <CoTcodes />
       <CoResources />
-      <FaqAccordion />
+      <FaqAccordion items={FAQ_ITEMS} moduleLabel="CO" />
       <NextStep />
     </ModuleLayout>
   );

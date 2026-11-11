@@ -1,18 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import FlowDiagram from "@/components/diagrams/FlowDiagram";
 import ModuleLayout from "@/components/ModuleLayout";
 import { certCode } from "@/lib/certCodes";
-
-const ChevronIcon = ({ open }: { open: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-    className={`transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`} aria-hidden="true">
-    <polyline points="6 9 12 15 18 9"/>
-  </svg>
-);
+import FaqAccordion from "@/components/sap/FaqAccordion";
 
 /* ─────────────────────────────────────────────────────────────
    Concepts clés
@@ -441,29 +434,8 @@ const FAQ_ITEMS = [
   { q: "Qu'est-ce que l'ATP en SAP SD ?", a: "L'Available-to-Promise (ATP) est la vérification de disponibilité du stock lors de la création du Sales Order : SAP vérifie si le stock disponible, les réceptions planifiées et les réservations existantes peuvent couvrir la demande à la date souhaitée. En S/4HANA, l'aATP ajoute allocation produit, backorder processing et substitution automatique." },
   { q: "Comment fonctionne la condition technique en pricing SD ?", a: "Cinq briques s'enchaînent : la pricing procedure empile des condition types (prix, remise, taxe…), chacun cherchant une valeur via son access sequence dans les condition tables, où sont stockés les condition records (VK11). SAP parcourt l'access sequence du plus spécifique au plus général et s'arrête à la première valeur trouvée." },
   { q: "Pourquoi la Credit Management classique (FD32) est-elle obsolète en S/4HANA ?", a: "Depuis la release on-premise 1511, SAP a remplacé la Credit Management classique par SAP Credit Management (FSCM), paramétrée sur le Business Partner via UKM_BP. FD32 et les tables KNKA/KNKK ne sont plus utilisables — le nouveau modèle sépare profil de crédit et segment de crédit, et vise une vue de risque cross-système." },
-  { q: "SAP SD est-il difficile à apprendre en partant de zéro ?", a: "SD est conceptuellement accessible car le cycle O2C est intuitif (commande → livraison → facture → paiement). La complexité vient du pricing (condition technique) et de la détermination de comptes FI. Commencer par le cycle O2C basique avant d'aborder le pricing avancé et l'aATP est la bonne approche." },
+  { q: "SAP SD est-il accessible à un débutant total ?", a: "SD est conceptuellement accessible car le cycle O2C est intuitif (commande → livraison → facture → paiement). La complexité vient du pricing (condition technique) et de la détermination de comptes FI. Commencer par le cycle O2C basique avant d'aborder le pricing avancé et l'aATP est la bonne approche." },
 ];
-
-const FaqAccordion = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.24 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Questions fréquentes</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Les doutes les plus courants sur SAP SD.</p>
-      <div className="space-y-2">
-        {FAQ_ITEMS.map((item, i) => (
-          <div key={i} className="border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
-            <button type="button" onClick={() => setOpenIndex(openIndex === i ? null : i)} className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-sm font-medium text-slate-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors" aria-expanded={openIndex === i}>
-              <span>{item.q}</span><ChevronIcon open={openIndex === i} />
-            </button>
-            {openIndex === i && <div className="px-4 pb-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-gray-100 dark:border-slate-700 pt-3">{item.a}</div>}
-          </div>
-        ))}
-      </div>
-    </motion.section>
-  );
-};
 
 /* ─────────────────────────────────────────────────────────────
    Ressources
@@ -537,7 +509,7 @@ export default function SD() {
       <CareerBenefits />
       <SdTcodes />
       <SdResources />
-      <FaqAccordion />
+      <FaqAccordion items={FAQ_ITEMS} moduleLabel="SD" />
       <NextStep />
     </ModuleLayout>
   );
