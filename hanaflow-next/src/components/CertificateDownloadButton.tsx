@@ -9,7 +9,6 @@ import { trackEvent } from "@/lib/analytics";
 interface Props {
   userName: string;
   moduleCode: string;
-  moduleName: string;
   score: number;
   totalQuestions: number;
 }
@@ -102,10 +101,6 @@ export default function CertificateDownloadButton({ userName, moduleCode, score,
       setLoading(false);
     }
   };
-
-  // Mark `userName` as used (it's passed in props mais on utilise candidateName
-  // de la DB pour le PDF — on garde le param pour la rétrocompat).
-  void userName;
 
   return (
     <div className="flex flex-col items-end gap-1">

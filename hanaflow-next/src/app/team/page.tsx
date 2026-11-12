@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 interface Member {
   userId: number;
@@ -23,7 +24,7 @@ interface TeamData {
   pendingInvites: Array<{ id: number; email: string; expiresAt: string; createdAt: string }>;
 }
 
-export default function TeamPage() {
+function TeamContent() {
   const { token, loading: authLoading } = useAuth();
   const [data, setData] = useState<TeamData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -225,5 +226,13 @@ export default function TeamPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TeamPage() {
+  return (
+    <ProtectedRoute>
+      <TeamContent />
+    </ProtectedRoute>
   );
 }

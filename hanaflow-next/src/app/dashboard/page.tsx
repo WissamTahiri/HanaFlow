@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useProgress, SAP_MODULES } from "@/hooks/useProgress";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { useGamification, BADGES, getLevelInfo } from "@/context/GamificationContext";
+import { useFiLessonsCompleted } from "@/hooks/useFiLessonsCompleted";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import QuizHistorySection from "@/components/QuizHistorySection";
 
@@ -76,12 +77,7 @@ function DashboardContent() {
     [earnedBadges]
   );
 
-  const fiLessonsCompleted = useMemo(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("hanaflow_fi_lessons") || "[]");
-      return Array.isArray(saved) ? saved.length : 0;
-    } catch { return 0; }
-  }, []);
+  const fiLessonsCompleted = useFiLessonsCompleted();
 
   const nextSlug = useMemo(
     () => RECOMMENDED_ORDER.find((s) => !isVisited(s)),

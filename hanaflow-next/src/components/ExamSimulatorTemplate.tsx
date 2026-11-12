@@ -197,7 +197,6 @@ function ResultsScreen({ answers, questions, timeUsed, certInfo, certPath, modul
           <CertificateDownloadButton
             userName={user?.name || ""}
             moduleCode={moduleId.toUpperCase()}
-            moduleName={certInfo.shortName}
             score={score}
             totalQuestions={questions.length}
           />

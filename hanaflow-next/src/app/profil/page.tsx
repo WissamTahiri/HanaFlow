@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/hooks/useProgress";
+import { useFiLessonsCompleted } from "@/hooks/useFiLessonsCompleted";
 import { useSubscription } from "@/context/SubscriptionContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import TwoFactorSection from "@/components/TwoFactorSection";
@@ -130,12 +131,7 @@ function ProfileContent() {
     localStorage.setItem("hanaflow_learning_goal", next);
   };
 
-  const fiLessonsCompleted = useMemo(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("hanaflow_fi_lessons") || "[]");
-      return Array.isArray(saved) ? saved.length : 0;
-    } catch { return 0; }
-  }, []);
+  const fiLessonsCompleted = useFiLessonsCompleted();
 
   const initials = user?.name
     ? user.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
