@@ -23,6 +23,7 @@ export default function AdminNPSPage() {
   const { getToken } = useAuth();
   const [data, setData] = useState<NPSData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -33,8 +34,12 @@ export default function AdminNPSPage() {
           headers: { Authorization: `Bearer ${token ?? ""}` },
           credentials: "include",
         });
-        const d = await r.json();
-        if (r.ok && !cancelled) setData(d);
+        const d = await r.json().catch(() => ({}));
+        if (cancelled) return;
+        if (r.ok) setData(d);
+        else setError(d.message ?? "Erreur lors du chargement du NPS.");
+      } catch {
+        if (!cancelled) setError("Erreur réseau.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -43,6 +48,15 @@ export default function AdminNPSPage() {
   }, [getToken]);
 
   if (loading) return <p className="text-sm text-slate-400">Chargement…</p>;
+  if (error) {
+    return (
+      <div className="max-w-3xl">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">NPS</h1>
+        <p className="text-sm text-slate-500 mb-6">Net Promoter Score — qualité de la relation utilisateur.</p>
+        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">{error}</div>
+      </div>
+    );
+  }
   if (!data || data.total === 0) {
     return (
       <div className="max-w-3xl">
