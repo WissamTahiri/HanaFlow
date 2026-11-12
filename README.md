@@ -55,7 +55,7 @@ npm test          # Vitest run
 npm run test:watch
 ```
 
-Couverture actuelle : `auth.ts`, `apiHelpers.ts`, `totp.ts`.
+Fichiers `*.test.ts` colocalisés avec le code qu'ils couvrent (`lib/`, `data/`, `config/`).
 
 ## Documentation détaillée
 

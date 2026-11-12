@@ -23,7 +23,6 @@ jobs:
       # pas. Les vrais sont posés sur Vercel ; en CI on n'a besoin que de pouvoir
       # importer les fichiers.
       JWT_SECRET: ci-jwt-secret-32chars-minimum-fake
-      JWT_REFRESH_SECRET: ci-refresh-secret-32chars-minimum-fake
       DATABASE_URL: postgresql://stub:stub@localhost:5432/stub
       DIRECT_URL: postgresql://stub:stub@localhost:5432/stub
       NEXT_PUBLIC_APP_URL: http://localhost:3000
@@ -63,7 +62,6 @@ jobs:
         working-directory: hanaflow-next
     env:
       JWT_SECRET: ci-jwt-secret-32chars-minimum-fake
-      JWT_REFRESH_SECRET: ci-refresh-secret-32chars-minimum-fake
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hanaflow_e2e
       DIRECT_URL: postgresql://postgres:postgres@localhost:5432/hanaflow_e2e
       NEXT_PUBLIC_APP_URL: http://localhost:3000
