@@ -10,11 +10,16 @@ const PROTECTED_PREFIXES = [
   "/admin",
   "/certificats",
   "/stats",
+  "/team",
 ];
 
 // Pages publiques qui matchent un PROTECTED_PREFIXES mais doivent rester
 // accessibles sans login (SEO, funnel d'acquisition).
-const PUBLIC_EXCEPTIONS: string[] = [];
+// /team/join : un visiteur déconnecté peut arriver ici via un lien d'invitation
+// email — la page affiche elle-même une invite à se connecter/s'inscrire avec
+// un `next` qui pointe vers l'invitation précise, plutôt qu'un redirect brut
+// vers /login qui perdrait le contexte de l'invitation.
+const PUBLIC_EXCEPTIONS: string[] = ["/team/join"];
 
 const ADMIN_PREFIX = "/admin";
 
