@@ -130,7 +130,10 @@ describe("generateBackupCodes", () => {
       const remaining = await consumeBackupCode(code, hashed);
       expect(remaining).not.toBeNull();
     }
-  });
+    // 10 générations + jusqu'à 10 vérifications Argon2 chacune : ~1.3s en
+    // local, peut dépasser le timeout par défaut (5s) sur un runner CI
+    // partagé plus lent (observé en prod CI) — marge explicite.
+  }, 15000);
 });
 
 describe("consumeBackupCode", () => {
