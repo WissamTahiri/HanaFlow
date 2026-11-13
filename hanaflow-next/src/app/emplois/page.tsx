@@ -59,6 +59,7 @@ export default function EmploisPage() {
   const { isPro } = useSubscription();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [moduleFilter, setModuleFilter] = useState("");
   const [seniorityFilter, setSeniorityFilter] = useState("");
   // Compte total (non filtré) du pool d'offres — sert à savoir si des offres existent
@@ -69,18 +70,23 @@ export default function EmploisPage() {
 
   const loadJobs = async () => {
     setLoading(true);
+    setLoadError(false);
     const params = new URLSearchParams();
     if (moduleFilter) params.set("module", moduleFilter);
     if (seniorityFilter) params.set("seniority", seniorityFilter);
     const isUnfiltered = !moduleFilter && !seniorityFilter;
     try {
       const r = await fetch(`/api/jobs?${params.toString()}`);
+      if (!r.ok) throw new Error();
       const d = await r.json();
       const list = d.jobs ?? [];
       setJobs(list);
       if (isUnfiltered) setTotalJobsCount(list.length);
     } catch {
-      if (isUnfiltered) setTotalJobsCount(0);
+      // Page publique : pas de bannière d'erreur alarmante pour un visiteur
+      // anonyme, mais on distingue malgré tout "échec de chargement" de
+      // "aucune offre" (sinon indistinguable — cf. EmptyState).
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -166,6 +172,11 @@ export default function EmploisPage() {
         {loading ? (
           <div className="flex justify-center py-16">
             <div className="w-6 h-6 border-2 border-sap-blue border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : loadError ? (
+          <div className="text-center py-16">
+            <p className="text-slate-500 dark:text-slate-400 mb-3">Impossible de charger les offres pour le moment.</p>
+            <button onClick={loadJobs} className="text-sap-blue font-semibold hover:underline">Réessayer</button>
           </div>
         ) : jobs.length === 0 ? (
           <EmptyState hasActiveFilters={hasActiveFilters} onReset={resetFilters} />
