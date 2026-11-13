@@ -407,6 +407,35 @@ describe("applyGamificationEvent — write conflict retry (Serializable P2034)",
     expect(state.totalXp).toBe(150 + 200); // quizXp + badge quiz_perfect
   });
 
+  it("also retries on the Prisma 7 DriverAdapterError commit-time conflict shape (prisma/orm#30580)", async () => {
+    // Depuis Prisma 7 + @prisma/adapter-pg, un conflit détecté au COMMIT (pas
+    // pendant la transaction) ne se mappe plus en P2034 mais en DriverAdapterError
+    // avec cause.kind === "TransactionWriteConflict" — cf. commentaire sur
+    // isWriteConflict(). Sans ce test, une régression sur ce second cas de
+    // détection passerait inaperçue.
+    const row = baseRow();
+    setupTx(row);
+    let calls = 0;
+    transactionMock.mockImplementation(async (fn: (tx: unknown) => unknown) => {
+      calls += 1;
+      if (calls === 1) {
+        const err = new Error("could not serialize access") as Error & { name: string; cause: { kind: string } };
+        err.name = "DriverAdapterError";
+        err.cause = { kind: "TransactionWriteConflict" };
+        throw err;
+      }
+      const tx = {
+        userGamification: { upsert: upsertMock, update: updateMock },
+        userProgress: { count: userProgressCountMock },
+        user: { findUnique: userFindUniqueMock },
+      };
+      return fn(tx);
+    });
+    const { state } = await applyGamificationEvent(1, { type: "quiz_pass", module: "fi", chapterId: "ch1", scorePct: 100 });
+    expect(calls).toBe(2);
+    expect(state.totalXp).toBe(150 + 200);
+  });
+
   it("rethrows a second serializable write conflict instead of retrying forever", async () => {
     transactionMock.mockImplementation(async () => {
       const err = new Error("conflict") as Error & { code: string };

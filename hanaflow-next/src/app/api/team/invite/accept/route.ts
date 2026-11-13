@@ -3,15 +3,11 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { hashToken } from "@/lib/auth";
 import { requireAuth, ok, err, validateBody, rateLimit, getClientIp } from "@/lib/apiHelpers";
+import { isSerializationConflict } from "@/lib/prismaErrors";
 
 const schema = z.object({
   token: z.string().min(16).max(256),
 });
-
-/** Conflit d'écriture / deadlock sérialisable → rejouable une fois. */
-function isWriteConflict(e: unknown): boolean {
-  return !!e && typeof e === "object" && (e as { code?: string }).code === "P2034";
-}
 
 /**
  * Accepte une invitation d'équipe. L'utilisateur doit être connecté avec
@@ -73,7 +69,7 @@ export async function POST(req: NextRequest) {
       );
       break;
     } catch (e) {
-      if (attempt === 0 && isWriteConflict(e)) continue;
+      if (attempt === 0 && isSerializationConflict(e)) continue;
       throw e;
     }
   }

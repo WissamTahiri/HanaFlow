@@ -9,8 +9,10 @@ export default defineConfig({
   migrations: {
     path: "prisma/migrations",
   },
-  engine: "classic",
+  // Connexion directe (non poolée) pour les opérations CLI (db push, migrate) —
+  // DATABASE_URL (poolée via PgBouncer) reste réservée au runtime applicatif,
+  // configuré séparément via l'adapter dans src/lib/prisma.ts.
   datasource: {
-    url: env("DATABASE_URL"),
+    url: env("DIRECT_URL"),
   },
 });

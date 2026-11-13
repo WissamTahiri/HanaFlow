@@ -48,6 +48,7 @@ yarn-error.log*
 # Prisma
 /prisma/migrations/dev.db
 /prisma/migrations/dev.db-journal
+/src/generated/
 
 # PWA generated (serwist / workbox)
 /public/sw.js

@@ -19,6 +19,8 @@ const eslintConfig = defineConfig([
     "public/workbox-*.js.map",
     "public/worker-*.js",
     "public/fallback-*.js",
+    // Client Prisma généré (prisma generate) — code dérivé, pas écrit à la main.
+    "src/generated/**",
   ]),
   {
     rules: {

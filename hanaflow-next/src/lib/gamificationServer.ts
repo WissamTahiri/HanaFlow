@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "./prisma";
 import { getBadge, quizXp, examXp, LESSON_XP } from "./gamification";
+import { isSerializationConflict } from "./prismaErrors";
 
 /**
  * Logique de gamification côté serveur — source de vérité.
@@ -85,10 +86,6 @@ const utcDay = (d: Date) => d.toISOString().slice(0, 10);
 /** Client de transaction Prisma (sous-ensemble utilisé ici). */
 type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
 
-/** Conflit d'écriture / deadlock sérialisable → rejouable une fois. */
-function isWriteConflict(e: unknown): boolean {
-  return !!e && typeof e === "object" && (e as { code?: string }).code === "P2034";
-}
 
 /**
  * Applique un événement et persiste. Renvoie l'état à jour + les badges
@@ -108,7 +105,7 @@ export async function applyGamificationEvent(userId: number, event: Gamification
         { isolationLevel: "Serializable" },
       );
     } catch (e) {
-      if (attempt === 0 && isWriteConflict(e)) continue;
+      if (attempt === 0 && isSerializationConflict(e)) continue;
       throw e;
     }
   }
