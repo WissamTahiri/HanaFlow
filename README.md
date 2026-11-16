@@ -2,7 +2,7 @@
 
 Plateforme éducative SAP — apprends les modules FI, CO, MM, SD, PP et IA générative, de zéro à consultant certifié.
 
-> Le code actif vit dans [`hanaflow-next/`](./hanaflow-next/). Une ancienne implémentation React/Vite + Express est conservée dans `_archive/` pour référence (voir « Historique » plus bas).
+> Le code actif vit dans [`hanaflow-next/`](./hanaflow-next/). Une ancienne implémentation React/Vite + Express est conservée pour référence sur la branche `legacy-archive` (voir « Historique » plus bas).
 
 ## Stack
 
@@ -64,4 +64,4 @@ Fichiers `*.test.ts` colocalisés avec le code qu'ils couvrent (`lib/`, `data/`,
 
 ## Historique
 
-Avant la migration Next.js, HanaFlow était une SPA React/Vite + API Express. Ce code est archivé dans `_archive/Front-End` et `_archive/Back-End` (avec ses propres `PROGRESS.md`, `SECURITY.md`, `DEPLOIEMENT.md`, etc. qui n'ont **pas** été mis à jour pour la nouvelle stack). À consulter uniquement pour récupérer un composant ou comprendre une décision passée.
+Avant la migration Next.js, HanaFlow était une SPA React/Vite + API Express. Ce code a été retiré de `master` le 2026-11-16 (ses lockfiles, jamais mis à jour, faisaient remonter ~90 fausses alertes de vulnérabilités sur un projet jamais buildé ni déployé) mais reste entièrement conservé sur la branche `legacy-archive` (`_archive/Front-End` et `_archive/Back-End`, avec leurs propres `PROGRESS.md`, `SECURITY.md`, `DEPLOIEMENT.md`, etc. qui n'ont **pas** été mis à jour pour la nouvelle stack). À consulter uniquement pour récupérer un composant ou comprendre une décision passée — ne pas fusionner dans `master`.

@@ -6,7 +6,7 @@ Guidance pour Claude Code travaillant sur ce repo.
 
 **Le projet actif est dans [`hanaflow-next/`](./hanaflow-next/).** Tout nouveau travail s'y fait. La racine ne contient que de la doc.
 
-`_archive/` contient l'ancienne implémentation React/Vite + Express (à ne pas modifier — référence uniquement, pour récupérer un composant ou retrouver une décision passée).
+L'ancienne implémentation React/Vite + Express (jadis `_archive/`) a été retirée de `master` (2026-11-16, lockfiles obsolètes = ~90 fausses alertes Dependabot sur un repo jamais buildé/déployé) mais reste entièrement consultable sur la branche `legacy-archive` (`git show legacy-archive:_archive/...` ou `git checkout legacy-archive -- _archive`) — référence uniquement, ne pas la fusionner dans `master`.
 
 ## Avertissement Next.js 16
 
