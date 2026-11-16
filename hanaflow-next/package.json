@@ -34,7 +34,7 @@
     "groq-sdk": "^1.2.0",
     "jsonwebtoken": "^9.0.3",
     "motion": "^12.38.0",
-    "next": "^16.4.1",
+    "next": "^16.4.6",
     "otplib": "^13.4.0",
     "posthog-js": "^1.405.2",
     "qrcode": "^1.5.4",
