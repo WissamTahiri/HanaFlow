@@ -152,6 +152,7 @@ function TeamContent() {
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
             placeholder="collegue@entreprise.com"
+            aria-label="Email du membre à inviter"
             disabled={!organization.isActive}
             className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/50 disabled:opacity-50"
           />

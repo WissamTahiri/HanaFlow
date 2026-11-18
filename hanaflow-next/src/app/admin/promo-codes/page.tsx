@@ -140,8 +140,9 @@ export default function AdminPromoCodesPage() {
       {showForm && (
         <form onSubmit={createCode} className="mb-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Code *</label>
+            <label htmlFor="promo-code" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Code *</label>
             <input
+              id="promo-code"
               required
               value={form.code}
               onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
@@ -150,8 +151,9 @@ export default function AdminPromoCodesPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Description</label>
+            <label htmlFor="promo-description" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Description</label>
             <input
+              id="promo-description"
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               placeholder="Code de lancement..."
@@ -159,8 +161,9 @@ export default function AdminPromoCodesPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Limite d&apos;utilisation</label>
+            <label htmlFor="promo-usage-limit" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Limite d&apos;utilisation</label>
             <input
+              id="promo-usage-limit"
               type="number"
               min="1"
               value={form.usageLimit}
@@ -170,8 +173,9 @@ export default function AdminPromoCodesPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Expiration</label>
+            <label htmlFor="promo-expires-at" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Expiration</label>
             <input
+              id="promo-expires-at"
               type="datetime-local"
               value={form.expiresAt}
               onChange={(e) => setForm((f) => ({ ...f, expiresAt: e.target.value }))}

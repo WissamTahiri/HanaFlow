@@ -220,6 +220,7 @@ function ApplySection({ jobId, jobTitle }: { jobId: number; jobTitle: string }) 
         onChange={(e) => setMessage(e.target.value)}
         maxLength={1000}
         placeholder="Message optionnel (motivation, disponibilité…)"
+        aria-label="Message de motivation (optionnel)"
         className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white mb-3 min-h-[80px]"
       />
       {error && <p className="text-sm text-red-600 mb-3">{error}</p>}

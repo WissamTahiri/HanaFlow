@@ -222,6 +222,7 @@ export default function AdminUsersPage() {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           placeholder="Rechercher par nom ou email..."
+          aria-label="Rechercher un utilisateur par nom ou email"
           className="flex-1 min-w-[200px] px-4 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/50"
         />
         {selected.size > 0 && (
@@ -230,6 +231,7 @@ export default function AdminUsersPage() {
             <select
               value={bulkAction}
               onChange={(e) => setBulkAction(e.target.value as BulkAction | "")}
+              aria-label="Action groupée sur les utilisateurs sélectionnés"
               className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
             >
               <option value="">Action…</option>

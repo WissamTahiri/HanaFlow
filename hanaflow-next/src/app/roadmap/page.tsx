@@ -235,6 +235,7 @@ function RoadmapPersoContent() {
                     value={targetIndustry}
                     onChange={(e) => setTargetIndustry(e.target.value)}
                     placeholder="Ex: retail, énergie, banque, pharma, automotive..."
+                    aria-label="Secteur visé (optionnel)"
                     maxLength={100}
                     className="input"
                   />

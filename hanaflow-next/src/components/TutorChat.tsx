@@ -310,6 +310,7 @@ export default function TutorChat({ moduleCode, chapterId, moduleName }: Props) 
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={`Ta question sur ${moduleCode.toUpperCase()}...`}
+                  aria-label={`Ta question au tuteur SAP sur ${moduleCode.toUpperCase()}`}
                   disabled={pending}
                   maxLength={4000}
                   className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sap-blue/40"

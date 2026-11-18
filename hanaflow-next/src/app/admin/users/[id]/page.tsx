@@ -337,6 +337,7 @@ export default function AdminUserDetailPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Nouveau mot de passe (min. 8 car.)"
+              aria-label="Nouveau mot de passe"
               className="flex-1 min-w-[220px] px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
             />
             <button

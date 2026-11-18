@@ -358,6 +358,7 @@ function EntretienContent() {
                 value={answers[current.id] ?? ""}
                 onChange={(e) => setAnswers((p) => ({ ...p, [current.id]: e.target.value }))}
                 placeholder="Ta réponse... (cite des T-codes, des tables, donne un exemple concret)"
+                aria-label={`Ta réponse à la question : ${current.text}`}
                 rows={8}
                 maxLength={4000}
                 className="w-full p-4 text-sm rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sap-blue/40 leading-relaxed resize-none"

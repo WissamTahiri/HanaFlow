@@ -284,8 +284,9 @@ function ProfileContent() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Nom complet</label>
+              <label htmlFor="profil-name" className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Nom complet</label>
               <input
+                id="profil-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -296,8 +297,9 @@ function ProfileContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Email</label>
+              <label htmlFor="profil-email" className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Email</label>
               <input
+                id="profil-email"
                 type="email"
                 value={user?.email || ""}
                 disabled
@@ -308,12 +310,13 @@ function ProfileContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+              <label htmlFor="profil-new-password" className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
                 Nouveau mot de passe{" "}
                 <span className="text-gray-400 font-normal">(optionnel)</span>
               </label>
               <div className="relative">
                 <input
+                  id="profil-new-password"
                   type={showPwd ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -339,10 +342,11 @@ function ProfileContent() {
             {password && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="profil-confirm-password" className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
                     Confirmer le nouveau mot de passe
                   </label>
                   <input
+                    id="profil-confirm-password"
                     type={showPwd ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -353,10 +357,11 @@ function ProfileContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="profil-current-password" className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
                     Mot de passe actuel <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="profil-current-password"
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
@@ -374,10 +379,11 @@ function ProfileContent() {
 
                 {needs2fa && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="profil-totp-code" className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
                       Code 2FA <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="profil-totp-code"
                       type="text"
                       inputMode="numeric"
                       autoComplete="one-time-code"
@@ -469,6 +475,7 @@ function ProfileContent() {
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                     placeholder="HANAFLOW2025"
+                    aria-label="Code promo"
                     className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/50 font-mono"
                   />
                   <button

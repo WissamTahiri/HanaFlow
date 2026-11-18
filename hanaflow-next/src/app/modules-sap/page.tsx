@@ -182,6 +182,7 @@ export default function ModulesOverview() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un module, tag…"
+              aria-label="Rechercher un module ou un tag"
               className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-slate-700
                          bg-white dark:bg-slate-800 text-slate-900 dark:text-white
                          focus:outline-none focus:ring-2 focus:ring-sap-blue/40 placeholder:text-slate-400"

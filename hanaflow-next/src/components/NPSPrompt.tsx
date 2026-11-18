@@ -186,6 +186,7 @@ export default function NPSPrompt() {
                             ? "Qu'est-ce qui te ferait passer à 10 ?"
                             : "Qu'est-ce qui te déçoit ? On veut savoir."
                       }
+                      aria-label="Commentaire (optionnel)"
                       rows={2}
                       maxLength={2000}
                       className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sap-blue/40 resize-none"

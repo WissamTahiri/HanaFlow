@@ -96,6 +96,7 @@ export default function AdminJobApplicationsPage() {
                 <select
                   value={a.status}
                   onChange={(e) => updateStatus(a.id, e.target.value as Application["status"])}
+                  aria-label={`Statut de la candidature de ${a.user.name}`}
                   className="text-xs px-2 py-1.5 rounded-md border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                 >
                   {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}

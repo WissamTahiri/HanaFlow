@@ -89,6 +89,7 @@ export default function AuditLogPage() {
         <select
           value={actionFilter}
           onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
+          aria-label="Filtrer par type d'action"
           className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sap-blue/40"
         >
           <option value="">Toutes les actions</option>

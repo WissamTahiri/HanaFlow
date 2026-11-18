@@ -132,8 +132,9 @@ export default function AdminOrganizationsPage() {
       {showForm && (
         <form onSubmit={createOrg} className="mb-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nom de l&apos;organisation *</label>
+            <label htmlFor="org-name" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nom de l&apos;organisation *</label>
             <input
+              id="org-name"
               required
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -142,8 +143,9 @@ export default function AdminOrganizationsPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Email du propriétaire *</label>
+            <label htmlFor="org-owner-email" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Email du propriétaire *</label>
             <input
+              id="org-owner-email"
               required
               type="email"
               value={form.ownerEmail}
@@ -154,8 +156,9 @@ export default function AdminOrganizationsPage() {
             <p className="text-[11px] text-slate-400 mt-1">Doit déjà avoir un compte HanaFlow.</p>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nombre de sièges</label>
+            <label htmlFor="org-seat-limit" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nombre de sièges</label>
             <input
+              id="org-seat-limit"
               type="number"
               min="1"
               value={form.seatLimit}

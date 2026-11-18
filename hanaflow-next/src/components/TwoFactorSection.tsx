@@ -209,8 +209,9 @@ export default function TwoFactorSection() {
             Pour activer la 2FA, confirme d&apos;abord ton mot de passe.
           </p>
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Mot de passe</label>
+            <label htmlFor="tfa-enroll-password" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Mot de passe</label>
             <input
+              id="tfa-enroll-password"
               type="password"
               autoComplete="current-password"
               value={password}
@@ -263,10 +264,11 @@ export default function TwoFactorSection() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            <label htmlFor="tfa-enroll-code" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Code de vérification (6 chiffres)
             </label>
             <input
+              id="tfa-enroll-code"
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
@@ -366,8 +368,9 @@ export default function TwoFactorSection() {
               : "Pour régénérer les codes, confirme avec ton mot de passe et un code TOTP valide."}
           </p>
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Mot de passe</label>
+            <label htmlFor="tfa-confirm-password" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Mot de passe</label>
             <input
+              id="tfa-confirm-password"
               type="password"
               autoComplete="current-password"
               value={password}
@@ -376,10 +379,11 @@ export default function TwoFactorSection() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+            <label htmlFor="tfa-confirm-code" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
               {phase === "disabling" ? "Code 2FA ou code de récupération" : "Code 2FA (6 chiffres)"}
             </label>
             <input
+              id="tfa-confirm-code"
               type="text"
               inputMode={phase === "regenerating" ? "numeric" : "text"}
               pattern={phase === "regenerating" ? "[0-9]*" : undefined}
