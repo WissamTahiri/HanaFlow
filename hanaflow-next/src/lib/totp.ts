@@ -43,7 +43,10 @@ export function verifyTotpWithStep(token: string, secret: string): number | null
       secret,
       strategy: "totp",
       period: PERIOD_SECONDS,
-      epoch: step * PERIOD_SECONDS * 1000,
+      // otplib attend epoch en SECONDES (voir node_modules/otplib/dist/*.d.ts :
+      // « Current Unix epoch timestamp in seconds ») — un `* 1000` ici décale
+      // la fenêtre testée d'un facteur 1000 et fait échouer TOUT code valide.
+      epoch: step * PERIOD_SECONDS,
     });
     // Comparaison timing-safe
     if (expected.length === cleaned.length) {

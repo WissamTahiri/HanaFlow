@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateTotpSecret, buildOtpAuthUrl, verifyTotp, generateCurrentCode } from "./totp";
+import { generateTotpSecret, buildOtpAuthUrl, verifyTotp, verifyTotpWithStep, generateCurrentCode } from "./totp";
 
 describe("totp", () => {
   it("generates a base32 secret", () => {
@@ -45,5 +45,37 @@ describe("totp", () => {
     const validCode = generateCurrentCode(secret);
     const codeWithSpaces = validCode.slice(0, 3) + " " + validCode.slice(3);
     expect(verifyTotp(codeWithSpaces, secret)).toBe(true);
+  });
+});
+
+describe("verifyTotpWithStep", () => {
+  // Fonction réellement utilisée par login/enroll/disable (contrairement à
+  // verifyTotp ci-dessus, qui n'a aucun appelant réel) — a eu un bug critique
+  // (epoch passé en ms au lieu de secondes à otplib, cf. node_modules/otplib
+  // /dist/*.d.ts : « Current Unix epoch timestamp in seconds ») qui faisait
+  // échouer TOUT code TOTP valide en prod depuis le 20/05/2026. Zéro code de
+  // test n'appelait cette fonction avant — ce fichier ne couvrait que la
+  // fonction jumelle correcte et inutilisée.
+  it("accepte le code TOTP courant et renvoie le numéro de step", () => {
+    const secret = generateTotpSecret();
+    const code = generateCurrentCode(secret);
+    const step = verifyTotpWithStep(code, secret);
+    expect(step).not.toBeNull();
+    expect(step).toBe(Math.floor(Date.now() / 1000 / 30));
+  });
+
+  it("rejette un code invalide", () => {
+    const secret = generateTotpSecret();
+    expect(verifyTotpWithStep("000000", secret)).toBeNull();
+  });
+
+  it("rejette une entrée malformée", () => {
+    const secret = generateTotpSecret();
+    expect(verifyTotpWithStep("12345", secret)).toBeNull();
+    expect(verifyTotpWithStep("", secret)).toBeNull();
+  });
+
+  it("rejette quand le secret est vide", () => {
+    expect(verifyTotpWithStep("123456", "")).toBeNull();
   });
 });
