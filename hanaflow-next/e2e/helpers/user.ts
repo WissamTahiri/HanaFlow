@@ -19,7 +19,10 @@ export function makeUser(role: string = "test"): E2EUser {
   const id = randomUUID().slice(0, 8);
   return {
     email: `e2e-${role}-${id}@hanaflow.test`,
-    password: "Test1234!",
+    // Mot de passe unique par run : un mot de passe fixe comme "Test1234!"
+    // finit dans les bases de fuites (HaveIBeenPwned) et se fait rejeter par
+    // le check anti-fuite au register/reset-password.
+    password: `Test-${id}-1234!`,
     name: `E2E ${role} ${id}`,
   };
 }

@@ -18,15 +18,19 @@ test.describe("2FA enroll → login → backup code", () => {
   });
 
   test("enroll 2FA et login avec code TOTP", async ({ page, request }) => {
+    // Le test attend volontairement 31s (nouvelle fenêtre TOTP, cf. plus bas) :
+    // dépasse le timeout par défaut de 30s, donc on l'étend explicitement.
+    test.setTimeout(60_000);
     // Login pour obtenir le token
     const loginRes = await request.post("/api/auth/login", {
       data: { email: u.email, password: u.password },
     });
     const { token } = await loginRes.json();
 
-    // Démarrer l'enroll
+    // Démarrer l'enroll (exige currentPassword — anti-vol de token)
     const enrollRes = await request.post("/api/auth/2fa/enroll", {
       headers: { Authorization: `Bearer ${token}` },
+      data: { currentPassword: u.password },
     });
     const { secret } = await enrollRes.json();
     expect(secret).toBeTruthy();
@@ -43,8 +47,8 @@ test.describe("2FA enroll → login → backup code", () => {
 
     // Nouveau login : doit demander 2FA
     await page.goto("/login");
-    await page.getByLabel(/email/i).fill(u.email);
-    await page.getByLabel(/mot de passe/i).fill(u.password);
+    await page.getByLabel("Adresse email").fill(u.email);
+    await page.getByLabel("Mot de passe", { exact: true }).fill(u.password);
     await page.getByRole("button", { name: /se connecter/i }).click();
 
     // Récupère le secret depuis la DB (chiffré) pour générer un code frais
@@ -63,6 +67,14 @@ test.describe("2FA enroll → login → backup code", () => {
   });
 
   test("rejette un code TOTP déjà consommé (anti-replay)", async ({ request }) => {
+    // Le test précédent vient de se logger avec un code — on attend la fenêtre
+    // de 30s suivante pour être sûr de générer un step strictement supérieur
+    // à totpLastStep (sinon le check anti-replay rejette ce code à tort, lui
+    // qui n'a jamais été soumis, simplement parce que son step n'a pas encore
+    // avancé par rapport au test précédent).
+    test.setTimeout(60_000);
+    await new Promise((resolve) => setTimeout(resolve, 31_000));
+
     // Récupère le secret + génère un code
     const userInDb = await prisma.user.findUnique({
       where: { email: u.email.toLowerCase() },

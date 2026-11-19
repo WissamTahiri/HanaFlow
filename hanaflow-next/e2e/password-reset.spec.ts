@@ -51,8 +51,8 @@ test.describe("password reset flow", () => {
 
     // 4) Login avec le nouveau mdp
     await page.goto("/login");
-    await page.getByLabel(/email/i).fill(u.email);
-    await page.getByLabel(/mot de passe/i).fill("NewPwd1234!");
+    await page.getByLabel("Adresse email").fill(u.email);
+    await page.getByLabel("Mot de passe", { exact: true }).fill("NewPwd1234!");
     await page.getByRole("button", { name: /se connecter/i }).click();
     await expect(page).toHaveURL(/\/dashboard/);
   });
@@ -74,6 +74,6 @@ test.describe("password reset flow", () => {
     });
     expect(res.status()).toBe(400);
     const body = await res.json();
-    expect(body.message).toMatch(/déjà utilisé/i);
+    expect(body.message).toMatch(/déjà.*utilisé/i);
   });
 });

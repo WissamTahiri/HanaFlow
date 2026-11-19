@@ -22,22 +22,22 @@ test.describe("paywall : accès examen Pro", () => {
 
   test("user free voit la paywall sur /certifications/fi/examen", async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel(/email/i).fill(free.email);
-    await page.getByLabel(/mot de passe/i).fill(free.password);
+    await page.getByLabel("Adresse email").fill(free.email);
+    await page.getByLabel("Mot de passe", { exact: true }).fill(free.password);
     await page.getByRole("button", { name: /se connecter/i }).click();
     await expect(page).toHaveURL(/\/dashboard/);
 
     await page.goto("/certifications/fi/examen");
     // Le composant ProPaywall doit s'afficher
-    await expect(page.getByText(/pro/i).first()).toBeVisible();
+    await expect(page.getByText(/accès pro/i).first()).toBeVisible();
     // Pas de questions d'examen rendues
     await expect(page.getByText(/q 1\//i)).not.toBeVisible();
   });
 
   test("user pro peut démarrer l'examen FI", async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel(/email/i).fill(pro.email);
-    await page.getByLabel(/mot de passe/i).fill(pro.password);
+    await page.getByLabel("Adresse email").fill(pro.email);
+    await page.getByLabel("Mot de passe", { exact: true }).fill(pro.password);
     await page.getByRole("button", { name: /se connecter/i }).click();
     await expect(page).toHaveURL(/\/dashboard/);
 
